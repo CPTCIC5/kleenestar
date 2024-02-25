@@ -54,3 +54,46 @@ class Profile(models.Model):
     def  __str__(self):
         return str(self.user)
     
+
+INDUSTRIES  = (
+    ("E-commerce","E-commerce"),
+    ("Sales", "Sales"),
+    ("Enterprise","Enterprise")
+ )   
+
+AUDIENCE = (
+    (1,"Beginner"),
+    (2,"Intermediate"),
+)
+
+class WorkSpace(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='workspace')
+    name = models.CharField(max_length=80)
+    industry = models.CharField(max_length=60,choices=INDUSTRIES)
+    budget = models.IntegerField()
+    audience_type = models.CharField(max_length=80,choices =AUDIENCE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    
+
+FEEDBACK_CATEGORIES = (
+    ("General","General"),
+    ("Technical","Technical"),
+    ("To improve", "To improve"),
+    ("Feeback","Feedback"),
+    ("Others","Others")
+)
+
+class Feedback(models.Model):
+    user = models.ForeignKey(Profile,on_delete=models.CASCADE)
+    urgency=models.IntegerField()
+    category=models.CharField(max_length=30,choices=FEEDBACK_CATEGORIES)
+    message = models.TextField()
+    attachment = models.ImageField()
+
+
+    def __str__(self):
+        return self.user.user.username
