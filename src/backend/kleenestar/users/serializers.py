@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile,Team,Feedback
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,7 +8,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         write_only = [ 'password']
         fields = ['username','password']
         
-    
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,11 +16,25 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        read_only = ['referral_code']
-        fields = ['user','phone_number','avatar','position'
-                  ,'country','referral_code','total_referrals']
+        model = Profile
+        #read_only = ['referral_code']
+        fields = ['user','avatar','role','country'
+                  ,'phone_number']
     
-"""
+    """
     def create(self, validated_data):
         return Profile.objects.create(user=self.context['request'].user, **validated_data)
-"""
+    """
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ['root_user','users','name',
+                  'url','budget','industry','created_at']
+        
+        
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['user','urgency','category',
+                  'message','emoji','attachment']
