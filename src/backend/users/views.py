@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
-from rest_framework import permissions, status, views
+from django.http import Http404
+from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 
 from . import models, serializers
 
@@ -45,3 +48,26 @@ class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+class UserViewSetPermissions(IsAuthenticated):
+    def has_object_permission(self, request, view, instance):
+        if request.user.is_authenticated and request.method not in SAFE_METHODS:
+            if instance.id != request.user.id and not request.user.is_staff:
+                return False
+
+        return super().has_object_permission(request, view, instance)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.UserSerializer
+    permission_classes = (UserViewSetPermissions,)
+    queryset = models.User.objects.all().select_related("profile")
+
+    def list(self, request, *args, **kwargs):
+        # dont list all users
+        raise Http404
+
+    @action(methods=("GET",), detail=False, url_path="me")
+    def get_current_user_data(self, request):
+        return Response(self.get_serializer(request.user).data)

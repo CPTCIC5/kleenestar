@@ -5,6 +5,8 @@ from django.core.validators import validate_image_file_extension
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from .managers import CustomUserManager
+
 # from random import randint
 
 
@@ -14,6 +16,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
 
 POSITIONS = (
@@ -28,14 +32,14 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(
         upload_to="avatars/",
-        default="default.jpeg",
+        default="default.jpeg", null=True, blank=True,
         validators=[validate_image_file_extension],
     )
-    role = models.CharField(max_length=50, choices=POSITIONS, blank=True)
+    role = models.CharField(max_length=50, choices=POSITIONS, blank=True, null=True)
     country = models.CharField(
-        choices=CountryField().choices, max_length=50, blank=True
+        choices=CountryField().choices, max_length=50, blank=True, null=True
     )
-    phone_number = models.CharField(max_length=10, blank=True, unique=True)
+    phone_number = models.CharField(max_length=10, blank=True, null=True, unique=True)
 
     # referral_code = models.CharField(max_length=6,unique=True,blank=True)
     # total_referrals = models.IntegerField(default=0)
