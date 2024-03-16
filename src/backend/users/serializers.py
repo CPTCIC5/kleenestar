@@ -1,40 +1,60 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Profile,Team,Feedback
+from .models import Profile, Team, Feedback
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        write_only = [ 'password']
-        fields = ['username','password']
-        
+        write_only = ["password"]
+        fields = ["email", "password"]
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id','first_name','last_name','is_active',]
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        #read_only = ['referral_code']
-        fields = ['user','avatar','role','country'
-                  ,'phone_number']
-    
-    """
-    def create(self, validated_data):
-        return Profile.objects.create(user=self.context['request'].user, **validated_data)
-    """
+        # read_only = ['referral_code']
+        fields = ["avatar", "role", "country", "phone_number"]
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "first_name",
+            "email",
+            "last_name",
+            "is_active",
+            "profile",
+        ]
+
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['root_user','users','name',
-                  'url','budget','industry','created_at']
-        
-        
+        fields = [
+            "root_user",
+            "users",
+            "name",
+            "url",
+            "budget",
+            "industry",
+            "created_at",
+        ]
+
+
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
-        fields = ['user','urgency','category',
-                  'message','emoji','attachment']
+        fields = ["id", "user", "urgency", "category", "message", "emoji", "attachment"]
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
