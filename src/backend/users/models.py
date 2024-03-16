@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 
 from .managers import CustomUserManager
 
-# from random import randint
+from random import randint
 
 
 class User(AbstractUser):
@@ -20,13 +20,14 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
 
+"""
 POSITIONS = (
     ("Developer", "Developer"),
     ("Manager", "Manager"),
     ("Designer", "Designer"),
     # Add more positions as needed
 )
-
+"""
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -35,19 +36,19 @@ class Profile(models.Model):
         default="default.jpeg", null=True, blank=True,
         validators=[validate_image_file_extension],
     )
-    role = models.CharField(max_length=50, choices=POSITIONS, blank=True, null=True)
+    #role = models.CharField(max_length=50, choices=POSITIONS, blank=True, null=True)
     country = models.CharField(
         choices=CountryField().choices, max_length=50, blank=True, null=True
     )
     phone_number = models.CharField(max_length=10, blank=True, null=True, unique=True)
 
-    # referral_code = models.CharField(max_length=6,unique=True,blank=True)
-    # total_referrals = models.IntegerField(default=0)
+    referral_code = models.CharField(max_length=6,unique=True,blank=True)
+    total_referrals = models.IntegerField(default=0)
 
-    """
+    
     def create_random(self):
         return ''.join([str(randint(0, 9)) for _ in range(6)])
-    """
+    
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -58,7 +59,7 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-    """
+    
     def save(self, *args, **kwargs):
         if not self.referral_code:
             referal_codee = self.create_random()
@@ -70,7 +71,7 @@ class Profile(models.Model):
                     self.referral_code = referal_codee
             self.referral_code = referal_codee
         super().save(*args, **kwargs)
-    """
+    
 
     def __str__(self):
         return str(self.user)
