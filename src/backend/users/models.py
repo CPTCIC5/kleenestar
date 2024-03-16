@@ -5,6 +5,7 @@ from django.core.validators import validate_image_file_extension
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from .managers import CustomUserManager
 # from random import randint
 
 
@@ -14,6 +15,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
 
 POSITIONS = (
