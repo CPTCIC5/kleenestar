@@ -1,11 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django_countries.fields import CountryField
 from django.core.validators import validate_image_file_extension
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # from random import randint
+
+
+class User(AbstractUser):
+    username = None
+    email = models.EmailField("email address", unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
 
 POSITIONS = (
