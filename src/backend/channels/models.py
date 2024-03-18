@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import validate_image_file_extension
-from users.models import WorkSpace
+from users.models import Profile,WorkSpace
 
 
 # Create your models here.
@@ -23,3 +23,22 @@ class Channel(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+COMMONS = (
+    ("Don't like the style","Don't like the style"),
+    ("Being lazy","Being lazy"),
+    ("Refused when it shouldn't have","Refused when it shouldn't have"),
+    ("Not factually correct","Not factually correct"),
+    ("Other","Other")
+
+)
+
+class PromptFeedback(models.Model):
+    user= models.ForeignKey(Profile,on_delete=models.CASCADE)
+    channel =  models.ForeignKey(Channel,on_delete=models.CASCADE)
+    commons= models.CharField(max_length=50,choices=COMMONS)
+    note = models.TextField()
+
+    def __str__(self):
+        return str(self.user)
