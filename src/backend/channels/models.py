@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import validate_image_file_extension
-from users.models import Team
+from users.models import WorkSpace
 
 
 # Create your models here.
@@ -12,7 +12,7 @@ class Credential(models.Model):
 
 
 class Channel(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     logo = models.ImageField(
         upload_to="Channel-Logo", validators=[validate_image_file_extension]
     )
