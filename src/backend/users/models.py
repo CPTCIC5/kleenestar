@@ -97,7 +97,7 @@ class WorkSpace(models.Model):
     )
     users = models.ManyToManyField(Profile)
     business_name = models.CharField(max_length=80)
-    website_url = models.URLField()
+    website_url = models.URLField(unique=True)
     industry = models.CharField(max_length=60, choices=INDUSTRIES,blank=True,null=True)
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)

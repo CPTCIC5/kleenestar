@@ -12,15 +12,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class ProfileUpdateSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         read_only = ['referral_code']
-        fields = ["user","avatar", "country", "phone_number","referral_code","total_referrals"]
+        fields = ["id","user","avatar", "country", "phone_number","referral_code","total_referrals"]
 
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileUpdateSerializer()
+    profile = ProfileSerializer()
 
     class Meta:
         model = User

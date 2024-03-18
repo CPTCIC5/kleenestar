@@ -54,10 +54,17 @@ class LogoutView(views.APIView):
 class ProfileView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get(self, request):
+        
+        query = get_object_or_404(models.Profile,user=request.user)
+        serializer = serializers.ProfileSerializer(query,many=False)
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
     """
     def post(self,request):
 
-        serializer = serializers.ProfileUpdateSerializer(data=request.data)
+        serializer = serializers.ProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -68,7 +75,7 @@ class ProfileView(views.APIView):
         # Retrieve the user instance that needs to be updated.
         profile = get_object_or_404(models.Profile,user=request.user)
         # Create or update the user data.
-        serializer = serializers.ProfileUpdateSerializer(instance=profile,data=request.data)
+        serializer = serializers.ProfileSerializer(instance=profile,data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -76,13 +83,16 @@ class ProfileView(views.APIView):
 
 
 
-class WorkSpaceSerializer(serializers.ModelSerializer):
+class WorkSpaceSerializer(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self,request):
-        pass
-        #workspace = models.WorkSpace.objects.get(owner=request.user)
-    
+
+        workspaces = models.WorkSpace.objects.filter(Q(root_user=request.user) | Q(users=request.user))
+        serializer = serializers.WorkSpaceSerializer(workspaces,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
     def post(self,request):
 
         serializer =serializers.WorkSpaceSerializer(data=request.data)
