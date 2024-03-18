@@ -91,20 +91,19 @@ AUDIENCE = (
 """
 
 
-class Team(models.Model):
+class WorkSpace(models.Model):
     root_user = models.OneToOneField(
-        Profile, on_delete=models.CASCADE, related_name="users.Team.root_user+"
+        Profile, on_delete=models.CASCADE, related_name="users.WorkSpace.root_user+"
     )
     users = models.ManyToManyField(Profile)
-    name = models.CharField(max_length=80)
-    url = models.URLField()
-    budget = models.FloatField()
-    industry = models.CharField(max_length=60, choices=INDUSTRIES)
+    business_name = models.CharField(max_length=80)
+    website_url = models.URLField()
+    industry = models.CharField(max_length=60, choices=INDUSTRIES,blank=True,null=True)
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.business_name
 
 
 FEEDBACK_CATEGORIES = (
@@ -115,38 +114,37 @@ FEEDBACK_CATEGORIES = (
     ("Others", "Others"),
 )
 URGENCYY = (
-    ("1", "1"),
-    ("2", "2"),
-    ("3", "3"),
-    ("4", "4"),
-    ("5", "5"),
-    ("6", "6"),
-    ("7", "7"),
-    ("8", "8"),
-    ("9", "9"),
-    ("10", "10"),
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9),
+    (10, 10)
 )
 
-EMOJI = (
-    ("1", "1"),
-    ("2", "2"),
-    ("3", "3"),
-    ("4", "4"),
-    ("5", "5"),
-    ("6", "6"),
-    ("7", "7"),
-    ("8", "8"),
-    ("9", "9"),
+URGENCYY = (
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9)
 )
 
 
 class Feedback(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    urgency = models.CharField(max_length=3, choices=URGENCYY)
+    urgency = models.IntegerField(choices=URGENCYY)
     category = models.CharField(max_length=30, choices=FEEDBACK_CATEGORIES)
     message = models.TextField()
-    emoji = models.CharField(max_length=100, blank=True)
-    attachment = models.ImageField(upload_to="Feedback-Attachments", blank=True)
+    emoji = models.IntegerField(blank=True,null = True)
 
     def __str__(self):
         return self.user.user.username

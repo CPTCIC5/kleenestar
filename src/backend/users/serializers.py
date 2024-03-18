@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Profile, Team, Feedback
+from .models import User, Profile, WorkSpace, Feedback
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -12,15 +12,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        # read_only = ['referral_code']
-        fields = ["avatar", "role", "country", "phone_number"]
+        read_only = ['referral_code']
+        fields = ["user","avatar", "country", "phone_number","referral_code","total_referrals"]
 
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
+    profile = ProfileUpdateSerializer()
 
     class Meta:
         model = User
@@ -34,15 +34,15 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class TeamSerializer(serializers.ModelSerializer):
+class WorkSpaceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Team
+        model = WorkSpace
         fields = [
+            "id",
             "root_user",
             "users",
-            "name",
-            "url",
-            "budget",
+            "business_name",
+            "website_url",
             "industry",
             "created_at",
         ]

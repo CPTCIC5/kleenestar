@@ -4,6 +4,8 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from . import models, serializers
 
@@ -48,6 +50,58 @@ class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
+    
+class ProfileView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    """
+    def post(self,request):
+
+        serializer = serializers.ProfileUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    """
+    
+    def patch(self,request):
+
+        # Retrieve the user instance that needs to be updated.
+        profile = get_object_or_404(models.Profile,user=request.user)
+        # Create or update the user data.
+        serializer = serializers.ProfileUpdateSerializer(instance=profile,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data,status =status.HTTP_200_OK)
+
+
+
+class WorkSpaceSerializer(serializers.ModelSerializer):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self,request):
+        pass
+        #workspace = models.WorkSpace.objects.get(owner=request.user)
+    
+    def post(self,request):
+
+        serializer =serializers.WorkSpaceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        #serializer.validated_data.get('')
+        serializer.save()
+
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+        
+    def patch(self,request):
+
+        workspace = get_object_or_404(models.WorkSpace,root_user=request.user)
+        serializer = serializers.WorkSpaceSerializer(instance=workspace,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
 
 
 class UserViewSetPermissions(IsAuthenticated):
