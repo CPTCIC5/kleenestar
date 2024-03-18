@@ -80,6 +80,12 @@ class ProfileView(views.APIView):
         serializer.save()
 
         return Response(serializer.data,status =status.HTTP_200_OK)
+    
+    def delete(self,request):
+
+        profile = get_object_or_404(models.Profile,user=request.user)
+        profile.user.delete()
+
 
 
 

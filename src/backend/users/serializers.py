@@ -3,10 +3,12 @@ from .models import User, Profile, WorkSpace, Feedback
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    confirm_password =  serializers.CharField(write_only=True)
     class Meta:
         model = User
-        write_only = ["password"]
-        fields = ["email", "password"]
+        write_only = ["password","confirm_password"]
+        fields = ["email", "password","confirm_password"]
+
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
