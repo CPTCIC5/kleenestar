@@ -1,6 +1,5 @@
 from django.db import models
-from django.core.validators import validate_image_file_extension
-from users.models import Profile, WorkSpace
+from users.models import WorkSpace
 from django.conf import settings
 
 
@@ -23,7 +22,7 @@ class Channel(models.Model):
     credential = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return "xyz"
 
 
 class PromptFeedback(models.Model):
