@@ -50,16 +50,16 @@ class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
-    
+
+
 class ProfileView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
-        
-        query = get_object_or_404(models.Profile,user=request.user)
-        serializer = serializers.ProfileSerializer(query,many=False)
+        query = get_object_or_404(models.Profile, user=request.user)
+        serializer = serializers.ProfileSerializer(query, many=False)
 
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     """
     def post(self,request):
@@ -69,55 +69,49 @@ class ProfileView(views.APIView):
         serializer.save(user=request.user)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     """
-    
-    def patch(self,request):
 
+    def patch(self, request):
         # Retrieve the user instance that needs to be updated.
-        profile = get_object_or_404(models.Profile,user=request.user)
+        profile = get_object_or_404(models.Profile, user=request.user)
         # Create or update the user data.
-        serializer = serializers.ProfileSerializer(instance=profile,data=request.data)
+        serializer = serializers.ProfileSerializer(instance=profile, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data,status =status.HTTP_200_OK)
-    
-    def delete(self,request):
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        profile = get_object_or_404(models.Profile,user=request.user)
+    def delete(self, request):
+        profile = get_object_or_404(models.Profile, user=request.user)
         profile.user.delete()
-
-
 
 
 class WorkSpaceSerializer(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self,request):
+    def get(self, request):
+        workspaces = models.WorkSpace.objects.filter(
+            Q(root_user=request.user) | Q(users=request.user)
+        )
+        serializer = serializers.WorkSpaceSerializer(workspaces, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        workspaces = models.WorkSpace.objects.filter(Q(root_user=request.user) | Q(users=request.user))
-        serializer = serializers.WorkSpaceSerializer(workspaces,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-
-
-    def post(self,request):
-
-        serializer =serializers.WorkSpaceSerializer(data=request.data)
+    def post(self, request):
+        serializer = serializers.WorkSpaceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        #serializer.validated_data.get('')
+        # serializer.validated_data.get('')
         serializer.save()
 
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-        
-    def patch(self,request):
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        workspace = get_object_or_404(models.WorkSpace,root_user=request.user)
-        serializer = serializers.WorkSpaceSerializer(instance=workspace,data=request.data)
+    def patch(self, request):
+        workspace = get_object_or_404(models.WorkSpace, root_user=request.user)
+        serializer = serializers.WorkSpaceSerializer(
+            instance=workspace, data=request.data
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data,status=status.HTTP_200_OK)
-
-
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserViewSetPermissions(IsAuthenticated):
