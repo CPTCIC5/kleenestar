@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
     "channels.apps.ChannelsConfig",
+    "workspaces.apps.WorkspacesConfig",
     "rest_framework",
 ]
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Profile, WorkSpace, Feedback
+from .models import User, Profile, Feedback
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -35,19 +35,6 @@ class UserSerializer(serializers.ModelSerializer):
             "profile",
         ]
 
-
-class WorkSpaceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkSpace
-        fields = [
-            "id",
-            "root_user",
-            "users",
-            "business_name",
-            "website_url",
-            "industry",
-            "created_at",
-        ]
 
 
 class FeedbackSerializer(serializers.ModelSerializer):

@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import WorkSpace
+from workspaces.models import WorkSpace
 from django.conf import settings
 
 

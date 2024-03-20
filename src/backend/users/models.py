@@ -1,12 +1,7 @@
-from collections.abc import Iterable
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django_countries.fields import CountryField
-from django.utils.crypto import get_random_string
 from django.core.validators import validate_image_file_extension
-from django.dispatch import receiver
-from django.utils import timezone
-from django.db.models.signals import post_save
 
 from .managers import CustomUserManager
 
@@ -14,8 +9,18 @@ from random import randint
 
 
 class User(AbstractUser):
+    SUBSCRIPTION_CHOICES = (
+        (1, "Indie"),
+        (2, "Pro"),
+        (3, "Scale"),
+    )
     username = None
     email = models.EmailField("email address", unique=True)
+
+    subscription_type = models.IntegerField(
+        choices=SUBSCRIPTION_CHOICES, null=True, blank=True
+    )
+    is_team_member = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -78,48 +83,12 @@ class Profile(models.Model):
         return str(self.user)
 
 
-INDUSTRIES = (
-    ("E-commerce", "E-commerce"),
-    ("Sales", "Sales"),
-    ("Enterprise", "Enterprise"),
-)
-
 """
 AUDIENCE = (
     (1,"Beginner"),
     (2,"Intermediate"),
 )
 """
-
-
-class WorkSpace(models.Model):
-    root_user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="work_space_root_user"
-    )
-    users = models.ManyToManyField(User)
-    business_name = models.CharField(max_length=80)
-    website_url = models.URLField(unique=True)
-    industry = models.CharField(
-        max_length=60, choices=INDUSTRIES, blank=True, null=True
-    )
-    # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.business_name
-
-
-def create_workspace_invite():
-    return get_random_string(10)
-
-
-class WorkSpaceInvite(models.Model):
-    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    invite_code = models.CharField(max_length=20, default=create_workspace_invite)
-    email = models.EmailField(null=True, blank=True)
-    accepted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-
 
 FEEDBACK_CATEGORIES = (
     ("General", "General"),
