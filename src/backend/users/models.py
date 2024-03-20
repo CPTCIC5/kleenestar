@@ -1,8 +1,11 @@
+from collections.abc import Iterable
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django_countries.fields import CountryField
+from django.utils.crypto import get_random_string
 from django.core.validators import validate_image_file_extension
 from django.dispatch import receiver
+from django.utils import timezone
 from django.db.models.signals import post_save
 
 from .managers import CustomUserManager
@@ -18,6 +21,14 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+        is_created = self._state.adding
+
+        super().save(*args, **kwargs)
+
+        if is_created:
+            Profile.objects.create(user=self)
 
 
 """
@@ -50,15 +61,6 @@ class Profile(models.Model):
 
     def create_random(self):
         return "".join([str(randint(0, 9)) for _ in range(6)])
-
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
-
-    @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, **kwargs):
-        instance.profile.save()
 
     def save(self, *args, **kwargs):
         if not self.referral_code:
@@ -105,6 +107,18 @@ class WorkSpace(models.Model):
 
     def __str__(self):
         return self.business_name
+
+
+def create_workspace_invite():
+    return get_random_string(10)
+
+
+class WorkSpaceInvite(models.Model):
+    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
+    invite_code = models.CharField(max_length=20, default=create_workspace_invite)
+    email = models.EmailField(null=True, blank=True)
+    accepted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 FEEDBACK_CATEGORIES = (
