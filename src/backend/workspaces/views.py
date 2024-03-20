@@ -39,3 +39,5 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer(new_instance).data)
 
     @action(methods=("POST",), detail=True, url_path="create-invite")
+    def create_workspace_invite(self, request, pk):
+        raise NotImplementedError
