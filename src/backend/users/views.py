@@ -85,35 +85,6 @@ class ProfileView(views.APIView):
         profile.user.delete()
 
 
-class WorkSpaceSerializer(views.APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request):
-        workspaces = models.WorkSpace.objects.filter(
-            Q(root_user=request.user) | Q(users=request.user)
-        )
-        serializer = serializers.WorkSpaceSerializer(workspaces, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        serializer = serializers.WorkSpaceSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # serializer.validated_data.get('')
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def patch(self, request):
-        workspace = get_object_or_404(models.WorkSpace, root_user=request.user)
-        serializer = serializers.WorkSpaceSerializer(
-            instance=workspace, data=request.data
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class UserViewSetPermissions(IsAuthenticated):
     def has_object_permission(self, request, view, instance):
         if request.user.is_authenticated and request.method not in SAFE_METHODS:

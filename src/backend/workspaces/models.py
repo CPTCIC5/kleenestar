@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.utils import timezone
@@ -17,7 +17,7 @@ class WorkSpace(models.Model):
         on_delete=models.CASCADE,
         related_name="work_space_root_user",
     )
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     business_name = models.CharField(max_length=80)
     website_url = models.URLField(unique=True)
     industry = models.CharField(
@@ -28,6 +28,19 @@ class WorkSpace(models.Model):
 
     def __str__(self):
         return self.business_name
+
+    def save(self, *args, **kwargs) -> None:
+        is_being_created = self._state.adding
+        super().save(*args, **kwargs)
+
+        if is_being_created:
+
+            def add_member():
+                # Add the root_user of the workspace as a member
+                self.users.add(self.root_user)
+
+            # https://stackoverflow.com/a/78053539/13953998
+            transaction.on_commit(add_member)
 
 
 def create_workspace_invite():
