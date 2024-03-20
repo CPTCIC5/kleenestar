@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from . import permissions
@@ -36,3 +37,7 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(self.get_serializer(new_instance).data)
+
+    @action(methods=("POST",), detail=True, url_path="create-invite")
+    def create_workspace_invite(self, request, pk):
+        raise NotImplementedError

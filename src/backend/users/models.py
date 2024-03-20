@@ -13,6 +13,7 @@ class User(AbstractUser):
         (1, "Indie"),
         (2, "Pro"),
         (3, "Scale"),
+        (4, "Team member"),
     )
     username = None
     email = models.EmailField("email address", unique=True)
@@ -20,7 +21,6 @@ class User(AbstractUser):
     subscription_type = models.IntegerField(
         choices=SUBSCRIPTION_CHOICES, null=True, blank=True
     )
-    is_team_member = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
