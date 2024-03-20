@@ -3,6 +3,9 @@ from rest_framework.permissions import SAFE_METHODS
 
 class WorkSpaceViewSetPermissions:
     def has_permission(self, request, view):
+        if request.user.is_anonymous:
+            return False
+
         if request.method == "POST":
             return request.user.is_staff or request.user.subscription_type is not None
 

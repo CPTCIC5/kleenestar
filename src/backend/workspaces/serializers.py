@@ -7,7 +7,7 @@ from .models import WorkSpace
 class WorkSpaceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkSpace
-        fields = ("root_user", "business_name", "website_url", "industry")
+        fields = ("business_name", "website_url", "industry")
 
 
 class WorkSpaceSerializer(WorkSpaceCreateSerializer):
