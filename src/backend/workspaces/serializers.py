@@ -1,13 +1,21 @@
-
 from rest_framework import serializers
 
+from users.serializers import UserSerializer
 from .models import WorkSpace
 
 
-class WorkSpaceSerializer(serializers.ModelSerializer):
+class WorkSpaceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkSpace
-        fields = [
+        fields = ("root_user", "business_name", "website_url", "industry")
+
+
+class WorkSpaceSerializer(WorkSpaceCreateSerializer):
+    root_user = UserSerializer()
+    users = UserSerializer(many=True)
+
+    class Meta(WorkSpaceCreateSerializer.Meta):
+        fields = (
             "id",
             "root_user",
             "users",
@@ -15,4 +23,4 @@ class WorkSpaceSerializer(serializers.ModelSerializer):
             "website_url",
             "industry",
             "created_at",
-        ]
+        )
