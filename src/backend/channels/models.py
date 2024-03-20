@@ -16,8 +16,10 @@ class Channel(models.Model):
         (2, "Meta"),
         (3, "X (Twitter)"),
         (4, "Linkedin"),
+        (5, "TikTok")
     )
-    type = models.IntegerField(choices=CHANNEL_TYPES)
+    channel_type = models.IntegerField(choices=CHANNEL_TYPES)
+    
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     credential = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
 
@@ -32,3 +34,4 @@ class PromptFeedback(models.Model):
 
     def __str__(self):
         return str(self.user)
+    
