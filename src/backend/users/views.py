@@ -4,6 +4,7 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from workspaces.models import WorkSpaceInvite
 from . import models, serializers
 from .permissions import UserViewSetPermissions
 
@@ -39,7 +40,22 @@ class SignupView(views.APIView):
     def post(self, request):
         serializer = serializers.UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = serializer.save()
+
+        if serializer.validated_data["invite_code"]:
+            try:
+                invite = WorkSpaceInvite.objects.get(
+                    invite_code=serializer.validated_data["invite_code"]
+                )
+
+                user.is_team_member = True
+                user.save()
+
+                invite.workspace.users.add(user)
+            except WorkSpaceInvite.DoesNotExist:
+                pass
+
         login(request, user)
         return Response(status=status.HTTP_201_CREATED)
 

@@ -3,13 +3,17 @@ from .models import User, Profile, Feedback
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    invite_code = serializers.CharField(required=False)
+
     class Meta:
         model = User
         write_only = ["password"]
-        fields = ["email", "password"]
+        fields = ["email", "password", "invite_code"]
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        return User.objects.create_user(
+            email=validated_data["email"], password=validated_data["password"]
+        )
 
 
 class ProfileSerializer(serializers.ModelSerializer):

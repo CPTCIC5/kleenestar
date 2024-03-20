@@ -24,3 +24,6 @@ class WorkSpaceSerializer(WorkSpaceCreateSerializer):
             "industry",
             "created_at",
         )
+
+
+# class WorkSpaceInviteC
