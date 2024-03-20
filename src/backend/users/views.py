@@ -3,11 +3,9 @@ from django.http import Http404
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 
 from . import models, serializers
+from .permissions import UserViewSetPermissions
 
 
 class LoginView(views.APIView):
@@ -50,48 +48,6 @@ class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
-
-
-class ProfileView(views.APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request):
-        query = get_object_or_404(models.Profile, user=request.user)
-        serializer = serializers.ProfileSerializer(query, many=False)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    """
-    def post(self,request):
-
-        serializer = serializers.ProfileSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    """
-
-    def patch(self, request):
-        # Retrieve the user instance that needs to be updated.
-        profile = get_object_or_404(models.Profile, user=request.user)
-        # Create or update the user data.
-        serializer = serializers.ProfileSerializer(instance=profile, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, request):
-        profile = get_object_or_404(models.Profile, user=request.user)
-        profile.user.delete()
-
-
-class UserViewSetPermissions(IsAuthenticated):
-    def has_object_permission(self, request, view, instance):
-        if request.user.is_authenticated and request.method not in SAFE_METHODS:
-            if instance.id != request.user.id and not request.user.is_staff:
-                return False
-
-        return super().has_object_permission(request, view, instance)
 
 
 class UserViewSet(viewsets.ModelViewSet):
