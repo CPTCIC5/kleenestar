@@ -8,12 +8,13 @@ class APICredentialsSerializer(serializers.ModelSerializer):
 
 
 class ChannelSerializer(serializers.ModelSerializer):
+    credentials = APICredentialsSerializer()
     class Meta:
         model = models.Channel
-        fields  = ['type','workspace','credentials']
+        fields  = ['activated','channel_type','connected','workspace','credential']
 
 
 class PromptFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PromptFeedback
-        fields = ['user','channel','note']
+        fields = ['user','note']
