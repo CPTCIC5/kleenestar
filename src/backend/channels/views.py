@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import views, permissions, status
+from rest_framework import views,viewsets, permissions, status
 from rest_framework.response import Response
 from . import models, serializers
 
@@ -12,26 +12,26 @@ class PromptFeedbackView(views.APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class ChannelView(views.APIView):
-    
-    def get(self,request,pk,format=None):
-        serializer = serializers.ChannelSerializer(many=False,pk=pk)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+class ChannelViewSet(viewsets.ModelViewSet):
+    queryset = models.Channel.objects.all()
+    serializer_class = serializers.ChannelSerializer
 
-    def post(self, request):
-        serializer = serializers.ChannelSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(workspace=request.user.workspace)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def update(self, request, pk):
-        channel = get_object_or_404(models.Channel, pk=pk)
-        serializer = serializers.ChannelSerializer(instance=channel, data=request.data)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save(workspace=request.user.workspace)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, pk):
-        channel = get_object_or_404(models.Channel, pk=pk)
-        channel.delete()
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)

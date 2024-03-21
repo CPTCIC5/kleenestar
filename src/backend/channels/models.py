@@ -28,9 +28,6 @@ class Channel(models.Model):
     credential = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
 
     
-    def save(self,*args,**kwargs):
-        pass
-        #if Channel.objects.filter()
 
 
     class Meta:
