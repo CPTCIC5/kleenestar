@@ -35,3 +35,11 @@ class ChannelViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class PromptInputView(views.APIView):
+    def post(self,request):
+        serializer = serializers.PromptInputSerializer(
+            data= request.DATA
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
