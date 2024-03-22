@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from users.models import User
 from . import models
 import json
 
@@ -21,8 +22,9 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
         fields = ['user','note']
 
 class PromptInputSerializer(serializers.Serializer):
+    author = serializers.PrimaryKeyRelatedField(User)
     user_query=serializers.CharField(max_length=50,required=True)
-    refactored_query = serializers.CharField(allow_blank=True)
+    refactored_query = serializers.CharField(allow_blank=True) #gpt 3.5 turbo 
     response_text=serializers.CharField(allow_blank=True)
     image=serializers.ImageField(allow_null=True, required=False)
     created = serializers.DateTimeField()
