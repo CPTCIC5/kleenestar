@@ -33,11 +33,35 @@ const FrameComponent19: FunctionComponent = () => {
           src="/path-28.svg"
         />
       </div>
-      <div className="flex flex-row items-start justify-start py-0 pr-[23px] pl-[22.59999999999991px] text-mini text-white">
-        <div className="relative font-medium inline-block min-w-[69.1px] z-[2]">
-          Connect
-        </div>
-      </div>
+      <button
+  className="cursor-pointer relative"
+  style={{
+    backgroundColor: "#1C274C",
+    color: "white",
+    borderRadius: "50px",
+    width: "50%", // Set width to 100% for responsiveness
+    height: "40px",
+    flexShrink: 0,
+    // marginBottom:'1000px',
+    border: "none", // If you want to remove the border
+    padding: 0, // If you want to remove padding
+    alignSelf: "stretch", // If you want the button to stretch vertically
+    position: "relative", // If you want to position child elements relatively
+    maxWidth: "454px", // Set maximum width for larger screens
+  }}
+>
+  <span style={{ marginRight: '10px' ,color: '#FFF',
+fontFamily: 'Montserrat',
+fontSize: '15px',
+fontStyle: 'normal',
+fontWeight: '500',
+lineHeight: 'normal',}}>Connect</span>
+  <img
+    className="absolute top-[50%] transform -translate-y-1/2 right-2 w-[21.7px] h-[18.5px] z-[2]"
+    alt=""
+    src="/group-2051.svg"
+  />
+</button>
       <div className="w-full h-full absolute !m-[0] top-[0px] right-[-0.5px] bottom-[0px] left-[0px]">
         <img
           className="absolute top-[223.4px] left-[330.6px] w-[51px] h-[27.6px] z-[1]"
@@ -45,7 +69,7 @@ const FrameComponent19: FunctionComponent = () => {
           alt=""
           src="/component-6--58.svg"
         />
-        <img
+        {/* <img
           className="absolute top-[216px] left-[22.4px] w-[145px] h-[42.5px] z-[1]"
           alt=""
           src="/rectangle-512-4.svg"
@@ -55,7 +79,7 @@ const FrameComponent19: FunctionComponent = () => {
           loading="lazy"
           alt=""
           src="/group-2051.svg"
-        />
+        /> */}
         <img
           className="absolute top-[21.5px] left-[23.5px] w-[40.4px] h-[40.4px] object-cover z-[1]"
           loading="lazy"
@@ -63,10 +87,10 @@ const FrameComponent19: FunctionComponent = () => {
           src="/pngegg-1@2x.png"
         />
         <img
-          className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full z-[3]"
-          alt=""
-          src="/rectangle-700.svg"
-        />
+            className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full z-[3]"
+            alt=""
+            src="/rectangle-700.svg"
+          />
       </div>
     </div>
   );

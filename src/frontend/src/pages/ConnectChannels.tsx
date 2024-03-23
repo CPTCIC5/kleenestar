@@ -21,7 +21,7 @@ const ConnectChannels: FunctionComponent = () => {
             alt=""
             src="/rectangle-516-5.svg"
           />
-          <FrameComponent21 />
+          <FrameComponent21 />   
         </div>
         <FrameComponent20
           rectangle516="/rectangle-516.svg"

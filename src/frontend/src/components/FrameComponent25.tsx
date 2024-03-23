@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo, type CSSProperties } from "react";
+import { useState } from 'react';
 
 export type FrameComponent25Type = {
   googleAdsIsGooglesOnlineA?: string;
@@ -28,6 +29,11 @@ const FrameComponent25: FunctionComponent<FrameComponent25Type> = ({
       width: propWidth1,
     };
   }, [propWidth1]);
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleToggle = () => {
+    setIsChecked(prev => !prev);
+  };
 
   return (
     <div className="self-stretch flex flex-col items-start justify-start gap-[16.5px] max-w-full text-left text-mini text-darkslateblue-100 font-montserrat">
@@ -54,16 +60,20 @@ const FrameComponent25: FunctionComponent<FrameComponent25Type> = ({
         alt=""
         src="/path-28.svg"
       />
-      <button className="cursor-pointer [border:none] p-0 bg-[transparent] w-[136px] h-[42.5px] relative">
-        <img
-          className="absolute top-[0px] left-[0px] w-[136px] h-[42.5px] z-[1]"
-          alt=""
-          src="/rectangle-512.svg"
-        />
+      <label className="cursor-pointer">
+      <input
+        type="checkbox"
+        checked={isChecked}
+        onChange={handleToggle}
+        className="hidden"
+      />
+      <div className="relative">
+        <div className={`w-[136px] h-[42.5px] bg-transparent absolute top-0 left-0 z-[1] ${isChecked ? 'bg-gray-300' : ''}`}></div>
         <div className="absolute top-[10.6px] left-[22.3px] text-mini font-montserrat text-darkslateblue-100 text-left inline-block w-[91.4px] h-[19.1px] min-w-[91.4px] z-[2]">
           Disconnect
         </div>
-      </button>
+      </div>
+    </label>
     </div>
   );
 };

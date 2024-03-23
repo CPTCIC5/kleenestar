@@ -131,11 +131,35 @@ const FrameComponent20: FunctionComponent<FrameComponent20Type> = ({
             src={path28}
           />
         </div>
-        <div className="flex flex-row items-start justify-start py-0 pr-[22px] pl-[22.300000000000185px] text-white">
-          <div className="relative font-medium inline-block min-w-[69.1px] z-[2]">
-            Connect
-          </div>
-        </div>
+        <button
+  className="cursor-pointer relative"
+  style={{
+    backgroundColor: "#1C274C",
+    color: "white",
+    borderRadius: "50px",
+    width: "50%", // Set width to 100% for responsiveness
+    height: "40px",
+    flexShrink: 0,
+    // marginBottom:'1000px',
+    border: "none", // If you want to remove the border
+    padding: 0, // If you want to remove padding
+    alignSelf: "stretch", // If you want the button to stretch vertically
+    position: "relative", // If you want to position child elements relatively
+    maxWidth: "454px", // Set maximum width for larger screens
+  }}
+>
+  <span style={{ marginRight: '10px' ,color: '#FFF',
+fontFamily: 'Montserrat',
+fontSize: '15px',
+fontStyle: 'normal',
+fontWeight: '500',
+lineHeight: 'normal',}}>Connect</span>
+  <img
+    className="absolute top-[50%] transform -translate-y-1/2 right-2 w-[21.7px] h-[18.5px] z-[2]"
+    alt=""
+    src="/group-2051.svg"
+  />
+</button>
         <div className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
           <img
             className="absolute top-[223.9px] left-[331.6px] w-[51px] h-[27.6px] z-[1]"
@@ -143,7 +167,7 @@ const FrameComponent20: FunctionComponent<FrameComponent20Type> = ({
             alt=""
             src={component660}
           />
-          <img
+          {/* <img
             className="absolute top-[216.5px] left-[23.4px] w-[145px] h-[42.5px] z-[1]"
             alt=""
             src="/rectangle-512-4.svg"
@@ -153,7 +177,7 @@ const FrameComponent20: FunctionComponent<FrameComponent20Type> = ({
             loading="lazy"
             alt=""
             src="/group-2051.svg"
-          />
+          /> */}
           <img
             className="absolute top-[24.5px] left-[25.5px] w-[40.4px] h-[40.4px] object-cover z-[1]"
             loading="lazy"

@@ -41,18 +41,21 @@ const FrameComponent16: FunctionComponent = () => {
           <div className="flex-1 flex flex-col items-start justify-start gap-[11.350000000000025px] min-w-[181px]">
             <div className="relative font-medium z-[1]">Confirm password</div>
             <div className="self-stretch flex flex-row items-start justify-start pt-3.5 px-[19.399999999999636px] pb-[14.700000000000044px] relative text-mini text-darkslateblue-200">
-              <div className="relative z-[2]">Cornfirm password</div>
+              {/* <div className="relative z-[2]">Cornfirm password</div> */}
               <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
+              <input
+                className="w-[118px] [border:none] [outline:none] font-montserrat text-mini bg-[transparent] h-[19.1px] relative text-darkslateblue-200 text-left inline-block p-0 z-[2]"
+                placeholder="Confirm password"
+                type="text"
+              />
+              <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
+                
                 <img
-                  className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full z-[1]"
+                  className="absolute top-[13.7px] left-[242.8px] w-[17.1px] h-[21.3px] z-[2]"
                   alt=""
-                  src="/rectangle-522.svg"
+                  src="/pen2svgrepocom.svg"
                 />
-                <img
-                  className="absolute top-[13.7px] left-[242.7px] w-[17.1px] h-[21.3px] z-[2]"
-                  alt=""
-                  src="/pen2svgrepocom-5.svg"
-                />
+              </div>
               </div>
             </div>
             <div className="w-[224.3px] relative text-smi text-royalblue inline-block z-[1]">
@@ -60,22 +63,31 @@ const FrameComponent16: FunctionComponent = () => {
             </div>
           </div>
         </div>
-        <button className="cursor-pointer [border:none] p-0 bg-[transparent] self-stretch h-[42.5px] relative">
-          <img
-            className="absolute top-[0px] left-[0px] w-[573.6px] h-[42.5px] z-[1]"
-            alt=""
-            src="/rectangle-512.svg"
-          />
-          <b className="absolute top-[10.6px] left-[213.1px] text-mini inline-block font-inter text-whitesmoke text-left w-[141.4px] h-[19.1px] z-[2]">
-            Change password
-          </b>
-        </button>
+        <button
+            className="cursor-pointer"
+            style={{
+              backgroundColor: "#1C274C",
+              color: "white",
+              borderRadius: "10px",
+              width: "100%", // Set width to 100% for responsiveness
+              height: "40px",
+              flexShrink: 0,
+              border: "none", // If you want to remove the border
+              padding: 0, // If you want to remove padding
+              alignSelf: "stretch", // If you want the button to stretch vertically
+              position: "relative", // If you want to position child elements absolutely
+              maxWidth: "454px", // Set maximum width for larger screens
+              margin: "0 auto", // Center the button horizontally
+            }}
+          >
+            Change Password
+          </button>
         <div className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
-          <img
+          {/* <img
             className="absolute h-full w-[calc(100%_-_1px)] top-[0px] right-[0.5px] bottom-[0px] left-[0.5px] max-w-full overflow-hidden max-h-full"
             alt=""
             src="/rectangle-645.svg"
-          />
+          /> */}
           <img
             className="absolute top-[102px] left-[0px] w-[629.3px] h-px z-[1]"
             alt=""

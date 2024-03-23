@@ -1,7 +1,20 @@
 import { FunctionComponent } from "react";
+import React, { ChangeEvent } from 'react';
+
 import Confirmation from "./Confirmation";
 
 const PasswordUpdate: FunctionComponent = () => {
+  const handleImageClick = () => {
+    // Trigger file input click event
+    const input = document.getElementById('imageInput') as HTMLInputElement;
+    input.click();
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    // Handle selected file
+    const selectedFile = event.target.files?.[0];
+    console.log('Selected file:', selectedFile);
+  };
   return (
     <div className="flex-[0.9123] flex flex-col items-start justify-start pt-[26.600000000000136px] px-[27.600000000000364px] pb-[29.79999999999984px] box-border relative gap-[180.4000000000001px] min-w-[409px] max-w-full text-left text-lg text-darkslateblue-100 font-montserrat lg:flex-1 mq750:gap-[90px_180.4px] mq750:pt-5 mq750:pb-5 mq750:box-border mq750:min-w-full mq450:gap-[45px_180.4px]">
       <div className="w-[208.1px] flex flex-col items-start justify-start gap-[11.599999999999907px]">
@@ -142,12 +155,20 @@ const PasswordUpdate: FunctionComponent = () => {
           alt=""
           src="/group-2119.svg"
         />
-        <img
-          className="absolute top-[167.6px] left-[154.6px] w-[21.3px] h-[21.3px] z-[1]"
-          loading="lazy"
-          alt=""
-          src="/gallerysendsvgrepocom.svg"
-        />
+        <input
+        id="imageInput"
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <img
+        className="absolute top-[167.6px] left-[154.6px] w-[21.3px] h-[21.3px] z-[1]"
+        loading="lazy"
+        alt=""
+        src="/gallerysendsvgrepocom.svg"
+        onClick={handleImageClick}
+      />
         <img
           className="absolute top-[102px] left-[0px] w-[629.3px] h-px z-[1]"
           alt=""

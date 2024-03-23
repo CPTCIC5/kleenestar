@@ -15,11 +15,11 @@ const FrameComponent23: FunctionComponent = () => {
         propWidth1="229.6px"
       />
       <div className="w-full h-full absolute !m-[0] top-[0px] right-[-0.5px] bottom-[0px] left-[0px]">
-        <img
+        {/* <img
           className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
           alt=""
           src="/rectangle-516.svg"
-        />
+        /> */}
         <img
           className="absolute top-[224.5px] left-[331.7px] w-[51px] h-[25.5px] z-[1]"
           loading="lazy"
