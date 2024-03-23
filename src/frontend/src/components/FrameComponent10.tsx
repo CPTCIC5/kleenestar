@@ -26,24 +26,68 @@ const FrameComponent10: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <FrameComponent8
+      {/* <FrameComponent8
         unauthorizedEmail="Email not recognized"
         propAlignSelf="unset"
         propPadding="unset"
         propWidth="454px"
         propMinWidth="unset"
-      />
+      /> */}
+      <div
+      className="self-stretch flex flex-col items-start justify-start pt-0 px-0 pb-[5.099999999999909px] gap-[10.799999999999956px] text-left text-sm text-darkslateblue-100 font-montserrat"
+      // style={frameDiv3Style}
+    >
+      <div className="relative font-medium inline-block min-w-[46px] z-[1]">
+        Email*
+      </div>
+      <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[13.799999999999727px] relative text-mini text-darkslateblue-200">
+        {/* <div className="relative z-[2]">@work-email.com</div> */}
+        <div className="h-full w-full   top-[0px] right-[0px] bottom-[0px] left-[0px]">
+        <input
+                    type="text"
+                    placeholder="@work-email.com"
+                    className="border border-gray-300 outline-none px-2 py-1"
+                    style={{
+                      width: "454px",
+                      height: "45px",
+                      flexShrink: 0,
+                      fill: "#F8F9F7",
+                      borderRadius: "4px",
+                      border: "none",
+                    }}
+                  />
+                  <img
+                    className="absolute top-[50%] transform -translate-y-1/2 right-2 w-4 h-auto z-[2]"
+                    alt=""
+                    src="/pen2svgrepocom1.svg"
+                  />
+        </div>
+      </div>
+      
+    </div>
       <div className="w-[454px] flex flex-col items-end justify-start gap-[30px] max-w-full text-center text-sm font-montserrat">
-        <button className="cursor-pointer [border:none] p-0 bg-[transparent] self-stretch h-10 relative">
-          <img
-            className="absolute top-[0px] left-[0px] w-[454px] h-10 z-[1]"
-            alt=""
-            src="/rectangle-512.svg"
-          />
-          <div className="absolute top-[10px] left-[180.8px] text-mini font-semibold font-montserrat text-whitesmoke text-center inline-block min-w-[87px] z-[2]">
-            Send email
-          </div>
-        </button>
+      <button
+            className="cursor-pointer"
+            style={{
+              backgroundColor: "#1C274C",
+              color: "white",
+              borderRadius: "10px",
+              width: "100%", // Set width to 100% for responsiveness
+              height: "40px",
+              flexShrink: 0,
+              border: "none", // If you want to remove the border
+              padding: 0, // If you want to remove padding
+              alignSelf: "stretch", // If you want the button to stretch vertically
+              position: "relative", // If you want to position child elements absolutely
+              maxWidth: "454px", // Set maximum width for larger screens
+              margin: "0 auto", // Center the button horizontally
+            }}
+          >
+            Continue
+          </button><div className="relative inline-block min-w-[115px] z-[1] beautify">
+  
+</div>
+
         <div className="self-stretch flex flex-row items-start justify-center py-0 pr-5 pl-[21px]">
           <div className="w-[241px] relative inline-block z-[1]">
             {`Did not receive a code? `}

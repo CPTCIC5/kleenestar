@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import "../global.css";
 import {
   Select,
   InputLabel,
@@ -43,21 +44,35 @@ const BusinessNameContainer: FunctionComponent = () => {
                 Business name*
               </div>
               <div className="self-stretch flex flex-row items-start justify-start pt-[13.199999999999818px] px-[18.199999999999815px] pb-[13.800000000000182px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
-                <div className="relative inline-block min-w-[115px] z-[1]">
-                  Business name
-                </div>
-                <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
-                  <img
-                    className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
-                    alt=""
-                    src="/rectangle-522.svg"
+                <div className="relative inline-block min-w-[115px] z-[1] ">
+                  <input
+                    type="text"
+                    placeholder="Business name"
+                    className="border border-gray-300 outline-none px-2 py-1"
+                    style={{
+                      width: "454px",
+                      height: "45px",
+                      flexShrink: 0,
+                      fill: "#F8F9F7",
+                      borderRadius: "4px",
+                      border: "none",
+                    }}
                   />
+                  <img
+                    className="absolute top-[50%] transform -translate-y-1/2 right-2 w-4 h-auto z-[2]"
+                    alt=""
+                    src="/pen2svgrepocom1.svg"
+                  />
+                </div>
+
+                {/* <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
+
                   <img
                     className="absolute top-[13px] left-[420.8px] w-[16.1px] h-[20.1px] z-[1]"
                     alt=""
                     src="/pen2svgrepocom1.svg"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="self-stretch h-[72.3px] flex flex-col items-start justify-start pt-0 px-0 pb-[55.30000000000018px] box-border gap-[10.399999999999636px]">
@@ -65,10 +80,30 @@ const BusinessNameContainer: FunctionComponent = () => {
                 Website*
               </div>
               <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[13.799999999999727px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
-                <div className="relative inline-block min-w-[53px] z-[1]">
+                {/* <div className="relative inline-block min-w-[53px] z-[1]">
                   https://
+                </div> */}
+                <div className="relative inline-block min-w-[115px] z-[1] ">
+                  <input
+                    type="text"
+                    placeholder="https://"
+                    className="border border-gray-300 outline-none px-2 py-1"
+                    style={{
+                      width: "454px",
+                      height: "45px",
+                      flexShrink: 0,
+                      fill: "#F8F9F7",
+                      borderRadius: "4px",
+                      border: "none",
+                    }}
+                  />
+                  <img
+                    className="absolute top-[50%] transform -translate-y-1/2 right-2 w-4 h-auto z-[2]"
+                    alt=""
+                    src="/pen2svgrepocom1.svg"
+                  />
                 </div>
-                <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
+                {/* <div className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
                   <img
                     className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
                     alt=""
@@ -79,9 +114,10 @@ const BusinessNameContainer: FunctionComponent = () => {
                     alt=""
                     src="/pen2svgrepocom1.svg"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
+            <br />
             <div className="self-stretch flex flex-col items-start justify-start gap-[10.300000000000182px]">
               <div className="relative font-medium inline-block min-w-[60px] shrink-0 [debug_commit:f6aba90]">
                 Industry
@@ -158,16 +194,26 @@ const BusinessNameContainer: FunctionComponent = () => {
               </FormControl>
             </div>
           </div>
-          <button className="cursor-pointer [border:none] p-0 bg-[transparent] self-stretch h-10 relative">
-            <img
-              className="absolute top-[0px] left-[0px] w-[454px] h-10 z-[1]"
-              alt=""
-              src="/rectangle-512.svg"
-            />
-            <div className="absolute top-[10px] left-[201.7px] text-mini font-semibold font-montserrat text-whitesmoke text-left inline-block min-w-[51px] z-[2]">
-              Create
-            </div>
+          <button
+            className="cursor-pointer"
+            style={{
+              backgroundColor: "#1C274C",
+              color: "white",
+              borderRadius: "10px",
+              width: "100%", // Set width to 100% for responsiveness
+              height: "40px",
+              flexShrink: 0,
+              border: "none", // If you want to remove the border
+              padding: 0, // If you want to remove padding
+              alignSelf: "stretch", // If you want the button to stretch vertically
+              position: "relative", // If you want to position child elements absolutely
+              maxWidth: "454px", // Set maximum width for larger screens
+              margin: "0 auto", // Center the button horizontally
+            }}
+          >
+            Create
           </button>
+
           <div className="self-stretch flex flex-row items-start justify-start py-0 pr-[9px] pl-2.5 box-border max-w-full text-center">
             <div className="flex-1 flex flex-col items-end justify-start gap-[3px] max-w-full">
               <div className="self-stretch relative z-[1]">

@@ -15,6 +15,7 @@ const OnboardingDone: FunctionComponent = () => {
         founderLayerioAlignSelf="unset"
       />
       <FrameComponent51 />
+
     </div>
   );
 };

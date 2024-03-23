@@ -14,3 +14,9 @@ body {
 ::after {
   border-width: 0;
 }
+.beutify{
+  width: 454px;
+  height: 45px;
+  flex-shrink: 0;
+  fill: #F8F9F7;
+}

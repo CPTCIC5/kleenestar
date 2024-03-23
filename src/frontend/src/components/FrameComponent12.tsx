@@ -22,21 +22,53 @@ const FrameComponent12: FunctionComponent = () => {
         </div>
       </div>
       <div className="w-[454px] flex flex-col items-start justify-start gap-[10.900000000000093px] max-w-full text-sm font-montserrat">
-        <FrameComponent13
-          newPassword="New Password*"
-          password="Password"
-          component627="/component-62--5.svg"
-        />
-        <FrameComponent13
-          newPassword="Confirm Password*"
-          password="Confirm Password"
-          component627="/component-62--1.svg"
-          propPadding="unset"
-          propMinWidth="unset"
-          propMinWidth1="unset"
-        />
-        <div className="relative text-smi font-light text-orangered-300 z-[1]">
-          Password doesn’t match
+        <div className="relative font-medium inline-block min-w-[75px] z-[1]">
+          Password*
+        </div>
+        <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+          <input
+            type="text"
+            placeholder="Password"
+            className="border border-gray-300 outline-none px-2 py-1"
+            style={{
+              width: "454px",
+              height: "45px",
+              flexShrink: 0,
+              fill: "#F8F9F7",
+              borderRadius: "4px",
+              border: "none",
+            }}
+          />
+          <img
+            className="absolute top-[13.5px] left-[418px] w-[21.5px] h-[19px] z-[2]"
+            loading="lazy"
+            alt=""
+            src="/component-62--3.svg"
+          />
+        </div>
+        <div className="relative font-medium inline-block min-w-[75px] z-[1]">
+          Confirm Password*
+        </div>
+        <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+          <input
+            type="text"
+            placeholder="Confirm Password"
+            className="border border-gray-300 outline-none px-2 py-1"
+            style={{
+              width: "454px",
+              height: "45px",
+              flexShrink: 0,
+              fill: "#F8F9F7",
+              borderRadius: "4px",
+              border: "none",
+            }}
+          />
+          <img
+            className="absolute top-[13.5px] left-[418px] w-[21.5px] h-[19px] z-[2]"
+            loading="lazy"
+            alt=""
+            src="/component-62--3.svg"
+          />
         </div>
       </div>
       <button className="cursor-pointer [border:none] p-0 bg-[transparent] w-[454px] h-10 relative max-w-full">
