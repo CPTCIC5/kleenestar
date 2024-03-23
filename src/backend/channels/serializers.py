@@ -22,7 +22,7 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
         fields = ['user','note']
 
 class PromptInputSerializer(serializers.Serializer):
-    author = serializers.PrimaryKeyRelatedField(User)
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=False)
     user_query=serializers.CharField(max_length=50,required=True)
     refactored_query = serializers.CharField(allow_blank=True) #gpt 3.5 turbo 
     response_text=serializers.CharField(allow_blank=True)
