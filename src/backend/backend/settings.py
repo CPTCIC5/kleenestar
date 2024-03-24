@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "channels.apps.ChannelsConfig",
     "workspaces.apps.WorkspacesConfig",
+    "dummy.apps.DummyConfig",
     "rest_framework",
 ]
 
