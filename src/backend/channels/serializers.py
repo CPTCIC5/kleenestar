@@ -24,7 +24,7 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
 class PromptInputSerializer(serializers.Serializer):
     author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=False)
     user_query=serializers.CharField(max_length=50,required=True)
-    refactored_query = serializers.CharField(allow_blank=True) #gpt 3.5 turbo 
+    refactored_query = serializers.CharField(allow_blank=True) #gpt 4.0 will refactor the query 
     response_text=serializers.CharField(allow_blank=True)
     image=serializers.ImageField(allow_null=True, required=False)
     created = serializers.DateTimeField()
