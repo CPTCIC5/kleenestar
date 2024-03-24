@@ -50,11 +50,7 @@ class SignupView(views.APIView):
                 )
 
                 # set the users subscription type to team member
-                if invite.workspace.root_user.subscription_type == 2:  # pro
-                    user.subscription_type = 5
-                elif invite.workspace.root_user.subscription_type == 3:  # scale
-                    user.subscription_type = 4
-
+                user.subscription_type = 4
                 user.save()
 
                 # add the user to the workspace

@@ -13,8 +13,7 @@ class User(AbstractUser):
         (1, "Indie"),
         (2, "Pro"),
         (3, "Scale"),
-        (4, "Team member (15$)"),
-        (5, "Team member (20$)"),
+        (4, "Team member"),
     )
     username = None
     email = models.EmailField("email address", unique=True)
