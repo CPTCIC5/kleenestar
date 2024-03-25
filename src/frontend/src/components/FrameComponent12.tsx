@@ -71,16 +71,25 @@ const FrameComponent12: FunctionComponent = () => {
           />
         </div>
       </div>
-      <button className="cursor-pointer [border:none] p-0 bg-[transparent] w-[454px] h-10 relative max-w-full">
-        <img
-          className="absolute top-[0px] left-[0px] w-[454px] h-10 z-[1]"
-          alt=""
-          src="/rectangle-512.svg"
-        />
-        <div className="absolute top-[10px] left-[169.7px] text-mini font-semibold font-montserrat text-whitesmoke text-left inline-block min-w-[115px] z-[2]">
-          Save password
-        </div>
-      </button>
+      <button
+            className="cursor-pointer"
+            style={{
+              backgroundColor: "#1C274C",
+              color: "white",
+              borderRadius: "10px",
+              width: "100%", // Set width to 100% for responsiveness
+              height: "40px",
+              flexShrink: 0,
+              border: "none", // If you want to remove the border
+              padding: 0, // If you want to remove padding
+              alignSelf: "stretch", // If you want the button to stretch vertically
+              position: "relative", // If you want to position child elements absolutely
+              maxWidth: "454px", // Set maximum width for larger screens
+              margin: "0 auto", // Center the button horizontally
+            }}
+          >
+            Save Password
+          </button>
     </div>
   );
 };

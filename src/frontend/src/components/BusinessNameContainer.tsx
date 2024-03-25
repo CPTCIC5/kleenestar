@@ -11,8 +11,9 @@ import {
 import RoundArrowRightSvgrepoCom from "./RoundArrowRightSvgrepoCom";
 
 const BusinessNameContainer: FunctionComponent = () => {
+  
   return (
-    <div className="flex-1 flex flex-col items-start justify-start pt-[21px] px-[25px] pb-[121px] box-border relative gap-[67px] min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat mq750:gap-[33px_67px] mq750:min-w-full mq450:gap-[17px_67px] mq450:pb-[51px] mq450:box-border mq1050:pt-5 mq1050:pb-[79px] mq1050:box-border">
+    <div className="flex-1 flex items-start justify-start pt-[21px] px-[25px] pb-[121px] box-border relative gap-[67px] min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat mq750:gap-[33px_67px] mq750:min-w-full mq450:gap-[17px_67px] mq450:pb-[51px] mq450:box-border mq1050:pt-5 mq1050:pb-[79px] mq1050:box-border">
       <img
         className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
         alt=""

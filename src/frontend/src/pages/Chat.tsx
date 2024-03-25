@@ -54,11 +54,11 @@ const Chat: FunctionComponent = () => {
             alt=""
             src="/rectangle-642.svg"
           />
-          <img
+          {/* <img
             className="absolute top-[18.9px] left-[102.5px] w-[755.7px] h-[744.4px] z-[1]"
             alt=""
             src="/clip-path-group.svg"
-          />
+          /> */}
           <img
             className="absolute top-[797.4px] left-[907.2px] w-[33.5px] h-[33.5px] z-[1]"
             loading="lazy"

@@ -4,6 +4,7 @@ import FrameComponent5 from "./FrameComponent5";
 import Component from "./Component";
 import GoogleOauthButton from "./GoogleOauthButton";
 
+
 const FrameComponent4: FunctionComponent = () => {
   return (
     <div className="flex-1 flex flex-col items-start justify-start pt-[21px] px-[25px] pb-[108.09999999999992px] box-border relative gap-[47.90000000000009px] min-w-[469px] max-w-full text-left text-11xl text-darkslateblue-100 font-montserrat mq750:gap-[24px_47.9px] mq750:min-w-full mq450:pb-[45px] mq450:box-border mq1050:pt-5 mq1050:pb-[70px] mq1050:box-border">
