@@ -12,6 +12,15 @@ INDUSTRIES = (
 
 
 class WorkSpace(models.Model):
+    SUBSCRIPTION_CHOICES = (
+        (1, "Indie"),
+        (2, "Pro"),
+        (3, "Scale")
+    )
+    subscription_type = models.IntegerField(
+        choices=SUBSCRIPTION_CHOICES, null=False, blank=False
+    )
+
     root_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
