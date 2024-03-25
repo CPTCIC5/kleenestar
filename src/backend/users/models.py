@@ -9,18 +9,8 @@ from random import randint
 
 
 class User(AbstractUser):
-    SUBSCRIPTION_CHOICES = (
-        (1, "Indie"),
-        (2, "Pro"),
-        (3, "Scale"),
-        (4, "Team member"),
-    )
     username = None
     email = models.EmailField("email address", unique=True)
-
-    subscription_type = models.IntegerField(
-        choices=SUBSCRIPTION_CHOICES, null=True, blank=True
-    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
