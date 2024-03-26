@@ -3,7 +3,7 @@ import FrameComponent13 from "./FrameComponent13";
 
 const FrameComponent12: FunctionComponent = () => {
   return (
-    <div className="w-[722px] flex flex-col items-center justify-start pt-[85px] px-5 pb-[87px] box-border relative gap-[39px] max-w-full text-left text-11xl text-darkslateblue-100 font-syne mq675:gap-[19px_39px] mq675:pt-[55px] mq675:pb-[57px] mq675:box-border">
+    <div className="w-[722px] flex flex-col items-center justify-start pt-[0px] px-5 pb-[0px] box-border relative gap-[39px] max-w-full text-left text-11xl text-darkslateblue-100 font-syne mq675:gap-[19px_39px] mq675:pt-[55px] mq675:pb-[57px] mq675:box-border">
       <img
         className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
         alt=""
@@ -25,7 +25,7 @@ const FrameComponent12: FunctionComponent = () => {
         <div className="relative font-medium inline-block min-w-[75px] z-[1]">
           Password*
         </div>
-        <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+        <div className="self-stretch flex flex-row items-start justify-start pt-[0.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
           <input
             type="text"
             placeholder="Password"

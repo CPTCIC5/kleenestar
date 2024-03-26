@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 
 const FrameComponent14: FunctionComponent = () => {
   return (
-    <div className="w-[722px] flex flex-col items-center justify-start pt-[63.19999999999982px] px-5 pb-[64.79999999999973px] box-border relative gap-[374.6000000000003px] max-w-full text-left text-11xl text-darkslateblue-100 font-syne mq675:gap-[187px_374.6px] mq675:pt-[41px] mq675:pb-[42px] mq675:box-border">
+    <div className="w-[722px] flex flex-col items-center justify-start pt-[0.19999999999982px] px-5 pb-[0.79999999999973px] box-border relative gap-[374.6000000000003px] max-w-full text-left text-11xl text-darkslateblue-100 font-syne mq675:gap-[187px_374.6px] mq675:pt-[41px] mq675:pb-[42px] mq675:box-border">
       <div className="w-[454px] flex flex-row items-start justify-start py-0 pr-[35px] pl-[33px] box-border max-w-full">
         <div className="flex-1 flex flex-col items-start justify-start gap-[19px] max-w-full">
           <div className="flex flex-row items-start justify-start py-0 pr-[54px] pl-[57.5px] mq450:pl-5 mq450:pr-5 mq450:box-border">

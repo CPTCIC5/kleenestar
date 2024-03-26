@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 
 const FrameComponent51: FunctionComponent = () => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-start pt-[111.40000000000008px] px-5 pb-[113.40000000000008px] box-border relative gap-[389.1999999999998px] min-w-[469px] max-w-full text-center text-11xl text-darkslateblue-100 font-syne mq750:gap-[195px_389.2px] mq750:min-w-full mq450:pt-[47px] mq450:pb-12 mq450:box-border mq1050:pt-[72px] mq1050:pb-[74px] mq1050:box-border">
+    <div className="flex-1 flex flex-col items-center justify-start pt-[45px] px-5 pb-[113.40000000000008px] box-border relative gap-[389.1999999999998px] min-w-[469px] max-w-full text-center text-11xl text-darkslateblue-100 font-syne mq750:gap-[195px_389.2px] mq750:min-w-full mq450:pt-[47px] mq450:pb-12 mq450:box-border mq1050:pt-[72px] mq1050:pb-[74px] mq1050:box-border">
       <div className="w-[454px] flex flex-row items-start justify-end py-0 pr-9 pl-[37px] box-border max-w-full">
         <div className="flex-1 flex flex-col items-start justify-start gap-[24px] max-w-full lg:flex-1">
           <div className="self-stretch flex flex-row items-start justify-center py-0 pr-[21px] pl-5">
@@ -31,7 +31,7 @@ const FrameComponent51: FunctionComponent = () => {
           alt=""
           src="/rectangle-506.svg"
         />
-        <div className="absolute top-[295.4px] left-[134px] w-[454px] h-[267.1px] z-[1]">
+        <div className="absolute top-[295.4px] left-0 right-0 mx-auto w-[454px] h-[267.1px] z-[1]">
           <img
             className="absolute top-[119.3px] left-[129.4px] w-[86px] h-[35.5px]"
             alt=""

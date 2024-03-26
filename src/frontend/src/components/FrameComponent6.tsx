@@ -5,7 +5,7 @@ import FrameComponent7 from "./FrameComponent7";
 
 const FrameComponent6: FunctionComponent = () => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-start pt-[85.40000000000009px] px-5 pb-[88.40000000000009px] box-border relative gap-[39px] min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat mq750:gap-[19px_39px] mq750:min-w-full mq450:pt-9 mq450:pb-[37px] mq450:box-border mq1050:pt-14 mq1050:pb-[57px] mq1050:box-border">
+    <div className="flex-1 flex flex-col items-center justify-start pt-[45.40000000000009px] px-5 pb-[88.40000000000009px] box-border relative gap-[39px] min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat mq750:gap-[19px_39px] mq750:min-w-full mq450:pt-2 mq450:pb-[37px] mq450:box-border mq1050:pt-14 mq1050:pb-[57px] mq1050:box-border">
       <img
         className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
         alt=""
@@ -27,7 +27,7 @@ const FrameComponent6: FunctionComponent = () => {
         <div className="relative font-medium inline-block min-w-[64px] shrink-0 [debug_commit:f6aba90]">
           Email
         </div>
-        <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[13.799999999999727px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
+        <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[0px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
           {/* <div className="relative inline-block min-w-[53px] z-[1]">
                   https://
                 </div> */}
@@ -57,7 +57,7 @@ const FrameComponent6: FunctionComponent = () => {
         <div className="relative font-medium inline-block min-w-[75px] z-[1]">
           Password*
         </div>
-        <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+        <div className="self-stretch flex flex-row items-start justify-start pt-[0px] px-[18.200000000000045px] pb-[0px] relative text-mini text-darkslateblue-200">
           <input
             type="text"
             placeholder="Password"
@@ -83,7 +83,7 @@ const FrameComponent6: FunctionComponent = () => {
         <div className="relative font-medium inline-block min-w-[75px] z-[1]">
           Confirm Password*
         </div>
-        <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+        <div className="self-stretch flex flex-row items-start justify-start pt-[0px] px-[18.200000000000045px] pb-[0px] relative text-mini text-darkslateblue-200">
           <input
             type="text"
             placeholder="Confirm Password"
@@ -105,7 +105,7 @@ const FrameComponent6: FunctionComponent = () => {
           />
         </div>
       </div>
-      <div className="w-[454px] flex flex-col items-end justify-start pt-0 px-0 pb-[7.199999999999818px] box-border gap-[25.300000000000185px] max-w-full text-mini">
+      <div className="w-[454px] flex flex-col items-end justify-start pt-0 px-0 pb-[0 px] box-border gap-[25.300000000000185px] max-w-full text-mini">
       <button
             className="cursor-pointer"
             style={{
