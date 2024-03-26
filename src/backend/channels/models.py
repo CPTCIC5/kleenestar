@@ -44,7 +44,7 @@ class PromptFeedback(models.Model):
     def __str__(self):
         return str(self.user)
     
-
+"""
 class PromptInput(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
@@ -52,3 +52,4 @@ class PromptInput(models.Model):
     refactored_query = models.TextField(max_length=20_000)
     response_text = models.TextField(max_length=20_000)
     created = models.DateTimeField()
+"""
