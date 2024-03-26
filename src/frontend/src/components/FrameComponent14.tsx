@@ -15,23 +15,8 @@ const FrameComponent14: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <div className="w-[454px] h-10 relative max-w-full text-mini text-whitesmoke font-montserrat">
-        <img
-          className="absolute top-[0px] left-[0px] w-[454px] h-10 z-[1]"
-          loading="lazy"
-          alt=""
-          src="/rectangle-512.svg"
-        />
-        <div className="absolute top-[10px] left-[184.8px] font-semibold inline-block min-w-[85px] z-[2]">
-          Go to login
-        </div>
-      </div>
+      
       <div className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px]">
-        <img
-          className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
-          alt=""
-          src="/rectangle-506.svg"
-        />
         <img
           className="absolute top-[181.8px] left-[195px] w-[331.9px] h-[289.5px] z-[1]"
           loading="lazy"
@@ -39,6 +24,25 @@ const FrameComponent14: FunctionComponent = () => {
           src="/access-login--unlock-illustration.svg"
         />
       </div>
+      <button
+            className="cursor-pointer"
+            style={{
+              backgroundColor: "#1C274C",
+              color: "white",
+              borderRadius: "10px",
+              width: "100%", // Set width to 100% for responsiveness
+              height: "40px",
+              flexShrink: 0,
+              border: "none", // If you want to remove the border
+              padding: 0, // If you want to remove padding
+              alignSelf: "stretch", // If you want the button to stretch vertically
+              position: "relative", // If you want to position child elements absolutely
+              maxWidth: "454px", // Set maximum width for larger screens
+              margin: "0 auto", // Center the button horizontally
+            }}
+          >
+            Go to Login
+          </button>
     </div>
   );
 };

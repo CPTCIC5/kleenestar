@@ -5,11 +5,11 @@ const Chat: FunctionComponent = () => {
     <div className="w-full h-[982px] relative bg-whitesmoke overflow-hidden tracking-[normal] text-left text-6xl text-darkslateblue-100 font-syne mq398:h-auto mq398:min-h-[982]">
       <section className="absolute top-[69.4px] left-[483.2px] w-[960.6px] flex flex-col items-center justify-end pt-[735.5px] pb-[21.400000000000546px] pr-5 pl-[21px] box-border gap-[16.299999999999727px] max-w-full text-left text-base text-darkslateblue-100 font-montserrat">
         <div className="w-[776.6px] flex flex-row items-start justify-between pt-[5.900000000000091px] pb-1.5 pr-2 pl-[26.700000000000728px] box-border relative gap-[20px] max-w-full z-[2] mq398:flex-wrap">
-          <img
+          {/* <img
             className="h-full w-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
             alt=""
             src="/rectangle-2.svg"
-          />
+          /> */}
           <div className="h-[33.8px] w-[259.6px] flex flex-col items-start justify-start pt-[8.5px] px-0 pb-0 box-border">
             <div className="self-stretch flex-1 flex flex-row items-start justify-start gap-[25.300000000000185px]">
               <img
@@ -24,12 +24,12 @@ const Chat: FunctionComponent = () => {
                     That’s helpful, thank you!
                   </div>
                 </div>
-                <img
+                {/* <img
                   className="h-[23px] w-px relative min-h-[23px] z-[1] ml-[-7.2px]"
                   loading="lazy"
                   alt=""
                   src="/line-106.svg"
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -54,11 +54,11 @@ const Chat: FunctionComponent = () => {
             alt=""
             src="/rectangle-642.svg"
           />
-          <img
+          {/* <img
             className="absolute top-[18.9px] left-[102.5px] w-[755.7px] h-[744.4px] z-[1]"
             alt=""
             src="/clip-path-group.svg"
-          />
+          /> */}
           <img
             className="absolute top-[797.4px] left-[907.2px] w-[33.5px] h-[33.5px] z-[1]"
             loading="lazy"
