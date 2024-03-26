@@ -7,13 +7,16 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        write_only = ["password"]
-        fields = ["email", "password", "invite_code"]
+        write_only = ["password", "confirm_password"]
+        fields = ["email", "password", "confirm_password", "invite_code"]
 
     def create(self, validated_data):
-        return User.objects.create_user(
-            email=validated_data["email"], password=validated_data["password"]
-        )
+        if validated_data["password"] == validated_data["confirm_password"]:
+            return User.objects.create_user(
+                email=validated_data["email"], password=validated_data["password"]
+            )
+        else:
+            return  serializers.ValidationError("Password and confirmation do not match.") 
 
 
 class ProfileSerializer(serializers.ModelSerializer):

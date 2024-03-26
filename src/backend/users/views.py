@@ -50,8 +50,8 @@ class SignupView(views.APIView):
                 )
 
                 # set the users subscription type to team member
-                user.subscription_type = 4
-                user.save()
+                #user.subscription_type = 4
+                #user.save()
 
                 # add the user to the workspace
                 invite.workspace.users.add(user)
