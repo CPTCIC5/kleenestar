@@ -33,7 +33,7 @@ const FrameComponent4: FunctionComponent = () => {
               <div className="relative font-medium inline-block min-w-[64px] shrink-0 [debug_commit:f6aba90]">
                 Email
               </div>
-              <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[13.799999999999727px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
+              <div className="self-stretch flex flex-row items-start justify-start pt-[0px] px-[18.199999999999815px] pb-[0px] relative shrink-0 [debug_commit:f6aba90] text-mini text-darkslateblue-200">
                 {/* <div className="relative inline-block min-w-[53px] z-[1]">
                   https://
                 </div> */}
@@ -64,7 +64,7 @@ const FrameComponent4: FunctionComponent = () => {
               <div className="relative font-medium inline-block min-w-[75px] z-[1]">
                 Password*
               </div>
-              <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+              <div className="self-stretch flex flex-row items-start justify-start pt-[0px] px-[18.200000000000045px] pb-[0px] relative text-mini text-darkslateblue-200">
               <input
                     type="text"
                     placeholder="Password"
@@ -79,7 +79,7 @@ const FrameComponent4: FunctionComponent = () => {
                     }}
                   />
                   <img
-                    className="absolute top-[13.5px] left-[418px] w-[21.5px] h-[19px] z-[2]"
+                    className="absolute top-[0px] left-[418px] w-[21.5px] h-[19px] z-[2]"
                     loading="lazy"
                     alt=""
                     src="/component-62--3.svg"
@@ -91,7 +91,7 @@ const FrameComponent4: FunctionComponent = () => {
               <div className="relative font-medium inline-block min-w-[75px] z-[1]">
                 Confirm Password*
               </div>
-              <div className="self-stretch flex flex-row items-start justify-start pt-[13.299999999999727px] px-[18.200000000000045px] pb-[13.700000000000273px] relative text-mini text-darkslateblue-200">
+              <div className="self-stretch flex flex-row items-start justify-start pt-[0px] px-[18.200000000000045px] pb-[0px] relative text-mini text-darkslateblue-200">
               <input
                     type="text"
                     placeholder="Confirm Password"

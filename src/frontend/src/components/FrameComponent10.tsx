@@ -40,13 +40,14 @@ const FrameComponent10: FunctionComponent = () => {
       <div className="relative font-medium inline-block min-w-[46px] z-[1]">
         Email*
       </div>
-      <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[13.799999999999727px] relative text-mini text-darkslateblue-200">
+      <div className="self-stretch flex flex-row items-start justify-start pt-[13.200000000000273px] px-[18.199999999999815px] pb-[0px] relative text-mini text-darkslateblue-200">
         {/* <div className="relative z-[2]">@work-email.com</div> */}
-        <div className="h-full w-full   top-[0px] right-[0px] bottom-[0px] left-[0px]">
+        <div className="h-full w-full  flex flex-1 top-[0px] right-[0px] bottom-[0px] left-[0px]">
         <input
                     type="text"
                     placeholder="@work-email.com"
                     className="border border-gray-300 outline-none px-2 py-1"
+                    
                     style={{
                       width: "454px",
                       height: "45px",

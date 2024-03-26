@@ -13,14 +13,15 @@ import RoundArrowRightSvgrepoCom from "./RoundArrowRightSvgrepoCom";
 const BusinessNameContainer: FunctionComponent = () => {
   
   return (
-    <div className="flex-1 flex items-start justify-start pt-[21px] px-[25px] pb-[121px] box-border relative gap-[67px] min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat mq750:gap-[33px_67px] mq750:min-w-full mq450:gap-[17px_67px] mq450:pb-[51px] mq450:box-border mq1050:pt-5 mq1050:pb-[79px] mq1050:box-border">
+    <div className="flex-1 flex items-start justify-start pt-[21px] px-[25px] pb-[121px] box-border relative  min-w-[469px] max-w-full text-left text-sm text-darkslateblue-100 font-montserrat ">
       <img
         className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
         alt=""
         src="/rectangle-506.svg"
       />
       <RoundArrowRightSvgrepoCom />
-      <div className="self-stretch flex flex-row items-start justify-center max-w-full">
+      <div className="flex flex-1 items-center justify-center pt-[21px] px-[25px] pb-[121px] box-border relative min-w-[469px] max-w-full text-center text-sm text-darkslateblue-100 font-montserrat">
+      
         <div className="w-[454px] flex flex-col items-start justify-start gap-[39.666666666666664px] max-w-full mq450:gap-[20px_39.7px]">
           <div className="self-stretch flex flex-row items-start justify-start py-0 pr-2.5 pl-[9px] box-border max-w-full text-11xl font-syne">
             <div className="flex-1 flex flex-col items-start justify-start gap-[19px] max-w-full">
