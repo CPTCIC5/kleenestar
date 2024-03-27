@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 
 const FrameComponent11: FunctionComponent = () => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-start pt-[200px] px-5 pb-[275px] box-border relative gap-[19px] min-w-[469px] max-w-full text-center text-11xl text-darkslateblue-100 font-montserrat mq750:min-w-full mq450:pt-[115px] mq450:pb-[116px] mq450:box-border mq1050:pt-[177px] mq1050:pb-[179px] mq1050:box-border">
+    <div className="flex-1 flex flex-col items-center justify-start pt-[200px] px-5 pb-[275px] box-border relative gap-[19px] min-w-[469px] max-w-full text-center text-11xl font-montserrat mq750:min-w-full mq450:pt-[115px] mq450:pb-[116px] mq450:box-border mq1050:pt-[177px] mq1050:pb-[179px] mq1050:box-border">
       <img
         className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
         alt=""
@@ -13,12 +13,12 @@ const FrameComponent11: FunctionComponent = () => {
           Get Started
         </h1>
       </div>
-      <div className="w-[454px] flex flex-col items-end justify-start pt-0 px-0 pb-5 box-border gap-[41px] max-w-full text-base mq450:gap-[20px_41px]">
+      <div className="w-[554px] flex flex-col items-end justify-start pt-0 px-0 pb-5 box-border gap-[41px] max-w-full text-base mq450:gap-[20px_41px]">
         <div className="self-stretch flex flex-row items-start justify-end py-0 pr-3.5 pl-[15px] box-border max-w-full">
           <div className="flex-1 flex flex-col items-end justify-start gap-[5px] max-w-full">
             <div className="self-stretch relative z-[1]">{`A new way to run highly efficient marketing analytics `}</div>
             <div className="self-stretch flex flex-row items-start justify-end py-0 pr-[25.300000000000185px] pl-7">
-              <div className="w-[372px] relative inline-block z-[1]">
+              <div className="w-[554px] relative inline-block z-[1]">
                 across channels and learn real-time insights 🚀
               </div>
             </div>

@@ -2,17 +2,19 @@ import { FunctionComponent } from "react";
 
 const RoundArrowRightSvgrepoCom: FunctionComponent = () => {
   return (
-    <div className="h-[30px] flex flex-row items-start justify-start relative gap-[10px] z-[1]">
+    <div className="absolute top-0  transform -translate-x-1/2 w-[30%] max-w-full overflow-hidden max-h-full z-[1] ">
       <img
         className="h-[30px] w-[30px] relative"
         alt=""
         src="/ellipse-248.svg"
       />
+      {/* Position this image at the top center */}
       <img
-        className="h-[30%] w-2/5 absolute !m-[0] top-[35%] right-[30%] bottom-[35%] left-[30%] max-w-full overflow-hidden max-h-full z-[1]"
+        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-[30%] max-w-full overflow-hidden max-h-full z-[1]"
         loading="lazy"
         alt=""
         src="/path-962.svg"
+        style={{width:'20px'}}
       />
     </div>
   );

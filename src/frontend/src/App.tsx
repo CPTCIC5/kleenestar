@@ -5,6 +5,7 @@ import {
   useNavigationType,
   useLocation,
 } from "react-router-dom";
+import './global.css'
 import Login from "./pages/Login";
 import GetStarted from "./pages/GetStarted";
 import OnboardingStep from "./pages/OnboardingStep";
