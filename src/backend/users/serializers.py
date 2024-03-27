@@ -58,3 +58,9 @@ class FeedbackSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True,write_only=True)
+    new_password = serializers.CharField(required=True,write_only=True)
+    confirm_new_password= serializers.CharField(required=True,write_only=True)

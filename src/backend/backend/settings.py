@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "workspaces.apps.WorkspacesConfig",
     "dummy.apps.DummyConfig",
     "rest_framework",
+    "django_rest_passwordreset",
 ]
 
 MIDDLEWARE = [
