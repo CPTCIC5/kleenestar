@@ -8,13 +8,11 @@ import GoogleOauthButton from "./GoogleOauthButton";
 const FrameComponent4: FunctionComponent = () => {
   return (
     <div className="flex-1 flex flex-col items-start justify-start pt-[21px] px-[25px] pb-[108.09999999999992px] box-border relative gap-[47.90000000000009px] min-w-[469px] max-w-full text-left text-11xl text-darkslateblue-100 font-montserrat mq750:gap-[24px_47.9px] mq750:min-w-full mq450:pb-[45px] mq450:box-border mq1050:pt-5 mq1050:pb-[70px] mq1050:box-border">
-      <img
-        className="w-full h-full absolute !m-[0] top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full"
-        alt=""
-        src="/rectangle-506.svg"
-      />
-      <RoundArrowRightSvgrepoCom1 />
+      
+      
       <div className="self-stretch flex flex-row items-start justify-center max-w-full">
+     
+      <RoundArrowRightSvgrepoCom1 />
         <div className="w-[454px] flex flex-col items-end justify-start gap-[33px] max-w-full mq450:gap-[16px_33px]">
           <div className="self-stretch flex flex-row items-start justify-end py-0 pr-1 pl-[5px] box-border max-w-full font-syne">
             <div className="flex-1 flex flex-col items-start justify-start gap-[24px] max-w-full">

@@ -10,14 +10,14 @@ const FrameComponent: FunctionComponent = () => {
         alt=""
         src="/rectangle-506.svg"
       /> */}
-      <div className="w-[454px] flex flex-row items-start justify-start py-0 pr-14 pl-[55px] box-border max-w-full text-11xl font-syne mq450:pl-[27px] mq450:pr-7 mq450:box-border">
+      <div className="max-width flex flex-row items-start justify-start py-0 pr-14 pl-[0px] box-border max-w-full text-11xl font-syne mq450:pl-[27px] mq450:pr-7 mq450:box-border">
         <div className="flex-1 flex flex-col items-start justify-start gap-[19px] max-w-full">
           <div className="flex flex-row items-start justify-start py-0 px-[45px] mq450:pl-5 mq450:pr-5 mq450:box-border">
-            <h1 className="m-0 w-[253px] relative text-inherit font-bold font-inherit inline-block z-[1] mq750:text-5xl mq450:text-lg">
+            <h1 className="m-0 w-[340px] relative text-inherit font-bold font-inherit inline-block z-[1] mq750:text-5xl mq450:text-lg">
               Welcome back
             </h1>
           </div>
-          <div className="self-stretch relative text-base font-montserrat z-[1]">
+          <div className=" max-width self-stretch relative text-base font-montserrat z-[1]">
             Welcome back, log in to your workspace 🙌
           </div>
         </div>

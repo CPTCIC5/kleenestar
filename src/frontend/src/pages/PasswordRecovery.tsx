@@ -3,7 +3,7 @@ import FrameComponent12 from "../components/FrameComponent12";
 
 const PasswordRecovery: FunctionComponent = () => {
   return (
-    <div className="w-full relative bg-whitesmoke overflow-hidden flex flex-col items-center justify-start pt-[30px] px-5 pb-[0.4000000000001px] box-border gap-[91.69999999999982px] tracking-[normal] text-left text-6xl text-darkslateblue-100 font-syne mq450:gap-[23px_91.7px] mq750:gap-[46px_91.7px]">
+    <div className="w-full relative overflow-hidden flex flex-col items-center justify-start pt-[30px] px-5 pb-[0.4000000000001px] box-border gap-[91.69999999999982px] tracking-[normal] text-left text-6xl text-darkslateblue-100 font-syne mq450:gap-[23px_91.7px] mq750:gap-[46px_91.7px]">
       <div className="w-[722px] h-[52.3px] flex flex-row items-start justify-center max-w-full">
         <div className="self-stretch flex flex-row items-start justify-start gap-[17.800000000000182px]">
           <img

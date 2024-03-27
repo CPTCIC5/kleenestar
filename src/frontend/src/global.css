@@ -6,6 +6,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*{
+  background-color: #FFFFFF;
+}
 body {
   @apply leading-[normal] m-0;
 }
