@@ -1,7 +1,12 @@
+from dotenv import load_dotenv
+from openai import OpenAI
 import openai
 import os
 
-openai.api_key = os.environ.get("API_KEY")
+load_dotenv()
+
+
+client = OpenAI()
 
 
 SYSTEM_PROMPT = """
@@ -42,10 +47,7 @@ for the query at hand.
 
 
 def generate_instructions(user_query, image=None):
-    prompt = SYSTEM_PROMPT + f"\nUser Query: {user_query}\n"
-    print(prompt)
-
- # Simplified intent detection logic
+    # Simplified intent detection logic
     if "how to improve" in user_query.lower():
         analysis_type = "database_analysis"
     elif image and "analyze this image" in user_query.lower():
@@ -67,31 +69,35 @@ def generate_instructions(user_query, image=None):
 
     return prompt, analysis_type
 
+
 def perform_analysis_with_gpt4(instructions):
-    response = openai.Completion.create(
-    engine="gpt-4",  # Use the correct identifier for GPT-4
-    prompt=instructions,
-    max_tokens=500,
-    temperature=0.5,
+    response = client.chat.completions.create(
+        model="gpt-4",  # Use the correct identifier for GPT-4
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": instructions},
+        ],
+        max_tokens=500,
+        temperature=0.5,
     )
-    insights = response.choices[0].text.strip()
+    insights = response.choices[0].message
     return insights
+
 
 def handle_user_query(user_query, image=None):
     # Generate instructions for analysis based on the user query
-    instructions = generate_instructions(user_query, image=image)
+    prompt, analysis_type = generate_instructions(user_query, image=image)
     # If analysis involves the user's database or images, you would include logic here
     # to fetch relevant data from the database or analyze the image as required.
     # For simplicity, this example focuses on generating and querying prompts.
 
-    insights = query_gpt4_for_insights(prompt)
-    
     return {
         "analysis_type": analysis_type,
-        "insights": insights
+        "insights": perform_analysis_with_gpt4(prompt),
     }
 
-# Example usage
+
+# # Example usage
 user_query = "How to improve my ad conversion rate?"
-response = handle_user_query(user_query)
+response = perform_analysis_with_gpt4(user_query)
 print(response)
