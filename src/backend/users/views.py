@@ -56,7 +56,7 @@ class SignupView(views.APIView):
                 # add the user to the workspace
                 invite.workspace.users.add(user)
             except WorkSpaceInvite.DoesNotExist:
-                pass
+                return Response(serializer.error,status=status.HTTP_404_NOT_FOUND)
 
         login(request, user)
         return Response(status=status.HTTP_201_CREATED)
