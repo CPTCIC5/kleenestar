@@ -1,8 +1,41 @@
-import { FunctionComponent } from "react";
-import FrameComponent1 from "./FrameComponent1";
+import React, { useState } from 'react';
+import axios from 'axios';
 import GoogleOauthButton from "./GoogleOauthButton";
 
-const FrameComponent: FunctionComponent = () => {
+interface FormData {
+  email: string;
+  password: string;
+}
+
+const FrameComponent: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log(response.data); // Do something with the response
+      alert("Logged In!");
+    } catch (error) {
+      console.error('Error submitting the form:', error);
+    }
+  };
+  
+
+
   return (
     <div className=" flex-col items-center justify-start pt-[100px] px-5 pb-[0px] box-border relative gap-[39px] min-w-[469px] max-w-full text-center text-sm text-darkslateblue-100 font-montserrat mq750:gap-[19px_39px] mq750:min-w-full mq450:pt-[60px] mq450:pb-[62px] mq450:box-border mq1050:pt-[93px] mq1050:pb-[95px] mq1050:box-border">
       {/* <img
@@ -23,6 +56,7 @@ const FrameComponent: FunctionComponent = () => {
         </div>
       </div>
       <div className="w-[454px] flex flex-col items-start justify-start pt-0 px-0 pb-[7.200000000000273px] box-border gap-[40.30000000000018px] max-w-full text-left mq450:gap-[20px_40.3px]">
+        <form method="post" onSubmit={handleSubmit}>
         <div className="self-stretch flex flex-col items-start justify-start gap-[10px]">
           <div className="self-stretch flex flex-col items-start justify-start pt-0 px-0 pb-[6.299999999999727px] gap-[10px]">
           <div className="relative font-medium inline-block min-w-[64px] shrink-0 [debug_commit:f6aba90]">
@@ -35,7 +69,10 @@ const FrameComponent: FunctionComponent = () => {
                 <div className="relative inline-block min-w-[115px] z-[1] ">
                   <input
                     type="text"
-                    placeholder="@work-email.com"
+                    name="email"
+                    placeholder="my@email.com"
+                    onChange={handleInputChange}
+                    value={formData.email}
                     className="border border-gray-300 outline-none px-2 py-1"
                     style={{
                       width: "454px",
@@ -45,6 +82,7 @@ const FrameComponent: FunctionComponent = () => {
                       borderRadius: "4px",
                       border: "none",
                     }}
+                    required
                   />
                   <img
                     className="absolute flex flex-center top-[50%] transform -translate-y-1/2 right-2 w-4 h-auto z-[2] -[100px]"
@@ -62,7 +100,10 @@ const FrameComponent: FunctionComponent = () => {
               <input
                     type="text"
                     placeholder="Password"
+                    name="password"
                     className="border border-gray-300 outline-none px-2 py-1"
+                    onChange={handleInputChange}
+                    value={formData.password}
                     style={{
                       width: "454px",
                       height: "45px",
@@ -71,6 +112,7 @@ const FrameComponent: FunctionComponent = () => {
                       borderRadius: "4px",
                       border: "none",
                     }}
+                    required
                   />
                   <img
                     className="absolute top-[13.5px] left-[418px] w-[21.5px] h-[19px] z-[2]"
@@ -89,6 +131,7 @@ const FrameComponent: FunctionComponent = () => {
             </div>
           </div>
         </div>
+        </form>
         <div className="self-stretch flex flex-col items-start justify-start gap-[25.299999999999727px] text-mini">
         <button
             className="cursor-pointer"
