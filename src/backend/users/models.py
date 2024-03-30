@@ -11,6 +11,7 @@ from random import randint
 class User(AbstractUser):
     username = None
     email = models.EmailField("email address", unique=True)
+    newsletter = models.BooleanField(default=False, help_text="Do you want to receive the newsletter?")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
