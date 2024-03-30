@@ -59,9 +59,7 @@ const OnboardingStep1: FunctionComponent = () => {
                 <form
                     method="post"
                     onSubmit={handleFormSubmit}
-                    className={`max-w-[454px] ${
-                        !validUrl ? "h-[353.99px]" : "h-[327.99px]"
-                    } w-full  mt-[41px] flex flex-col gap-[16px]`}
+                    className={`max-w-[454px] max-h-[353.99px] w-full  mt-[41px] flex flex-col gap-[16px]`}
                 >
                     <div className="w-full h-[72.33px] gap-[10px] flex flex-col justify-between">
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">

@@ -68,9 +68,7 @@ const Login: FunctionComponent = () => {
                 <form
                     method="post"
                     onSubmit={handleSubmit}
-                    className={`max-w-[454px] ${
-                        unauthorisedEmail ? "h-[292.63px]" : "h-[266.63px]"
-                    } w-full mt-[39px] flex flex-col gap-[16px]`}
+                    className={`max-w-[454px] max-h-[292.63px] w-full mt-[39px] flex flex-col gap-[16px]`}
                 >
                     <div
                         className={`w-full ${
