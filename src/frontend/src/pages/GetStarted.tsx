@@ -20,17 +20,19 @@ const GetStarted: FunctionComponent = () => {
                 </div>
 
                 <div className="mt-[39px] max-w-[454px] w-full h-[40px] ">
-                    <PrimaryButton className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-300 text-white">Create a workspace</span>
-                        <MoveRight className="bg-primary-300 text-white" />
-                    </PrimaryButton>
+                    <Link to={"/OnboardingStep1"} className="no-underline">
+                        <PrimaryButton className="flex items-center justify-center gap-[10px]">
+                            <span className="bg-primary-300 text-white">Create a workspace</span>
+                            <MoveRight className="bg-primary-300 text-white" />
+                        </PrimaryButton>
+                    </Link>
                     {/* PrimaryButton for create workspace */}
                 </div>
 
                 <div className="h-[17px] w-full flex justify-center mt-[46.26px]">
                     <span className="h-[17px] font-montserrat text-[14px] font-[400] leading-[17.07px] text-center">
                         Already using KleeneStar?{" "}
-                        <Link to={"/"} className="underline text-primary-300">
+                        <Link to={"/"} className="underline text-black">
                             Log in to an existing workspace
                         </Link>
                         {/* Link to login page */}
