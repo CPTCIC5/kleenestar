@@ -68,9 +68,15 @@ const Login: FunctionComponent = () => {
                 <form
                     method="post"
                     onSubmit={handleSubmit}
-                    className="max-w-[454px] w-full h-[290.63px] mt-[59.05px] flex flex-col gap-[16px]"
+                    className={`max-w-[454px] ${
+                        unauthorisedEmail ? "h-[292.63px]" : "h-[266.63px]"
+                    } w-full mt-[39px] flex flex-col gap-[16px]`}
                 >
-                    <div className="w-full h-[99.33px] gap-[10px] flex flex-col justify-between">
+                    <div
+                        className={`w-full ${
+                            unauthorisedEmail ? "h-[98.33px]" : "h-[72.33px]"
+                        } gap-[10px] flex flex-col justify-between`}
+                    >
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">
                             Email*
                         </span>
@@ -89,12 +95,15 @@ const Login: FunctionComponent = () => {
                                 <PencilLine className="bg-inherit " />
                             </div>
                         </div>
-                        <div className="w-full h-[16px] flex items-center justify-start">
-                            <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
-                                {unauthorisedEmail ? "Unauthorized email" : ""}
-                            </span>
-                        </div>
+                        {unauthorisedEmail && (
+                            <div className="w-full h-[16px] flex items-center justify-start">
+                                <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
+                                    Unauthorized email
+                                </span>
+                            </div>
+                        )}
                     </div>
+
                     <div className="w-full h-[99.3px] gap-[10px] flex flex-col justify-between">
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">
                             Password*
@@ -150,11 +159,11 @@ const Login: FunctionComponent = () => {
                     </div>
                 </form>
 
-                <div className="w-full h-[25.47px] flex justify-center mt-[25px] items-center">
+                <div className="w-full h-[25.47px] flex justify-center mt-[25.25px] items-center">
                     <GoogleOauthButton /> {/* Use the GoogleOauthButton component */}
                 </div>
 
-                <div className="h-[25.47px] w-full flex justify-center mt-[46.26px]">
+                <div className="h-[25.47px] w-full flex justify-center mt-[46.27px]">
                     <span className="h-[17px] font-montserrat text-[14px] font-[400] leading-[10.07px] text-center">
                         Need a workspace?
                         <Link to={"/OnboardingStep1"} className="underline text-black">
