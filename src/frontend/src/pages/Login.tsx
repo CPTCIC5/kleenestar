@@ -1,4 +1,3 @@
-
 import { FunctionComponent } from "react";
 import React, { useState } from "react";
 import axios from "axios";
@@ -8,32 +7,40 @@ import PrimaryInputBox from "../components/PrimaryInputBox";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, PencilLine } from "lucide-react";
 
-interface FormData {
-    email: string;
-    password: string;
-}
 const Login: FunctionComponent = () => {
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
     const [incorrectCredentials, setIncorrectCredentials] = useState<boolean>(false);
+    const [unauthorisedEmail, setUnauthorisedEmail] = useState<boolean>(false);
 
-    const [formData, setFormData] = useState<FormData>({
-        email: "",
-        password: "",
-    });
+    {
+        /* Make google login button work*/
+    }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(event.target.value);
+        const email = event.target.value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            setUnauthorisedEmail(true);
+        } else {
+            setUnauthorisedEmail(false);
+        }
+    };
+
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(email, password);
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-                email: formData.email,
-                password: formData.password,
+                email: email,
+                password: password,
             });
             console.log(response.data); // Do something with the response
             alert("Logged In!");
@@ -61,9 +68,9 @@ const Login: FunctionComponent = () => {
                 <form
                     method="post"
                     onSubmit={handleSubmit}
-                    className="max-w-[454px] w-full h-[187.63px] mt-[59.05px] flex flex-col gap-[16px]"
+                    className="max-w-[454px] w-full h-[290.63px] mt-[59.05px] flex flex-col gap-[16px]"
                 >
-                    <div className="w-full h-[72.33px] gap-[10px] flex flex-col justify-between">
+                    <div className="w-full h-[99.33px] gap-[10px] flex flex-col justify-between">
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">
                             Email*
                         </span>
@@ -72,15 +79,20 @@ const Login: FunctionComponent = () => {
                                 type="email"
                                 name="email"
                                 placeholder="my@email.com"
-                                onChange={handleInputChange}
+                                onChange={handleEmailChange}
                                 className="focus:outline-primary-100 focus:outline"
-                                value={formData.email}
+                                value={email}
                                 required
                             />
                             {/* PrimaryInputBox component for email*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
-                                <PencilLine className="bg-inherit" />
+                                <PencilLine className="bg-inherit " />
                             </div>
+                        </div>
+                        <div className="w-full h-[16px] flex items-center justify-start">
+                            <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
+                                {unauthorisedEmail ? "Unauthorized email" : ""}
+                            </span>
                         </div>
                     </div>
                     <div className="w-full h-[99.3px] gap-[10px] flex flex-col justify-between">
@@ -92,9 +104,9 @@ const Login: FunctionComponent = () => {
                                 type={passwordShow ? "text" : "password"}
                                 placeholder="Password"
                                 name="password"
-                                onChange={handleInputChange}
+                                onChange={handlePasswordChange}
                                 className="focus:outline-primary-100 focus:outline"
-                                value={formData.password}
+                                value={password}
                                 required
                             />
                             {/*PrimaryInputBox component for password*/}
@@ -130,11 +142,13 @@ const Login: FunctionComponent = () => {
                             {/* forgot-password link */}
                         </div>
                     </div>
+                    <div className="h-[40px] max-w-[454px] w-full mt-[23px]">
+                        <PrimaryButton disabled={unauthorisedEmail || !email || !password}>
+                            Login
+                        </PrimaryButton>
+                        {/* Use the PrimaryButton component */}
+                    </div>
                 </form>
-
-                <div className="h-[40px] max-w-[454px] w-full mt-[39px]">
-                    <PrimaryButton>Login</PrimaryButton> {/* Use the PrimaryButton component */}
-                </div>
 
                 <div className="w-full h-[25.47px] flex justify-center mt-[25px] items-center">
                     <GoogleOauthButton /> {/* Use the GoogleOauthButton component */}
@@ -143,7 +157,7 @@ const Login: FunctionComponent = () => {
                 <div className="h-[25.47px] w-full flex justify-center mt-[46.26px]">
                     <span className="h-[17px] font-montserrat text-[14px] font-[400] leading-[10.07px] text-center">
                         Need a workspace?
-                        <Link to={"/create-workspace"} className="underline text-primary">
+                        <Link to={"/OnboardingStep1"} className="underline text-black">
                             Create a workspace
                         </Link>
                         {/* create-workspace link */}
