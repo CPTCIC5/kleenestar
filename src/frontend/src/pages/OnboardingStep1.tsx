@@ -75,6 +75,7 @@ const OnboardingStep1: FunctionComponent = () => {
                                 value={businessName}
                                 required
                             />
+                            {/* PrimaryInputBox component for business name*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <PencilLine className="bg-inherit" />
                             </div>
@@ -125,7 +126,7 @@ const OnboardingStep1: FunctionComponent = () => {
                                 className="focus:outline-primary-100 focus:outline"
                                 value={industry}
                             />
-                            {/* PrimaryInputBox component for email*/}
+                            {/* PrimaryInputBox component for industry*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <ChevronDown className="bg-inherit" />
                             </div>
