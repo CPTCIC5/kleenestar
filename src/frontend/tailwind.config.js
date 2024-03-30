@@ -4,6 +4,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // color palette
+        "background" : "#F8F9F7",
+        "primary" : {
+          "100" : "#d2d4db",
+          "200" : "#495270",
+          "300" : "#1C274C",
+        },
+
         whitesmoke: "#f8f9f7",
         darkslateblue: {
           "100": "#1c274c",

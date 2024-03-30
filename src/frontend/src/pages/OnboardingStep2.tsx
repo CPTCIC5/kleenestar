@@ -1,11 +1,12 @@
-import { Eye, EyeOff, PencilLine } from "lucide-react";
 import { FunctionComponent, useState } from "react";
-import PrimaryInputBox from "../components/PrimaryInputBox";
-import PrimaryButton from "../components/PrimaryButton";
 import GoogleOauthButton from "../components/GoogleOauthButton";
-import { Link } from "react-router-dom";
+import PrimaryInputBox from "../components/PrimaryInputBox";
+import { Circle, CircleArrowLeft, Eye, EyeOff, PencilLine } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import PrimaryButton from "../components/PrimaryButton";
 
-const JoinTeam: FunctionComponent = () => {
+const OnboardingStep2: FunctionComponent = () => {
+    const navigate = useNavigate();
     const [passwordShow1, setPasswordShow1] = useState<boolean>(false);
     const [passwordShow2, setPasswordShow2] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
@@ -13,6 +14,7 @@ const JoinTeam: FunctionComponent = () => {
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordUnmatch, setPasswordUnmatch] = useState<boolean>(false);
     const [unauthorisedEmail, setUnauthorisedEmail] = useState<boolean>(true);
+    const [newsletter, setNewsletter] = useState<boolean>(false);
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -46,7 +48,8 @@ const JoinTeam: FunctionComponent = () => {
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(email, password, confirmPassword);
+        console.log(email, password, confirmPassword, newsletter);
+
         {
             /* add axios post request here */
         }
@@ -55,13 +58,16 @@ const JoinTeam: FunctionComponent = () => {
     return (
         <div className="w-full h-screen flex items-center justify-center bg-background p-4">
             <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative ">
+                <div className="absolute top-5 left-5">
+                    <CircleArrowLeft onClick={() => navigate(-1)} />
+                </div>
                 <div className="max-width flex items-center justify-center box-border max-w-full text-11xl font-syne">
                     <div className="flex-1 flex flex-col items-center justify-center gap-[19px] max-w-full">
                         <span className=" m-0 text-inherit font-bold font-inherit inline-block z-[1]">
-                            Join Team
+                            Account
                         </span>
                         <div className="max-width self-stretch text-base text-center font-montserrat z-[1] flex flex-col item-center">
-                            <span>Welcome to your team workspace 🙌</span>
+                            <span>We suggest using the email address you use at work.</span>
                         </div>
                     </div>
                 </div>
@@ -168,6 +174,18 @@ const JoinTeam: FunctionComponent = () => {
                             </div>
                         )}
                     </div>
+                    <div className="h-[19px] max-w-[330px] w-full flex items-center justify-center gap-1 mt-[3px]">
+                        <div className="flex" onClick={() => setNewsletter(!newsletter)}>
+                            {newsletter ? (
+                                <Circle fill={"#495270"} size={"16px"} />
+                            ) : (
+                                <Circle size={"16px"} />
+                            )}
+                        </div>
+                        <span className="h-[17px] font-montserrat font-[400] text-[14px] leading-[17.07px]">
+                            Send me emails with tips, news, and offers.
+                        </span>
+                    </div>
                     <div className="h-[40px] max-w-[454px] w-full mt-[23px]">
                         <PrimaryButton
                             disabled={
@@ -178,7 +196,7 @@ const JoinTeam: FunctionComponent = () => {
                                 !confirmPassword
                             }
                         >
-                            Sign up
+                            Continue
                         </PrimaryButton>
                         {/* Use the PrimaryButton component */}
                     </div>
@@ -187,18 +205,9 @@ const JoinTeam: FunctionComponent = () => {
                 <div className="w-full h-[25.47px] flex justify-center mt-[25.27px] items-center">
                     <GoogleOauthButton />
                 </div>
-                <div className="h-[25.47px] w-full flex justify-center mt-[46.27px]">
-                    <span className="h-[17px] font-montserrat text-[14px] font-[400] leading-[10.07px] text-center">
-                        Need a workspace?
-                        <Link to={"/OnboardingStep1"} className="underline text-black">
-                            Create a workspace
-                        </Link>
-                        {/* create-workspace link */}
-                    </span>
-                </div>
             </div>
         </div>
     );
 };
 
-export default JoinTeam;
+export default OnboardingStep2;
