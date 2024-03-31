@@ -10,6 +10,7 @@ charset-normalizer==3.3.2
 curlify==2.2.1
 distro==1.9.0
 Django==5.0.2
+django-cors-headers==4.3.1
 django-countries==7.5.1
 django-rest-passwordreset==1.4.0
 djangorestframework==3.14.0
