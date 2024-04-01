@@ -35,7 +35,27 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_rest_passwordreset",
     "corsheaders",
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+SITE_ID = 1
+SOCIALACCOUNT_LOGIN_ON_GET=True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -47,6 +67,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend'
+    ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000'
@@ -113,6 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
 
 
 # Internationalization

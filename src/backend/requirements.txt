@@ -6,10 +6,14 @@ asgiref==3.7.2
 attrs==23.2.0
 cachetools==5.3.3
 certifi==2024.2.2
+cffi==1.16.0
 charset-normalizer==3.3.2
+cryptography==42.0.5
 curlify==2.2.1
+defusedxml==0.7.1
 distro==1.9.0
 Django==5.0.2
+django-allauth==0.61.1
 django-cors-headers==4.3.1
 django-countries==7.5.1
 django-rest-passwordreset==1.4.0
@@ -37,9 +41,12 @@ psycopg2==2.9.9
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
 pycountry==23.12.11
+pycparser==2.22
 pydantic==2.6.4
 pydantic_core==2.16.3
+PyJWT==2.8.0
 python-dotenv==1.0.1
+python3-openid==3.2.0
 pytz==2024.1
 PyYAML==6.0.1
 requests==2.31.0

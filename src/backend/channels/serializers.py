@@ -21,12 +21,14 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
         model = models.PromptFeedback
         fields = ['user','note']
 
+"""
 class PromptInputSerializer(serializers.Serializer):
     author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=False)
-    user_query=serializers.CharField(max_length=50,required=True)
-    refactored_query = serializers.CharField(allow_blank=True) #gpt 4.0 will refactor the query 
+    text_query=serializers.CharField(max_length=50,required=True)
+    image_query=serializers.ImageField(allow_null=True, required=False)
+    refactored_image = serializers.CharField(allow_blank=True) #gpt 4.0 will refactor the query 
     response_text=serializers.CharField(allow_blank=True)
-    image=serializers.ImageField(allow_null=True, required=False)
+    response_image= serializers.ImageField(allow_null=True, required=False)
     created = serializers.DateTimeField()
 
 
@@ -52,3 +54,4 @@ class PromptInputSerializer(serializers.Serializer):
             json.dump(response_data_list, file)
 
         return response_data_list
+"""
