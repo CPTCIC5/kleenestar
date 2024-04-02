@@ -47,11 +47,10 @@ class PromptFeedback(models.Model):
 class PromptInput(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-
     text_query = models.TextField(max_length=10_000)
     image_query = models.ImageField(upload_to='Prompts-Query/', blank=True,null=True)
 
-    refactored_text = models.TextField(max_length=20_000,blank=True,null=True) #gpt4 refactored text
+    refactored_text = models.TextField(max_length=20_000,blank=True) #gpt4 refactored text
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
