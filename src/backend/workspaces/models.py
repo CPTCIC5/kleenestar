@@ -13,9 +13,9 @@ INDUSTRIES = (
 
 class WorkSpace(models.Model):
     SUBSCRIPTION_CHOICES = (
-        (1, "Indie"),
-        (2, "Pro"),
-        (3, "Scale")
+        (1, "Pro"),
+        (2, "Scale"),
+        (3, "Enterprise")
     )
     subscription_type = models.IntegerField(
         choices=SUBSCRIPTION_CHOICES, null=False, blank=False

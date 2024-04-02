@@ -27,8 +27,6 @@ class Channel(models.Model):
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     credential = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
 
-    
-
 
     class Meta:
         unique_together = ["workspace", "channel_type"]
