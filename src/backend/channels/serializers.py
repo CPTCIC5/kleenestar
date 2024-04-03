@@ -21,6 +21,17 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
         model = models.PromptFeedback
         fields = ['user','note']
 
+class ConvoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Convo
+        fields = ('id', 'workspace', 'title')
+
+class PromptInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PromptInput
+        fields = ('id', 'convo', 'author', 'text_query', 'image_query', 
+                  'refactored_text', 'response_text', 'response_image', 'created_at')
+
 """
 class PromptInputSerializer(serializers.Serializer):
     author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=False)

@@ -42,9 +42,19 @@ class PromptFeedback(models.Model):
     def __str__(self):
         return str(self.user)
     
-class PromptInput(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+class Convo(models.Model):
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+    
+    
+class PromptInput(models.Model):
+    convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
     text_query = models.TextField(max_length=10_000)
     image_query = models.ImageField(upload_to='Prompts-Query/', blank=True,null=True)
 
@@ -54,6 +64,11 @@ class PromptInput(models.Model):
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    """
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+    """
 
     class Meta:
         ordering  = ['author','id']

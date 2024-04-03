@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import views,viewsets, permissions, status
+from rest_framework import views,viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
+
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 10
+
 
 class PromptFeedbackView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -36,10 +40,13 @@ class ChannelViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class PromptInputView(views.APIView):
-    def post(self,request):
-        serializer = serializers.PromptInputSerializer(
-            data= request.DATA
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+
+class ConvoViewSet(viewsets.ModelViewSet):
+    queryset = models.Convo.objects.all()
+    serializer_class = serializers.ConvoSerializer
+    pagination_class = CustomPagination
+
+class PromptInputViewSet(viewsets.ModelViewSet):
+    queryset = models.PromptInput.objects.all()
+    serializer_class = serializers.PromptInputSerializer
+    pagination_class = CustomPagination
