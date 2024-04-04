@@ -71,7 +71,7 @@ class Prompt(models.Model):
 
 class PromptFeedback(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    
+    prompt = models.ForeignKey(Prompt,on_delete=models.CASCADE)
     note = models.TextField()
 
     def __str__(self):
