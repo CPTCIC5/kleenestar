@@ -46,7 +46,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ConvoSerializer
     pagination_class = CustomPagination
 
-class PromptInputViewSet(viewsets.ModelViewSet):
-    queryset = models.PromptInput.objects.all()
-    serializer_class = serializers.PromptInputSerializer
+class PromptViewSet(viewsets.ModelViewSet):
+    queryset = models.Prompt.objects.all()
+    serializer_class = serializers.PromptSerializer
     pagination_class = CustomPagination

@@ -1,21 +1,18 @@
-import requests
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.adaccount import AdAccount
-from facebook_business.adobjects.adset import AdSet
-from facebook_business.adobjects.ad import Ad
-from facebook_business.adobjects.adsinsights import AdsInsights
-from facebook_business.adobjects.campaign import Campaign
-from facebook_business.adobjects.adreportrun import AdReportRun
-import pandas as pd
 
-app_id = 'app id from developer account'
-app_secret = 'app secret'
-access_token = 'access token'
 
-FacebookAdsApi.init(app_id,app_secret,access_token)
-my_account = AdAccount('act_xyz') #xyx is the account id in the business manager
+my_app_id = 'your-app-id'
+my_app_secret = 'your-appsecret'
+my_access_token = 'your-page-access-token'
+FacebookAdsApi.init(my_app_id, my_app_secret, my_access_token)
+my_account = AdAccount('act_<your-adaccount-id>')
+campaigns = my_account.get_campaigns()
+print(campaigns)
 
-#Fetch all the campaigns id that are associated with you account
-campaigns = my_account.get_campaigns(fields=[Campaign.Field.name])
-for campaign in campaigns:
-    print(campaign[Campaign.Field.id])
+
+print(my_account)
+#{'account_id': u'17842443', 'id': u'act_17842443'}
+my_account = my_account.api_get(fields=[AdAccount.Field.amount_spent])
+print(my_account[AdAccount.Field.amount_spent])
+#{'amount_spent': 21167, 'account_id': u'17842443', 'id': u'act_17842443'}

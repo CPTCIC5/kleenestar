@@ -35,14 +35,6 @@ class Channel(models.Model):
         return "xyz"
 
 
-class PromptFeedback(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    note = models.TextField()
-
-    def __str__(self):
-        return str(self.user)
-    
-
 class Convo(models.Model):
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
@@ -51,7 +43,7 @@ class Convo(models.Model):
         return self.title
     
     
-class PromptInput(models.Model):
+class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
@@ -75,3 +67,12 @@ class PromptInput(models.Model):
 
     def __str__(self):
         return str(self.author)
+    
+
+class PromptFeedback(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
+    note = models.TextField()
+
+    def __str__(self):
+        return str(self.user)
