@@ -32,7 +32,7 @@ const PrimaryInputBox: React.FC<PrimaryInputBoxProps> = ({
             placeholder={placeholder}
             onChange={handleInputChange}
             value={value}
-            className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary  text-opacity-50 outline-none ${className}`}
+            className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none ${className}`}
             required={required}
         />
     );

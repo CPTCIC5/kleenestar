@@ -12,6 +12,8 @@ module.exports = {
           "300" : "#1C274C",
         },
 
+        "dimwhite" : "#BEB9B1",
+
         whitesmoke: "#f8f9f7",
         darkslateblue: {
           "100": "#1c274c",
@@ -62,6 +64,9 @@ module.exports = {
       },
       mq1000: {
         raw: "screen and (max-width: 1000px)",
+      },
+      mq850: {
+        raw: "screen and (max-width: 850px)",
       },
       mq750: {
         raw: "screen and (max-width: 750px)",
