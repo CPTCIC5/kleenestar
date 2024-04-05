@@ -1,7 +1,7 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
-
+from channels.ai import generate_instructions,generate_instructions,handle_user_query
 
 class APICredentials(models.Model):
     key_1 = models.CharField(max_length=255,unique=True)
@@ -50,17 +50,19 @@ class Prompt(models.Model):
     text_query = models.TextField(max_length=10_000)
     image_query = models.ImageField(upload_to='Prompts-Query/', blank=True,null=True)
 
-    refactored_text = models.TextField(max_length=20_000,blank=True) #gpt4 refactored text
+    #refactored_text = models.TextField(max_length=20_000,blank=True) #gpt4 refactored text
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    
     """
     def save(self,*args,**kwargs):
         super().save(*args,**kwargs)
     """
+    
 
     class Meta:
         ordering  = ['author','id']

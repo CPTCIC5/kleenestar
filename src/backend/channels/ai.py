@@ -1,10 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
-import openai
-import os
 
 load_dotenv()
-
 
 client = OpenAI()
 
@@ -45,9 +42,10 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
-# This is for input_query
 def generate_instructions(user_query, image=None):
     # Simplified intent detection logic
+
+
     #if "how to improve" in user_query.lower():
         #analysis_type = "database_analysis"
     if image and "analyze this image" in user_query.lower():
@@ -58,6 +56,8 @@ def generate_instructions(user_query, image=None):
         analysis_type = "general_knowledge_database_analysis"
 
     # Generate prompt for GPT-4 based on the analysis type
+        
+        
     #if analysis_type == "database_analysis":
         #prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
     if analysis_type == "image_and_database_analysis":
@@ -81,7 +81,7 @@ def perform_analysis_with_gpt4(instructions):
         temperature=0.5,
     )
     insights = response.choices[0].message
-    return insights
+    return insights.content
 
 
 def handle_user_query(user_query, image=None):
@@ -95,9 +95,3 @@ def handle_user_query(user_query, image=None):
         "analysis_type": analysis_type,
         "insights": perform_analysis_with_gpt4(prompt),
     }
-
-
-# # Example usage
-user_query = "How to improve my ad conversion rate?"
-response = perform_analysis_with_gpt4(user_query)
-print(response)
