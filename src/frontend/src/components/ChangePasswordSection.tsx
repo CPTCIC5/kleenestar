@@ -16,31 +16,31 @@ function ChangePasswordSection(): JSX.Element {
 				</p>
 			</div>
 			<div className="w-[95%] font-montserrat mx-auto">
-				<div className="flex gap-4 mq750:pl-2  pt-8 pb-4 mq750:flex-col">
-					<div className="text-primary-300 mq750:text-[14px] font-bold text-xl">
+				<div className="flex justify-center items-center gap-4 mq750:pl-2  pt-8 pb-4 mq750:flex-col">
+					<div className="w-full text-primary-300 mq750:text-[14px] font-bold text-xl">
 						New password
-						<div className="w-fit mq750:h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
+						<div className="w-full mq750:h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
 							<input
 								type="password"
 								placeholder="New password"
-								className="font-montserrat text-xl mq750:text-[15px]"
+								className="w-full font-montserrat text-xl mq750:text-[15px]"
 							/>
 							<PencilLine className="text-primary-300" />
 						</div>
 					</div>
-					<div className="text-primary-300 mq750:text-[14px] font-bold text-xl">
+					<div className="w-full text-primary-300 mq750:text-[14px] font-bold text-xl">
 						Confirm password
-						<div className="w-fit mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
+						<div className="w-full mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
 							<input
 								type="password"
 								placeholder="Confirm password"
-								className="font-montserrat text-xl mq750:text-[15px]"
+								className="w-full font-montserrat text-xl mq750:text-[15px]"
 							/>
 							<PencilLine className="text-primary-300" />
 						</div>
 					</div>
 				</div>
-				<div className="flex justify-between px-4 mq750:flex-col text-royalblue">
+				<div className="flex justify-between px-4 gap-4 mq750:flex-col text-royalblue">
 					<div className="flex gap-4 ">
 						{password_security_array.map((level, index) => {
 							return level <= current_security ? (

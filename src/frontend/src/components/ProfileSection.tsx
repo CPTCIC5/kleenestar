@@ -38,74 +38,74 @@ function ProfileSection(): JSX.Element {
 			</div>
 			<div className="p-2 pt-4  w-full font-montserrat text-lg ">
 				<div className="w-[95%] mx-auto">
-					<div className="flex mq750:flex-col gap-4">
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+					<div className="flex items-center justify-center mq750:flex-col gap-4">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Frist name
-							<div className="w-fit mt-2 bg-background rounded-[2rem] p-4 flex items-center mq750:h-[45px] ">
+							<div className="w-full mt-2 bg-background rounded-[2rem] p-4 flex items-center mq750:h-[45px] ">
 								<input
 									type="text"
 									placeholder="First name"
-									className="font-montserrat text-xl mq750:text-[15px]"
+									className="font-montserrat w-full text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>
 						</div>
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Last name
-							<div className="w-fit mt-2 bg-background mq750:h-[45px] rounded-[2rem] p-4 flex items-center ">
+							<div className="w-full mt-2 bg-background mq750:h-[45px] rounded-[2rem] p-4 flex items-center ">
 								<input
 									type="text"
 									placeholder="Last name"
-									className="font-montserrat  text-xl mq750:text-[15px]"
+									className="w-full font-montserrat  text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>
 						</div>
 					</div>
-					<div className="flex gap-4 pt-2 mq750:flex-col">
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+					<div className="flex items-center justify-center gap-4 pt-2 mq750:flex-col">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Email address
-							<div className="w-fit mq750:h-[45px] mt-2 bg-[#D1D3DB] rounded-[2rem] p-4 flex items-center ">
+							<div className="w-full mq750:h-[45px] mt-2 bg-[#D1D3DB] rounded-[2rem] p-4 flex items-center ">
 								<input
 									pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 									type="text"
 									placeholder="Email address"
-									className="font-montserrat text-xl mq750:text-[15px]"
+									className="font-montserrat w-full text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>
 						</div>
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Workspace name
-							<div className="w-fit mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
+							<div className="w-full mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
 									type="text"
 									placeholder="Workspace name"
-									className="font-montserrat text-xl mq750:text-[15px]"
+									className="w-full font-montserrat text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>
 						</div>
 					</div>
-					<div className="flex gap-4 pt-2 mq750:flex-col">
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+					<div className="flex items-center justify-center gap-4 pt-2 mq750:flex-col">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Country
-							<div className="w-fit mt-2 bg-background mq750:h-[45px] rounded-[2rem] p-4 flex items-center ">
+							<div className="w-full mt-2 bg-background mq750:h-[45px] rounded-[2rem] p-4 flex items-center ">
 								<input
 									type="text"
 									placeholder="Country"
-									className="font-montserrat text-xl mq750:text-[15px]"
+									className="w-full font-montserrat text-xl mq750:text-[15px]"
 								/>
 								<ChevronDown className="text-primary-300" />
 							</div>
 						</div>
-						<div className="text-primary-300 font-bold text-xl mq750:text-[14px]">
+						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Phone number
-							<div className="w-fit mq750:h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
+							<div className="w-full mq750:h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
 									type="text"
 									placeholder="Phone number"
-									className="font-montserrat text-xl mq750:text-[15px]"
+									className="w-full font-montserrat text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>

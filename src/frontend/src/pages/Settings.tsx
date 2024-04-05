@@ -8,7 +8,7 @@ import { FolderClosed } from "lucide-react"
 
 function Settings(): JSX.Element {
   return (
-		<div className="w-full bg-background pb-20">
+		<div className="w-screen bg-background pb-20">
 			<div className="pt-10 pl-8 mq750:pl-0 ">
 				<div className="text-primary-300 mq750:px-10 flex gap-8 mq750:justify-between items-center">
 					<div className="border px-[0.6rem] border-solid  border-gray-700 w-fit rounded-full py-[0.5rem] mq750:px-[0.4rem] mq750:py-0 ">
