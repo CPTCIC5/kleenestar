@@ -17,6 +17,8 @@ import Chat from "./pages/Chat";
 import ChatImageQuerySent from "./pages/ChatImageQuerySent";
 import ChatImageQuery from "./pages/ChatImageQuery";
 import ChatNew from "./pages/ChatNew";
+import NewChatDisplay from "./components/NewChatDisplay";
+import TempTester from "./modals/TempTester";
 
 function App() {
     const action = useNavigationType();
@@ -116,7 +118,7 @@ function App() {
 
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<TempTester/>} />
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/onboardingstep1" element={<OnboardingStep1 />} />
             <Route path="/onboardingstep2" element={<OnboardingStep2 />} />
