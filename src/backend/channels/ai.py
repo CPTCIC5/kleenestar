@@ -45,27 +45,27 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
-
+# This is for input_query
 def generate_instructions(user_query, image=None):
     # Simplified intent detection logic
-    if "how to improve" in user_query.lower():
-        analysis_type = "database_analysis"
-    elif image and "analyze this image" in user_query.lower():
+    #if "how to improve" in user_query.lower():
+        #analysis_type = "database_analysis"
+    if image and "analyze this image" in user_query.lower():
         analysis_type = "image_and_database_analysis"
     elif image:
         analysis_type = "image_analysis"
     else:
-        analysis_type = "general_knowledge"
+        analysis_type = "general_knowledge_database_analysis"
 
     # Generate prompt for GPT-4 based on the analysis type
-    if analysis_type == "database_analysis":
-        prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
-    elif analysis_type == "image_and_database_analysis":
+    #if analysis_type == "database_analysis":
+        #prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
+    if analysis_type == "image_and_database_analysis":
         prompt = "Analyze the provided image and the user's marketing channel data to offer branding insights."
     elif analysis_type == "image_analysis":
         prompt = "Analyze the provided image to offer branding insights."
-    else:  # general_knowledge
-        prompt = "Provide marketing and branding insights based on general knowledge."
+    else:  # general_knowledge on the basis of user conditional data
+        prompt = "Provide marketing and branding insights based on general knowledge, Analyze the user's marketing channel data to provide insights on improving their strategy."
 
     return prompt, analysis_type
 

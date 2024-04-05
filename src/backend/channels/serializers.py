@@ -28,7 +28,7 @@ class ConvoSerializer(serializers.ModelSerializer):
 
 class PromptInputSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.PromptInput
+        model = models.Prompt
         fields = ('id', 'convo', 'author', 'text_query', 'image_query', 
                   'refactored_text', 'response_text', 'response_image', 'created_at')
 
