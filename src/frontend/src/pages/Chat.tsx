@@ -111,7 +111,7 @@ const Chat: FunctionComponent = () => {
               className="absolute h-full w-full top-[0px] right-[0px] bottom-[0px] left-[0px] max-w-full overflow-hidden max-h-full z-[1]"
               alt=""
             />
-            <img
+            <img  
               className="absolute top-[11px] left-[17.1px] w-[24.9px] h-[25.1px] z-[2]"
               alt=""
               src="/usersgrouproundedsvgrepocom.svg"

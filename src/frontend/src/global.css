@@ -7,9 +7,7 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-    background-color: #ffffff;
-}
+
 body {
     @apply leading-[normal] m-0;
 }
@@ -39,4 +37,14 @@ body {
 
 *::-webkit-scrollbar {
     width: 8px;
+}
+
+input[type="text"], input[type="password"]{
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    background-color: transparent;
 }

@@ -1,20 +1,94 @@
-import { FunctionComponent } from "react";
-import FrameComponent18 from "../components/FrameComponent18";
-import PasswordUpdate from "../components/PasswordUpdate";
-import FrameComponent16 from "../components/FrameComponent16";
-import FrameComponent15 from "../components/FrameComponent15";
+import { ArrowLeft } from "lucide-react" 
+import ChangePasswordSection from "../components/ChangePasswordSection"
+import ProfileSection from "../components/ProfileSection"
+import SlideSwitch from "../components/SlideSwitch"
+import { ChevronDown } from "lucide-react"
+import { FolderClosed } from "lucide-react"
 
-const Settings: FunctionComponent = () => {
+
+function Settings(): JSX.Element {
   return (
-    <div className="w-full relative bg-whitesmoke flex flex-col items-end justify-start pt-[69px] pb-[97px] pr-[108.30000000000018px] pl-[50px] box-border gap-[40.09999999999991px] tracking-[normal] mq750:gap-[20px_40.1px] mq750:pl-[25px] mq750:pr-[54px] mq750:box-border mq450:pr-5 mq450:box-border">
-      <FrameComponent18 />
-      <form className="m-0 w-[1294.7px] flex flex-row items-start justify-start pt-0 px-0 pb-[22.700000000000045px] box-border gap-[36.099999999999454px] max-w-full lg:flex-wrap mq750:gap-[36.1px_18px]">
-        <PasswordUpdate />
-        <FrameComponent16 />
-      </form>
-      <FrameComponent15 />
-    </div>
-  );
-};
+		<div className="w-full bg-background pb-20">
+			<div className="pt-10 pl-8 mq750:pl-0 ">
+				<div className="text-primary-300 mq750:px-10 flex gap-8 mq750:justify-between items-center">
+					<div className="border px-[0.6rem] border-solid  border-gray-700 w-fit rounded-full py-[0.5rem] mq750:px-[0.4rem] mq750:py-0 ">
+						<ArrowLeft className="mq750:w-[0.6rem] h-fit w-8" />
+					</div>
+					<div className="text-primary-300 font-syne text-[1.6rem] font-bold mq750:text-[20px]">
+						Settings
+					</div>
+					<div className="hidden mq750:block">
+						<FolderClosed size={30} />
+					</div>
+				</div>
+				<div className="font-montserrat text-primary-300 flex px-[5rem] mq750:w-full mq750:px-[2.2rem] mq750:text-center justify-between">
+					<p className="whitespace-nowrap mq750:mx-auto">
+						Manage your profile details.
+					</p>
+					<p className="mq750:hidden">
+						<u>Archived chats</u>
+					</p>
+				</div>
+			</div>
+			<div className="w-[90%] gap-[5%] relative top-10 mx-auto mq750:flex-col flex">
+				<ProfileSection />
+				<div className="w-[50%] mq750:w-[95%] mq750:mx-auto mq750:mt-10 flex-col ">
+					<ChangePasswordSection />
+					<div className="bg-white rounded-[2rem] h-fit  mt-4 ">
+						<div className="text-primary-300 font-montserrat pt-2 pl-8 pb-4 my-4 ">
+							<div className=" font-bold pr-10 mq750:pr-4 mq750:text-[16px]  text-[1.6rem] flex justify-between my-4">
+								Google Authenticator
+								<SlideSwitch />
+							</div>
+							<p className="mq750:text-[14px] mq750:pr-2">
+								Use the Google Authenticator app to generate one time security
+								codes.
+							</p>
+						</div>
+					</div>
+					<div className="bg-white rounded-[2rem] h-fit mt-4 ">
+						<div className="text-primary-300 font-montserrat pt-2 pl-8 pb-4">
+							<div className=" font-bold mq750:text-[16px] pr-10 mq750:pr-4 text-[1.6rem] flex justify-between my-4">
+								Two Factor Authentication
+								<SlideSwitch />
+							</div>
+							<p className="mq750:text-[14px] mq750:pr-2">
+								Require a second authentication method in addition to your
+								password.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="w-[90%] mq750:w-[85%] mx-auto mt-20 bg-white rounded-[2rem]">
+				<div className="text-primary-300 font-montserrat pt-2 pl-8 pb-4 mq750:pl-4  mq750:pr-2 ">
+					<p className=" font-bold text-[1.6rem] mq750:text-[16px]">
+						Delete Account
+					</p>
+					<p className="mq750:text-[14px]">
+						Deleting your account will close your workspace, stop all activities
+						from our service, and purge all your information from our database.
+						This cannot be undone. 😱
+					</p>
+					<div className="flex justify-between items-center pr-4 pb-4 mq750:flex-col"	>
+						<div className="w-[60%]  mq750:w-full text-primary-300 font-bold text-xl">
+							<div className=" mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
+								<input
+									type="text"
+									placeholder="To confirm, tell us why you are leaving."
+									className="font-montserrat flex w-[90%]  text-xl mq750:text-[12px]"
+								/>
+								<ChevronDown className="text-primary-300" />
+							</div>
+						</div>
+						<div className="border-2 items-center flex whitespace-nowrap mq750:text-[15px] mq750:mt-4 mq750:py-[0.5rem] mq750:px-16 hover:text-white hover:bg-red-500 cursor-pointer w-fit px-10 rounded-[2rem] py-[1rem] border-solid border-red-500 text-red-500"	>
+							Delete Account
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
 
-export default Settings;
+export default Settings

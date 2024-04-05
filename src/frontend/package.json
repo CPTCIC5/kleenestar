@@ -11,7 +11,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^16.11.14",
-    "@types/react": "^18.0.28",
+    "@types/react": "^18.2.74",
     "@types/react-dom": "^18.0.11",
     "axios": "^1.6.8",
     "lucide": "^0.363.0",
@@ -24,6 +24,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
     "autoprefixer": "^10.4.8",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8"
