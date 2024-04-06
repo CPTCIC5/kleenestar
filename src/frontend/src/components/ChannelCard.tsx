@@ -45,7 +45,7 @@ function ChannelCard ({
 					</div>
 				</div>
 			) : (
-				<div className="mq750:mx-[31.63px]  mq750:max-h-[300.95px]max-w-[407.48px] relative  bg-primary-300 bg-opacity-[0.2]  px-[23.5px] w-full max-h-[291.95px]  rounded-[2rem]">
+				<div className="mq750:mx-[31.63px]  mq750:max-h-[300.95px] max-w-[407.48px] relative  bg-primary-300 bg-opacity-[0.2]  px-[23.5px] w-full max-h-[291.95px]  rounded-[2rem]">
 					<div className="text-white left-[80.49px] mq750:left-[30px] whitespace-nowrap mq750:text-[30px] top-[119.95px] font-syne absolute font-[700] text-[30px]">
 						Comming soon
 					</div>
