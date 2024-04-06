@@ -68,18 +68,25 @@ def base(user_query, image=None):
     else:  # general_knowledge on the basis of user conditional data
         prompt = "Provide marketing and branding insights based on general knowledge, Analyze the user's marketing channel data to provide insights on improving their strategy."
 
-    return prompt, analysis_type
+    return {
+        "prompt":prompt,
+        "analysis_type": analysis_type
+    }
+    #return prompt, analysis_type
 
 
 
 def generate_instructions(user_query,image=None):
-    x1 = base(user_query,image)
+    fetch = base(user_query,image)
     response = client.chat.completions.create(
         model="gpt-4",  # Use the correct identifier for GPT-4
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role" : "user", "content":str(x1)},
+            {"role": "system", "content": fetch["analysis_type"]},
+
+            {"role" : "user", "content":fetch["prompt"]},
         ],
+        stream=True,
         max_tokens=500,
         temperature=0.5,
     )
