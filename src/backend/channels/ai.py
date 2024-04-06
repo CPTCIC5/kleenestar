@@ -47,9 +47,9 @@ def base(user_query, image=None):
     # Simplified intent detection logic
 
 
-    #if "how to improve" in user_query.lower():
-        #analysis_type = "database_analysis"
-    if image and "analyze this image" in user_query.lower():
+    if "how to improve" in user_query.lower():
+        analysis_type = "database_analysis"
+    elif image and "analyze this image" in user_query.lower():
         analysis_type = "image_and_database_analysis"
     elif image:
         analysis_type = "image_analysis"
@@ -59,9 +59,9 @@ def base(user_query, image=None):
     # Generate prompt for GPT-4 based on the analysis type
         
         
-    #if analysis_type == "database_analysis":
-        #prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
-    if analysis_type == "image_and_database_analysis":
+    if analysis_type == "database_analysis":
+        prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
+    elif analysis_type == "image_and_database_analysis":
         prompt = "Analyze the provided image and the user's marketing channel data to offer branding insights."
     elif analysis_type == "image_analysis":
         prompt = "Analyze the provided image to offer branding insights."
@@ -92,20 +92,14 @@ def generate_instructions(user_query,image=None):
     insights = response.choices[0].message
     return insights.content
 
-"""
+def generate_insights_with_gpt4(query):
+    data_for_analysis = generate_instructions(query)
+    prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
-def handle_user_query(user_query, image=None):
-    # Generate instructions for analysis based on the user query
-    prompt, analysis_type = generate_instructions(user_query, image=image)
-    # If analysis involves the user's database or images, you would include logic here
-    # to fetch relevant data from the database or analyze the image as required.
-    # For simplicity, this example focuses on generating and querying prompts.
-
-    print()
-
-    return analysis_type,perform_analysis_with_gpt4(prompt)
-    return {
-        "analysis_type": analysis_type,
-        "insights": perform_analysis_with_gpt4(prompt),
-    }
-"""
+    response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt_for_gpt4}],
+            max_tokens=1000,
+            temperature=0.5,
+    )
+    return response.choices[0].message.content
