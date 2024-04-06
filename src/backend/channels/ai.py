@@ -42,7 +42,8 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
-def generate_instructions(user_query, image=None):
+
+def base(user_query, image=None):
     # Simplified intent detection logic
 
 
@@ -70,12 +71,14 @@ def generate_instructions(user_query, image=None):
     return prompt, analysis_type
 
 
-def perform_analysis_with_gpt4(instructions):
+
+def generate_instructions(user_query,image=None):
+    x1 = base(user_query,image)
     response = client.chat.completions.create(
         model="gpt-4",  # Use the correct identifier for GPT-4
-        messages=[
+        messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": instructions},
+            {"role" : "user", "content":str(x1)},
         ],
         max_tokens=500,
         temperature=0.5,
@@ -83,6 +86,7 @@ def perform_analysis_with_gpt4(instructions):
     insights = response.choices[0].message
     return insights.content
 
+"""
 
 def handle_user_query(user_query, image=None):
     # Generate instructions for analysis based on the user query
@@ -91,7 +95,11 @@ def handle_user_query(user_query, image=None):
     # to fetch relevant data from the database or analyze the image as required.
     # For simplicity, this example focuses on generating and querying prompts.
 
+    print()
+
+    return analysis_type,perform_analysis_with_gpt4(prompt)
     return {
         "analysis_type": analysis_type,
         "insights": perform_analysis_with_gpt4(prompt),
     }
+"""
