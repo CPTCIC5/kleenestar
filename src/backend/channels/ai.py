@@ -86,7 +86,6 @@ def generate_instructions(user_query,image=None):
 
             {"role" : "user", "content":fetch["prompt"]},
         ],
-        stream=True,
         max_tokens=500,
         temperature=0.5,
     )
