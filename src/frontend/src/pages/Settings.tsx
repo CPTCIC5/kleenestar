@@ -1,8 +1,7 @@
-import { ArrowLeft } from "lucide-react" 
 import ChangePasswordSection from "../components/ChangePasswordSection"
 import ProfileSection from "../components/ProfileSection"
 import SlideSwitch from "../components/SlideSwitch"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, CircleArrowLeft } from "lucide-react"
 import { FolderClosed } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import SelectOptions from "../components/SelectOptions"
@@ -21,11 +20,10 @@ function Settings(): JSX.Element {
 		<div className="w-screen bg-background pb-20">
 			<div className="pt-10 pl-8 mq750:pl-0 ">
 				<div className="text-primary-300 mq750:px-10 flex gap-8 mq750:justify-between items-center">
-					<div
+					<CircleArrowLeft
+						className="w-[30px] h-[30px]  "
 						onClick={() => navigate(-1)}
-						className="border px-[0.6rem] border-solid  border-gray-700 w-fit rounded-full py-[0.5rem] mq750:px-[0.4rem] mq750:py-0 ">
-						<ArrowLeft className="mq750:w-[0.6rem] h-fit w-8" />
-					</div>
+					/>
 					<div className="text-primary-300 font-syne text-[1.6rem] font-bold mq750:text-[20px]">
 						Settings
 					</div>
