@@ -1,0 +1,18 @@
+{
+    "chat": [
+        {
+            "id": "1",
+            "title": "Growth performance analysis",
+            "date": "November 30th, 2023",
+            "archive": true,
+            "convo": {}
+        },
+        {
+            "id": "2",
+            "title": "Ad sets performance comparison",
+            "date": "November 16th, 2023",
+            "archive": true,
+            "convo": {}
+        }
+    ]
+}
