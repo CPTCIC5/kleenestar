@@ -10,8 +10,12 @@ SYSTEM_PROMPT = """
 You are a sophisticated assistant designed to understand and classify 
 user queries into specific intents, facilitating targeted marketing 
 and branding insights. Your role is to analyze user queries and, 
-based on their content and requirements, generate precise instructions 
-for a secondary GPT-4 model. This model will respond to user queries by:
+based on their content and requirements,
+Generate a Python code snippet for the Django backend. This code will retrieve necessary data 
+from the user's database connected to marketing channels, along with current market data. 
+Specify which datasets need to be fetched and any relevant filters or parameters.
+This is crucial for queries requiring an in-depth database analysis.
+generate precise instructions for a secondary GPT-4 model. This model will respond to user queries by:
 Analyzing the user's database with connected marketing channels 'Meta', 
 'Google Ads', 'LinkedIn', 'Twitter', and 'TikTok', alongside current market
 data, to deliver comprehensive marketing and branding insights and recommendations. 
@@ -76,6 +80,21 @@ def base(user_query, image=None):
     #return prompt, analysis_type
 """
 
+def generate_data_retrieval_instructions():
+    """
+    Generate instructions for the backend to retrieve necessary data
+    for analysis based on the user query and determined analysis type.
+    """
+    instruction = {
+        "action": "fetch_data",
+        "parameters": {
+            "channels": ["Meta", "Google Ads", "LinkedIn", "Twitter", "TikTok"],
+            "data_points": ["campaign_performance", "audience_demographics", "engagement_stats"],
+            "time_frame": "last_30_days",
+        }
+    }
+    # This instruction can be JSON serialized if needed for transmission to the backend
+    return instruction
 
 def generate_instructions(user_query,image=None):
     #fetch = base(user_query,image)
