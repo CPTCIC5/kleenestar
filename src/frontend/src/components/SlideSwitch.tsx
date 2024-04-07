@@ -24,11 +24,11 @@ const Android12Switch = styled(Switch)(({ theme }) => ({
 	},
 }))
 
-export default function SlideSwitch() {
+export default function SlideSwitch({on} : {on: boolean}) {
 	return (
 		<FormGroup>
 			<FormControlLabel
-				control={<Android12Switch defaultChecked />}
+				control={<Android12Switch defaultChecked checked={on} />}
 				label=""
 			/>
 		</FormGroup>
