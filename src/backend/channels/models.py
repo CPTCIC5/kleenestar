@@ -1,7 +1,6 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
-from channels.ai import generate_instructions,generate_instructions,handle_user_query
 
 class APICredentials(models.Model):
     key_1 = models.CharField(max_length=255,unique=True)

@@ -42,6 +42,7 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
+"""
 
 def base(user_query, image=None):
     # Simplified intent detection logic
@@ -49,7 +50,7 @@ def base(user_query, image=None):
 
     if "how to improve" in user_query.lower():
         analysis_type = "database_analysis"
-    elif image and "analyze this image" in user_query.lower():
+    elif image and "image" in user_query.lower():
         analysis_type = "image_and_database_analysis"
     elif image:
         analysis_type = "image_analysis"
@@ -73,24 +74,24 @@ def base(user_query, image=None):
         "analysis_type": analysis_type
     }
     #return prompt, analysis_type
-
+"""
 
 
 def generate_instructions(user_query,image=None):
-    fetch = base(user_query,image)
+    #fetch = base(user_query,image)
     response = client.chat.completions.create(
         model="gpt-4",  # Use the correct identifier for GPT-4
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "system", "content": fetch["analysis_type"]},
-
-            {"role" : "user", "content":fetch["prompt"]},
+            #{"role": "system", "content": fetch["analysis_type"]},
+            #{"role" : "user", "content":fetch["prompt"]},
+            {"role":"user", "content": user_query}
         ],
         max_tokens=500,
         temperature=0.5,
     )
     insights = response.choices[0].message
-    return insights.content
+    return insights.content.strip()
 
 def generate_insights_with_gpt4(query):
     data_for_analysis = generate_instructions(query)
@@ -102,4 +103,4 @@ def generate_insights_with_gpt4(query):
             max_tokens=1000,
             temperature=0.5,
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content.strip()
