@@ -3,17 +3,14 @@ import { CircleX } from "lucide-react";
 import React from "react";
 import PrimaryButton from "../components/PrimaryButton";
 
-interface GoogleAdsProps {
-    // define your props here
+interface TwitterAdsProps {
     isOpen: boolean;
     onClose: (option: boolean) => void;
     connected: boolean;
     setConnected: (option: boolean) => void;
 }
 
-const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setConnected }) => {
-    // define your state and methods here
-
+const TwitterAds: React.FC<TwitterAdsProps> = ({ isOpen, onClose, connected, setConnected }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setConnected(event.target.checked);
     };
@@ -40,7 +37,7 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
                         />
                         <div className="w-full pt-[42.5px] pl-[80px] pb-[19px] flex gap-[19px] mq551:fixed mq551:bg-white mq551:flex mq551:items-center mq551:justify-center mq551:pl-0 ">
                             <span className="font-syne font-[700] text-[30px] leading-[36px] text-primary-300 mq374:text-[25px] ">
-                                Google Ads
+                                Twitter X
                             </span>
                             <div>
                                 {connected ? (
@@ -61,7 +58,7 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
 
                         <div className="w-full h-full pl-[80px] flex flex-col mq551:mt-[120px] mq551:pl-0 mq551:flex mq551:flex-col mq551:items-center ">
                             <div className="max-w-[387px] w-full font-montserrat font-[400] text-[16px] leading-[19.5px] text-primary-300 text-start mb-[18px] mq551:text-center mq551:px-4">
-                                Integrate Google Ads with Kleenestar.
+                                Integrate Twitter X with Kleenestar.
                             </div>
                             <div className="w-full h-full flex flex-col justify-between mq551:px-4 mq551:items-center">
                                 <div className="rounded-3xl bg-white max-w-[388.56px] w-full">
@@ -85,12 +82,12 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
                                         <div className="max-w-[337px] w-full">
                                             <div className="w-full flex flex-col items-start gap-[12px]">
                                                 <span className="font-montserrat font-[600] text-[15px] leading-[18.29px] text-primary-300">
-                                                    2. Google Login
+                                                    2. Twitter Login
                                                 </span>
                                                 <span className="font-montserrat font-[400] text-[14px] leading-[17.07px] text-primary-300">
-                                                    You’ll be redirected to a Google login page.
-                                                    Enter your credentials for the Google account
-                                                    associated with your Google Ads.
+                                                    You’ll be redirected to log in to Twitter. Use
+                                                    the account that has access to your ad
+                                                    campaigns.
                                                 </span>
                                             </div>
                                         </div>
@@ -100,9 +97,9 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
                                                     3. Grant Access
                                                 </span>
                                                 <span className="font-montserrat font-[400] text-[14px] leading-[17.07px] text-primary-300">
-                                                    Review the permissions Kleenestar is requesting
-                                                    (e.g., view and manage your Google Ads
-                                                    campaigns) and click “Allow”.
+                                                    Read through the permissions Kleenestar needs
+                                                    (e.g., read and write access to your Twitter
+                                                    ads) and approve.
                                                 </span>
                                             </div>
                                         </div>
@@ -112,9 +109,8 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
                                                     4. Complete Setup
                                                 </span>
                                                 <span className="font-montserrat font-[400] text-[14px] leading-[17.07px] text-primary-300">
-                                                    Once authorized, you’ll be redirected back to
-                                                    Kleenestar with your Google Ads account
-                                                    connected.
+                                                    After granting access, you’ll be brought back to
+                                                    Kleenestar with Twitter linked.
                                                 </span>
                                             </div>
                                         </div>
@@ -139,4 +135,4 @@ const GoogleAds: React.FC<GoogleAdsProps> = ({ isOpen, onClose, connected, setCo
     );
 };
 
-export default GoogleAds;
+export default TwitterAds;
