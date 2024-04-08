@@ -81,6 +81,11 @@ module.exports = {
       mq625: {
         raw: "screen and (max-width: 625px)",
       },
+
+      mq551:{
+        raw: "screen and (max-width: 551px)",
+      },
+      
       mq450: {
         raw: "screen and (max-width: 450px)",
       },
