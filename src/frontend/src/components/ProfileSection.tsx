@@ -290,8 +290,11 @@ function ProfileSection(): JSX.Element {
 					<div className="flex items-center justify-center gap-4 pt-2 mq750:flex-col">
 						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
 							Country
-							<div className="w-full mt-2 bg-background mq750:h-[45px] rounded-[2rem] px-4 py-[0.5rem]  flex items-center ">
-								<SelectOptions  options={countries} InputText={"Country"} />
+							<div className="w-full px-[19.34px]  mt-2 bg-background  rounded-[2rem]  flex items-center ">
+								<SelectOptions
+									options={countries}
+									InputText={"Country"}
+								/>
 								<ChevronDown className="text-primary-300" />
 							</div>
 						</div>
