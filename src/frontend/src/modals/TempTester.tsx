@@ -1,6 +1,13 @@
 import React from "react";
-import DeleteChat from "./DeleteChat";
-import ChatFeedback from "./ChatFeedback";
+// import DeleteChat from "./DeleteChat";
+// import ChatFeedback from "./ChatFeedback";
+// import GoogleAds from "./GoogleAds";
+// import MetaAds from "./MetaAds";
+// import TwitterAds from "./TwitterAds";
+// import LinkedinAds from "./LinkedinAds";
+// import TiktokAds from "./TiktokAds";
+// import ArchiveChats from "./ArchiveChats";
+import InviteTeam from "./InviteTeam";
 
 interface TempTesterProps {
     // define your props here
@@ -8,9 +15,10 @@ interface TempTesterProps {
 
 const TempTester: React.FC<TempTesterProps> = () => {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
+    // const [connected, setConnected] = React.useState<boolean>(false);
 
-    const onClose = () => {
-        setIsOpen(!isOpen);
+    const onClose = (option: boolean) => {
+        setIsOpen(!option);
     };
 
     if (isOpen) {
@@ -21,8 +29,8 @@ const TempTester: React.FC<TempTesterProps> = () => {
 
     return (
         <div className="flex items-center justify-center ">
-            <button onClick={onClose}>Open Modal</button>
-            {isOpen && <ChatFeedback isOpen={isOpen} onClose={onClose} />}
+            <button onClick={() => onClose(isOpen)}>Open Modal</button>
+            {isOpen && <InviteTeam isOpen={isOpen} onClose={onClose} />}
         </div>
     );
 };

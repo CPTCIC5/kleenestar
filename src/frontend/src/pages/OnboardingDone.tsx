@@ -1,6 +1,4 @@
 import { FunctionComponent } from "react";
-import FrameComponent2 from "../components/FrameComponent2";
-import FrameComponent51 from "../components/FrameComponent5";
 import PrimaryButton from "../components/PrimaryButton";
 
 const OnboardingDone: FunctionComponent = () => {
