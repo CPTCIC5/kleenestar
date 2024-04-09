@@ -52,14 +52,17 @@ const Login: FunctionComponent = () => {
     };
 
     return (
-        <div className="w-full h-screen flex items-center justify-center bg-background p-4">
-            <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4">
-                <div className="max-width flex items-center justify-center box-border max-w-full text-11xl font-syne">
+        <div className="w-full h-screen flex items-center justify-center bg-background p-4  flex-col gap-[30px]">
+            <div className="hidden mq551:block">
+                <img src={"/public/MainLogo.svg"} alt="" />
+            </div>
+            <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 bg-white">
+                <div className="max-width flex items-center justify-center box-border max-w-full">
                     <div className="flex-1 flex flex-col items-center justify-center gap-[19px] max-w-full">
-                        <span className=" m-0 text-inherit font-bold font-inherit inline-block z-[1]">
+                        <span className="font-syne m-0  font-[700] text-[30px] font-inherit inline-block z-[1] leading-[36px] text-primary-300">
                             Welcome back
                         </span>
-                        <span className="max-width self-stretch text-base text-center font-montserrat z-[1]">
+                        <span className="max-width self-stretch text-[16px] leading-[19.5px] text-center font-montserrat z-[1] font-[400] text-primary-300">
                             Welcome back, log in to your workspace
                         </span>
                     </div>
@@ -157,14 +160,14 @@ const Login: FunctionComponent = () => {
                     </div>
                 </form>
 
-                <div className="w-full h-[25.47px] flex justify-center mt-[25.25px] items-center">
+                <div className="max-w-[454px] w-full h-[40px] flex justify-center mt-[25.25px] items-center ">
                     <GoogleOauthButton /> {/* Use the GoogleOauthButton component */}
                 </div>
 
                 <div className="h-[25.47px] w-full flex justify-center mt-[46.27px]">
                     <span className="h-[17px] font-montserrat text-[14px] font-[400] leading-[10.07px] text-center">
                         Need a workspace?
-                        <Link to={"/OnboardingStep1"} className="underline text-black">
+                        <Link to={"/onboard/step2"} className="underline text-black">
                             Create a workspace
                         </Link>
                         {/* create-workspace link */}

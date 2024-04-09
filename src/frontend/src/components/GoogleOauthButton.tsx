@@ -7,20 +7,18 @@ interface GoogleOauthButtonProps {
 const GoogleOauthButton: FunctionComponent<GoogleOauthButtonProps> = ({ onClick }) => {
     return (
         <div
-            className="self-stretch flex flex-row items-start justify-start z-[1] text-left text-mini text-darkslateblue-100 font-montserrat cursor-pointer"
-            onClick={onClick} // Use the onClick prop
+            className="w-full h-[40px] rounded-full border-[1.5px] border-solid border-lightblue cursor-pointer flex items-center justify-center hover:bg-lightblue hover:bg-opacity-10 active:bg-lightblue active:bg-opacity-50 gap-[10px]"
+            onClick={onClick}
         >
-            <div className="self-stretch flex flex-row items-start justify-start gap-[10.699999999999932px]">
-                <img
-                    className="h-[25.5px] w-[24.9px] relative"
-                    loading="lazy"
-                    alt=""
-                    src="/icons.svg"
-                />
-                <div className="flex flex-col items-start justify-start pt-[3.199999999999818px] px-0 pb-0">
-                    <div className="relative font-semibold">Login with Google</div>
-                </div>
-            </div>
+            <img
+                className="h-[25.5px] w-[24.9px] relative"
+                loading="lazy"
+                alt=""
+                src="/icons.svg"
+            />
+            <span className="font-montserrat font-[600] text-[15px] leading-[18.29px] text-primary-300">
+                Log in with Google
+            </span>
         </div>
     );
 };

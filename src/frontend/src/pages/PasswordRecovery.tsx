@@ -37,16 +37,22 @@ const PasswordRecovery: FunctionComponent = () => {
     };
 
     return (
-        <div className="w-full h-screen flex items-center justify-center bg-background p-4">
-            <div className="max-w-[722px] max-h-[552.63px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative ">
-                <div className="max-width flex items-center justify-center box-border max-w-full text-11xl font-syne">
+        <div className="w-full h-screen flex items-center justify-center bg-background p-4 flex-col gap-[30px]">
+            <div className=" items-center justify-center gap-[18.13px] flex">
+                <img className="w-[52.07px] h-[54.78px]" src="/group-672.svg" alt="" />
+                <span className="w-[156.02px] font-syne font-[700] text-[25px] leading-[30px]">
+                    Kleenestar
+                </span>
+            </div>
+            <div className="max-w-[722px] max-h-[552.63px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative bg-white ">
+                <div className="max-width flex items-center justify-center box-border max-w-full">
                     <div className="flex-1 flex flex-col items-center justify-center gap-[19px] max-w-full">
-                        <span className=" m-0 text-inherit font-bold font-inherit inline-block z-[1]">
+                        <span className="font-syne m-0  font-[700] text-[30px] font-inherit inline-block z-[1] leading-[36px] text-primary-300">
                             Password
                         </span>
-                        <div className="w-full self-stretch text-base text-center font-montserrat z-[1] flex flex-col item-center">
-                            <span>Reset your password by creating a new one.</span>
-                        </div>
+                        <span className="max-w-[454px] w-full self-stretch text-[16px] leading-[19.5px] text-center font-montserrat z-[1] font-[400] text-primary-300">
+                            Reset your password by creating a new one.
+                        </span>
                     </div>
                 </div>
 

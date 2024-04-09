@@ -12,8 +12,6 @@ const DeleteChat: React.FC<DeleteChatProps> = ({ isOpen, onClose, id }) => {
         onClose();
     };
 
-
-
     return (
         <>
             {isOpen ? (
@@ -45,7 +43,7 @@ const DeleteChat: React.FC<DeleteChatProps> = ({ isOpen, onClose, id }) => {
                                 </button>
                                 <button
                                     onClick={onDeletion}
-                                    className="w-[105px] h-[40px] outline-none bg-white text-orangered-300 border border-solid border-orangered-300 rounded-full flex items-center justify-center font-montserrat font-[400] text-[15px] leading-[18.29px] hover:bg-orangered-100 hover:text-white"
+                                    className="w-[105px] h-[40px] outline-none bg-white text-orangered-300 border border-solid border-orangered-300 rounded-full flex items-center justify-center font-montserrat font-[400] text-[15px] leading-[18.29px] hover:bg-orangered-100 hover:text-white hover:bg-opacity-60 "
                                 >
                                     Delete
                                 </button>
