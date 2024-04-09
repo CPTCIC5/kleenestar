@@ -16,6 +16,7 @@ import PlanBilling from "./pages/PlanBilling";
 import Settings from "./pages/Settings";
 import OnboardingStep4 from "./pages/OnboardingStep4";
 import TempTester from "./modals/TempTester";
+import Payment from './pages/Payment'
 
 function App() {
     const action = useNavigationType();
@@ -123,6 +124,7 @@ function App() {
             <Route path="/channels" element={<ConnectChannels />} />
             <Route path="/billing" element={<PlanBilling />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/payments" element={<Payment />} />
         </Routes>
     );
 }
