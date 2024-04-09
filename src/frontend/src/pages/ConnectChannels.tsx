@@ -1,4 +1,4 @@
-import { Circle, CircleArrowLeft } from "lucide-react"
+import { CircleArrowLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import json from '../utils/dummyConnectChannels.json'
 import ChannelCard from "../components/ChannelCard"

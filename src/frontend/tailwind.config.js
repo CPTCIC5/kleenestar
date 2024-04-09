@@ -1,20 +1,19 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
-        // color palette
-        
         "background" : "#F8F9F7",
         "primary" : {
           "100" : "#d2d4db",
           "200" : "#495270",
           "300" : "#1C274C",
         },
-
         "dimwhite" : "#BEB9B1",
-
         whitesmoke: "#f8f9f7",
         darkslateblue: {
           "100": "#1c274c",
@@ -35,23 +34,6 @@ module.exports = {
         syne: "Syne",
         inter: "Inter",
       },
-    },
-    fontSize: {
-      sm: "14px",
-      mini: "15px",
-      smi: "13px",
-      base: "16px",
-      "11xl": "30px",
-      "5xl": "24px",
-      lg: "18px",
-      xl: "20px",
-      "6xl": "25px",
-      "16xl": "35px",
-      "9xl": "28px",
-      "2xl": "21px",
-      mid: "17px",
-      xs: "12px",
-      inherit: "inherit",
     },
     screens: {
       lg: {
@@ -81,7 +63,7 @@ module.exports = {
       mq625: {
         raw: "screen and (max-width: 625px)",
       },
-
+      
       mq551:{
         raw: "screen and (max-width: 551px)",
       },
@@ -103,7 +85,9 @@ module.exports = {
       },
     },
   },
+  plugins: [],
   corePlugins: {
     preflight: false,
   },
-};
+}
+

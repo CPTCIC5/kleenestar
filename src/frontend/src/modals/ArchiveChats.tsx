@@ -9,7 +9,7 @@ interface ArchiveChatsProps {
 }
 
 const ArchiveChats: React.FC<ArchiveChatsProps> = ({ isOpen, onClose }) => {
-    const chat = archiveChats.chat;
+    const chats = archiveChats.chat;
     return (
         <>
             {isOpen ? (
@@ -38,7 +38,7 @@ const ArchiveChats: React.FC<ArchiveChatsProps> = ({ isOpen, onClose }) => {
                             </div>
                             <div className="w-full h-full flex flex-col justify-between mq551:px-4 mq551:items-center">
                                 <div className="max-w-[388.62px] w-full flex flex-col gap-[18px]">
-                                    {archiveChats.chat.map((chat) => {
+                                    {chats.map((chat) => {
                                         return (
                                             <div className="w-full flex flex-col gap-[10.5px] bg-white rounded-3xl p-[17.75px] pl-[18.19px]">
                                                 <span className="font-montserrat font-[600] text-[15px] leading-[18.29px] text-primary-300">

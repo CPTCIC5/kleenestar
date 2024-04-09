@@ -5,7 +5,7 @@ import PrimaryButton from "../components/PrimaryButton";
 import GoogleOauthButton from "../components/GoogleOauthButton";
 import { Link } from "react-router-dom";
 
-const JoinTeam: FunctionComponent = () => {
+const JoinWorkspace: FunctionComponent = () => {
     const [passwordShow1, setPasswordShow1] = useState<boolean>(false);
     const [passwordShow2, setPasswordShow2] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
@@ -58,7 +58,7 @@ const JoinTeam: FunctionComponent = () => {
                 <div className="max-width flex items-center justify-center box-border max-w-full text-11xl font-syne">
                     <div className="flex-1 flex flex-col items-center justify-center gap-[19px] max-w-full">
                         <span className=" m-0 text-inherit font-bold font-inherit inline-block z-[1]">
-                            Join Team
+                            Join Workspace
                         </span>
                         <div className="max-width self-stretch text-base text-center font-montserrat z-[1] flex flex-col item-center">
                             <span>Welcome to your team workspace 🙌</span>
@@ -201,4 +201,4 @@ const JoinTeam: FunctionComponent = () => {
     );
 };
 
-export default JoinTeam;
+export default JoinWorkspace;

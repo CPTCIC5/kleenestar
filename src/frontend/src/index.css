@@ -7,6 +7,11 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    box-sizing: border-box;
+    margin: 0%;
+    padding: 0%;
+}
 
 body {
     @apply leading-[normal] m-0;
@@ -15,12 +20,6 @@ body {
 ::before,
 ::after {
     border-width: 0;
-}
-.beutify {
-    width: 454px;
-    height: 45px;
-    flex-shrink: 0;
-    fill: #f8f9f7;
 }
 
 *::-webkit-scrollbar-track {
@@ -37,14 +36,4 @@ body {
 
 *::-webkit-scrollbar {
     width: 8px;
-}
-
-input[type="text"], input[type="password"]{
-    border: none;
-    outline: none;
-    background-color: transparent;
-}
-
-input[type="text"]:focus, input[type="password"]:focus {
-    background-color: transparent;
 }
