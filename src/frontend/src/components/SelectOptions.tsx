@@ -32,53 +32,66 @@ function getStyles(
 
 function SelectOptions({ options, InputText }: { options: Array<string>, InputText: string }) {
   const names = options;
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState<string>("");
+const theme = useTheme();
+const [personName, setPersonName] = React.useState<string>("");
 
-  const handleChange = (
-    event: SelectChangeEvent<typeof personName>
-  ) => {
-    const {
-      target: { value }
-    } = event;
-    setPersonName(value);
-  };
+const handleChange = (
+	event: SelectChangeEvent<typeof personName>
+) => {
+	const {
+		target: { value }
+	} = event;
+	setPersonName(value);
+};
 
-  return (
-		<div className="w-full">
-			<FormControl className="w-full">
-				{!personName && (
-					<InputLabel
-						shrink={false}
-						className="text-gray-500 focus:text-gray-500  px-1 mq750: py-1 border-transparent font-montserrat text-xl mq750:text-[15px]">
-						{InputText}
-					</InputLabel>
-				)}
-				<Select
-					labelId="demo-multiple-name-label"
-					id="demo-multiple-name"
-					value={personName}
-					onChange={handleChange}
-					input={
+return (
+	<div className="w-full">
+		<FormControl className="w-full">
+			{!personName && (
+				<InputLabel
+					shrink={false}
+					className="text-gray-500 focus:text-gray-500  border-transparent font-montserrat text-xl mq750:text-[15px]">
+					{InputText}
+				</InputLabel>
+			)}
+			<Select
+				labelId="demo-multiple-name-label"
+				id="demo-multiple-name"
+				value={personName}
+				onChange={handleChange}
+				input={
+					personName ? (
 						<Input
 							disableUnderline
-							className="w-full bg-transparent h-[45px] px-1 border-transparent font-montserrat text-xl mq750:text-[15px]"
+							className="w-full px-[10px] py-[10px] bg-transparent min-h-[47px] h-full  border-transparent font-montserrat text-xl mq750:text-[15px]"
 						/>
-					}
-					IconComponent={() => null} // This line hides the dropdown arrow
-					MenuProps={MenuProps}>
-					{names.map((name) => (
-						<MenuItem
-							key={name}
-							value={name}
-							style={getStyles(name, [personName], theme)}>
-							{name}
-						</MenuItem>
-					))}
-				</Select>
-			</FormControl>
-		</div>
-	)
+					) : (
+						<Input
+							disableUnderline
+							className="w-full px-[10px]  bg-transparent min-h-[47px] h-full  border-transparent font-montserrat text-xl mq750:text-[15px]"
+						/>
+					)
+				}
+				IconComponent={() => null} // This line hides the dropdown arrow
+				MenuProps={MenuProps}>
+				{names.map((name) => (
+					<MenuItem
+						key={name}
+						value={name}
+						style={{
+							...getStyles(name, [personName], theme),
+							fontFamily: "Montserrat",
+							fontWeight: 400,
+							fontSize: "14px",
+							lineHeight: "17.07px",
+						}}>
+						{name}
+					</MenuItem>
+				))}
+			</Select>
+		</FormControl>
+	</div>
+)
 }
 
 export default SelectOptions;

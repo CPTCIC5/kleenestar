@@ -14,12 +14,12 @@ function Settings(): JSX.Element {
 		"Dissatisfaction with the platform/service",
 		"Simplifying digital footprint",
 	]
-
+  
   const navigate = useNavigate()
   return (
-		<div className="w-screen bg-background pb-20">
-			<div className="pt-10 pl-8 mq750:pl-0 ">
-				<div className="text-primary-300 mq750:px-10 flex gap-8 mq750:justify-between items-center">
+		<div className="w-screen h-full min-h-screen bg-background pb-20">
+			<div className="w-full pl-8 mq750:pl-0 ">
+				<div className="text-primary-300 mq750:fixed z-30 w-full mq750:bg-white py-[20px]  mq750:px-10 flex gap-8 mq750:justify-between items-center">
 					<CircleArrowLeft
 						className="w-[30px] h-[30px]  "
 						onClick={() => navigate(-1)}
@@ -82,7 +82,7 @@ function Settings(): JSX.Element {
 					</p>
 					<div className="flex justify-between items-center pr-4 pb-4 mq750:flex-col">
 						<div className="w-[60%]  mq750:w-full text-primary-300 font-bold text-xl">
-							<div className=" mt-2 mq750:h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
+							<div className=" mt-2   bg-background rounded-[2rem] px-[26.57px] flex items-center ">
 								<SelectOptions
 									options={reasonsToDeleteAccount}
 									InputText={"To confirm, tell us why you are leaving."}
