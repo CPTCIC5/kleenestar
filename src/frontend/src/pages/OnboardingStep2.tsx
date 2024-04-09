@@ -39,17 +39,21 @@ const OnboardingStep2: FunctionComponent = () => {
     };
 
     return (
-        <div className="w-full h-screen flex items-center justify-center bg-background p-4">
-            <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative ">
+        <div className="w-full h-screen flex items-center justify-center bg-background p-4  flex-col gap-[30px]">
+            <div className="hidden mq551:block">
+                <img src={"/public/MainLogo.svg"} alt="" />
+            </div>
+            <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative bg-white ">
                 <div className="absolute top-5 left-5">
                     <CircleArrowLeft onClick={() => navigate(-1)} />
                 </div>
-                <div className="max-width flex items-center justify-center box-border max-w-full text-11xl font-syne">
+
+                <div className="max-width flex items-center justify-center box-border max-w-full">
                     <div className="flex-1 flex flex-col items-center justify-center gap-[19px] max-w-full">
-                        <span className=" m-0 text-inherit font-bold font-inherit inline-block z-[1]">
+                        <span className="font-syne m-0  font-[700] text-[30px] font-inherit inline-block z-[1] leading-[36px] text-primary-300">
                             Workspace
                         </span>
-                        <div className="max-width self-stretch text-base text-center font-montserrat z-[1] flex flex-col item-center">
+                        <div className="max-width self-stretch text-[16px] leading-[19.5px] text-center font-montserrat z-[1] font-[400] text-primary-300 flex flex-col">
                             <span>The more Kleenestar knows the better it performs and </span>
                             <span>help your business grow. 🤑</span>
                         </div>

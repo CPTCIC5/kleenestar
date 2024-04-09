@@ -27,6 +27,7 @@ export default {
         },
         royalblue: "#4b74ff",
         white: "#fff",
+        lightblue : "#A0C0FF"
       },
       spacing: {},
       fontFamily: {
