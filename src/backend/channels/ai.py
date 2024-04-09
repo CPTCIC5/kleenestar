@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+import openai
+import os
 
 load_dotenv()
+
 
 client = OpenAI()
 
@@ -10,12 +13,8 @@ SYSTEM_PROMPT = """
 You are a sophisticated assistant designed to understand and classify 
 user queries into specific intents, facilitating targeted marketing 
 and branding insights. Your role is to analyze user queries and, 
-based on their content and requirements,
-Generate a Python code snippet for the Django backend. This code will retrieve necessary data 
-from the user's database connected to marketing channels, along with current market data. 
-Specify which datasets need to be fetched and any relevant filters or parameters.
-This is crucial for queries requiring an in-depth database analysis.
-generate precise instructions for a secondary GPT-4 model. This model will respond to user queries by:
+based on their content and requirements, generate precise instructions 
+for a secondary GPT-4 model. This model will respond to user queries by:
 Analyzing the user's database with connected marketing channels 'Meta', 
 'Google Ads', 'LinkedIn', 'Twitter', and 'TikTok', alongside current market
 data, to deliver comprehensive marketing and branding insights and recommendations. 
@@ -46,80 +45,59 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
-"""
 
-def base(user_query, image=None):
+def generate_instructions(user_query, image=None):
     # Simplified intent detection logic
-
-
     if "how to improve" in user_query.lower():
         analysis_type = "database_analysis"
-    elif image and "image" in user_query.lower():
+    elif image and "analyze this image" in user_query.lower():
         analysis_type = "image_and_database_analysis"
     elif image:
         analysis_type = "image_analysis"
     else:
-        analysis_type = "general_knowledge_database_analysis"
+        analysis_type = "general_knowledge"
 
     # Generate prompt for GPT-4 based on the analysis type
-        
-        
     if analysis_type == "database_analysis":
         prompt = "Analyze the user's marketing channel data to provide insights on improving their strategy."
     elif analysis_type == "image_and_database_analysis":
         prompt = "Analyze the provided image and the user's marketing channel data to offer branding insights."
     elif analysis_type == "image_analysis":
         prompt = "Analyze the provided image to offer branding insights."
-    else:  # general_knowledge on the basis of user conditional data
-        prompt = "Provide marketing and branding insights based on general knowledge, Analyze the user's marketing channel data to provide insights on improving their strategy."
+    else:  # general_knowledge
+        prompt = "Provide marketing and branding insights based on general knowledge."
 
-    return {
-        "prompt":prompt,
-        "analysis_type": analysis_type
-    }
-    #return prompt, analysis_type
-"""
+    return prompt, analysis_type
 
-def generate_data_retrieval_instructions():
-    """
-    Generate instructions for the backend to retrieve necessary data
-    for analysis based on the user query and determined analysis type.
-    """
-    instruction = {
-        "action": "fetch_data",
-        "parameters": {
-            "channels": ["Meta", "Google Ads", "LinkedIn", "Twitter", "TikTok"],
-            "data_points": ["campaign_performance", "audience_demographics", "engagement_stats"],
-            "time_frame": "last_30_days",
-        }
-    }
-    # This instruction can be JSON serialized if needed for transmission to the backend
-    return instruction
 
-def generate_instructions(user_query,image=None):
-    #fetch = base(user_query,image)
+def perform_analysis_with_gpt4(instructions):
     response = client.chat.completions.create(
         model="gpt-4",  # Use the correct identifier for GPT-4
-        messages = [
+        messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            #{"role": "system", "content": fetch["analysis_type"]},
-            #{"role" : "user", "content":fetch["prompt"]},
-            {"role":"user", "content": user_query}
+            {"role": "user", "content": instructions},
         ],
         max_tokens=500,
         temperature=0.5,
     )
     insights = response.choices[0].message
-    return insights.content.strip()
+    return insights
 
-def generate_insights_with_gpt4(query):
-    data_for_analysis = generate_instructions(query)
-    prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
-    response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt_for_gpt4}],
-            max_tokens=1000,
-            temperature=0.5,
-    )
-    return response.choices[0].message.content.strip()
+def handle_user_query(user_query, image=None):
+    # Generate instructions for analysis based on the user query
+    prompt, analysis_type = generate_instructions(user_query, image=image)
+    # If analysis involves the user's database or images, you would include logic here
+    # to fetch relevant data from the database or analyze the image as required.
+    # For simplicity, this example focuses on generating and querying prompts.
+
+    return {
+        "analysis_type": analysis_type,
+        "insights": perform_analysis_with_gpt4(prompt),
+    }
+
+
+# # Example usage
+user_query = "How to improve my ad conversion rate?"
+response = perform_analysis_with_gpt4(user_query)
+print(response)
