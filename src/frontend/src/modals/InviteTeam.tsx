@@ -1,7 +1,9 @@
-import { CircleX, Link, PencilLine } from "lucide-react";
+import { CircleX, Ellipsis, LinkIcon, PencilLine } from "lucide-react";
 import React from "react";
 import PrimaryButton from "../components/PrimaryButton";
 import PrimaryInputBox from "../components/PrimaryInputBox";
+import { Link } from "react-router-dom";
+import dummyInviteTeam from "../utils/dummyInviteTeam.json";
 
 interface InviteTeamProps {
     // define your props here
@@ -32,13 +34,13 @@ const InviteTeam: React.FC<InviteTeamProps> = ({ isOpen, onClose }) => {
                             </span>
                         </div>
 
-                        <div className="w-full h-full pl-[80px] flex flex-col mq551:mt-[120px] mq551:pl-0 mq551:flex mq551:flex-col mq551:items-center ">
-                            <div className="max-w-[387px] w-full font-montserrat font-[400] text-[16px] leading-[19.5px] text-primary-300 text-start mb-[18px] mq551:text-center mq551:px-4">
+                        <div className="w-full pl-[80px] flex flex-col mq551:mt-[120px] mq551:pl-0 mq551:flex mq551:flex-col mq551:items-center gap-[18px] ">
+                            <div className="max-w-[387px] w-full font-montserrat font-[400] text-[16px] leading-[19.5px] text-primary-300 text-start mq551:text-center mq551:px-4">
                                 Send email invites to members.
                             </div>
-                            <div className="w-full h-full flex flex-col justify-between mq551:px-4 mq551:items-center">
-                                <div className="max-w-[388.62px] w-full flex flex-col">
-                                    <div className="relative w-full h-[45px] flex items-center mt-[18px] ">
+                            <div className="w-full h-full flex flex-col mq551:px-4 mq551:items-center  ">
+                                <div className="max-w-[388.62px] w-full flex flex-col items-center">
+                                    <div className="relative w-full h-[45px] flex items-center">
                                         <PrimaryInputBox
                                             type="email"
                                             name="email"
@@ -53,15 +55,47 @@ const InviteTeam: React.FC<InviteTeamProps> = ({ isOpen, onClose }) => {
                                             <PencilLine className="bg-inherit " />
                                         </div>
                                     </div>
-                                    <div className="h-[40px] max-w-[454px] w-full mt-[30px]">
+                                    <div className="h-[40px] max-w-[267.37px] w-full mt-[30px]">
                                         <PrimaryButton>Send Invite</PrimaryButton>
                                         {/* Use the PrimaryButton component */}
                                     </div>
 
-                                    <div>
-                                        <Link className="text-primary-300" />
-                                        <span>Get a shareable invite link instead</span>
+                                    <div className="flex items-center justify-center gap-[12px] mt-[19px]">
+                                        <LinkIcon className="text-primary-300 h-[20px] w-[20px]" />
+                                        <span className="font-montserrat font-[400] text-[14px] leading-[18px] text-primary-300">
+                                            <Link to={"#"} className="underline text-inherit ">
+                                                Get a shareable invite link
+                                            </Link>{" "}
+                                            instead
+                                        </span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="border border-opacity-50 border-solid border-dimwhite w-full mt-[37.5px]"></div>
+                        <div className="w-full pl-[80px] pt-[29px] mq551:px-0 mq551:flex mq551:flex-col mq551:items-center overflow-auto mb-[40px]">
+                            <div className="max-w-[388.62px] w-full flex flex-col gap-[19px]">
+                                <span className="w-full font-montserrat font-[600] text-[15px] leading-[18.29px]">
+                                    Invited team
+                                </span>
+                                <div className="w-full flex flex-col gap-[15px] ">
+                                    {dummyInviteTeam.members.map((data) => {
+                                        return (
+                                            <div className="w-full flex items-center justify-between py-[4.14px] pl-[11.07px] pr-[16px] h-[45px] bg-white rounded-full">
+                                                <div className="flex items-center gap-[16.79px]">
+                                                    <img
+                                                        className="h-[36.73px] w-[36.73px]"
+                                                        src="/public/group-2864.svg"
+                                                        alt=""
+                                                    />
+                                                    <span className="font-montserrat font-[500] text-[15px] leading-[18.29px] text-primary-300">
+                                                        {data.name}
+                                                    </span>
+                                                </div>
+                                                <Ellipsis className="bg-transparent text-primary-300" />
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

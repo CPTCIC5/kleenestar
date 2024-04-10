@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Routes, Route, useNavigationType, useLocation } from "react-router-dom";
 import "./App.css";
-import Login from "./pages/Login";
+// import Login from "./pages/Login";
 import OnboardingStep1 from "./pages/OnboardingStep1";
 import OnboardingStep2 from "./pages/OnboardingStep2";
 import OnboardingStep3 from "./pages/OnboardingStep3";
@@ -14,6 +14,9 @@ import Chat from "./pages/Chat";
 import ConnectChannels from "./pages/ConnectChannels";
 import PlanBilling from "./pages/PlanBilling";
 import Settings from "./pages/Settings";
+import OnboardingStep4 from "./pages/OnboardingStep4";
+import TempTester from "./modals/TempTester";
+import Payment from './pages/Payment'
 
 function App() {
     const action = useNavigationType();
@@ -107,11 +110,11 @@ function App() {
 
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<TempTester />} />
             <Route path="/onboard/step1" element={<OnboardingStep1 />} />
             <Route path="/onboard/step2" element={<OnboardingStep2 />} />
             <Route path="/onboard/step3" element={<OnboardingStep3 />} />
-            <Route path="/onboard/step4" />
+            <Route path="/onboard/step4" element={<OnboardingStep4 />} />
             <Route path="/onboard/done" element={<OnboardingDone />} />
             <Route path="/join-workspace" element={<JoinWorkspace />} />
             <Route path="/recovery-email" element={<RecoveryEmail />} />
@@ -121,6 +124,7 @@ function App() {
             <Route path="/channels" element={<ConnectChannels />} />
             <Route path="/billing" element={<PlanBilling />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/payments" element={<Payment />} />
         </Routes>
     );
 }

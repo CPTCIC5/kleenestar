@@ -1,0 +1,22 @@
+{
+	"plans": [
+		{
+			"price_m": 29,
+			"plan_name": "Indie",
+			"description": "Testers, and marketers looking to automate their analytics and insights.",
+			"features": ["Connect 1 channel", "Real-time analysis", "Support"]
+		},
+		{
+			"price_m": 69,
+			"plan_name": "Pro",
+			"description": "For brands with a growing audience seeking cross-analytics automation and insights.",
+			"features": ["Connect up to 3 channels", "Real-time analysis", "Cross-channels analysis","Visual analysis","Add team members ($20/seat)","Support"]
+		},
+		{
+			"price_m": 249,
+			"plan_name": "Scale",
+			"description": "For brands seeking centralized marketing data management, deep audience analysis, and insights.",
+			"features": ["Connect all channel", "Real-time analysis", "Data warehousing", "Cross-channels analysis","Visual analysis","Add team members ($15/seat)","Prority Support"]
+		}
+	]
+}
