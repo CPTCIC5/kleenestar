@@ -1,4 +1,4 @@
-import { CircleCheck } from "lucide-react"
+import { Check } from "lucide-react"
 
 function Plan({price_m, plan_name, description, features, current_plan}: {price_m: number, plan_name: string
     , description: string, features: Array<string>, current_plan: string
@@ -6,7 +6,7 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
   return (
 		<>
 			{current_plan == plan_name ? (
-				<div className="bg-primary-300 text-white pb-[60px] flex-col max-w-[405.307px] w-full rounded-xl ">
+				<div className="bg-primary-300 mq750:pr-[31px] text-white pb-[60px] flex-col max-w-[405.307px] w-full rounded-xl ">
 					<p className=" relative left-[32.82px]  top-[23.28px] font-[700] text-[35px] pr-8  font-syne">
 						${price_m}/month
 					</p>
@@ -23,7 +23,9 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 							return (
 								<>
 									<div className="flex gap-2 items-center pb-[28.81px]">
-										<CircleCheck className="bg-white text-primary-300 rounded-full" />
+										<div>
+											<Check  className="bg-white w-[20x] p-1 h-fit rounded-full text-primary-300" />
+										</div>
 										<p className="pl-2 font-montserrat font-[500] text-[15px]">
 											{point}
 										</p>
@@ -37,7 +39,7 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 					</div>
 				</div>
 			) : (
-				<div className="text-primary-300 bg-white h-full pb-[70px] flex-col max-w-[405.307px] w-full rounded-xl ">
+				<div className="mq750:hidden text-primary-300 bg-white h-full pb-[70px] flex-col max-w-[405.307px] w-full rounded-xl ">
 					<p className=" relative left-[32.82px] top-[23.28px] pr-[20px] font-[700] text-[35px] font-syne">
 						${price_m}/month
 					</p>
@@ -54,7 +56,9 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 							return (
 								<>
 									<div className="flex gap-2 items-center pb-[28.81px]">
-										<CircleCheck className="rounded-full bg-primary-300 text-white" />
+										<div>
+											<Check className="bg-primary-300 w-[20x] p-1 h-fit rounded-full text-white" />
+										</div>
 										<p className="pl-2 font-montserrat font-[500] text-[15px]">
 											{point}
 										</p>
