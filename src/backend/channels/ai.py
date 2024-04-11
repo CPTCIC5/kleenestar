@@ -45,7 +45,7 @@ Your instructions should be direct, leveraging the most appropriate data sources
 for the query at hand.
 """
 
-
+"""
 def generate_instructions(user_query, image=None):
     # Simplified intent detection logic
     if "how to improve" in user_query.lower():
@@ -68,36 +68,65 @@ def generate_instructions(user_query, image=None):
         prompt = "Provide marketing and branding insights based on general knowledge."
 
     return prompt, analysis_type
+"""
+
+def generate_instructions(user_query,image=None):
+    #fetch = base(user_query,image)
+    if not image:
+        print('scope 1')
+        response = client.chat.completions.create(
+            model="gpt-4-turbo-preview",  # Use the correct identifier for GPT-4
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT}, 
+                #{"role": "system", "content": fetch["analysis_type"]},
+                #{"role" : "user", "content":fetch["prompt"]},
+                {"role":"user", "content": user_query}
+            ],
+            max_tokens=500,
+            temperature=0.5,
+        )
+        insights = response.choices[0].message
+        return insights.content.strip()
+    else:
+        print('scope 2')
+        response = client.chat.completions.create(
+            model="gpt-4-vision-preview",  # Use the correct identifier for GPT-4
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT}, 
+                #{"role": "system", "content": fetch["analysis_type"]},
+                #{"role" : "user", "content":fetch["prompt"]},
+                {"role":"user", "content": user_query},
+                {'role':'user','content':image}
+            ],
+            max_tokens=500,
+            temperature=0.5,
+        )
+        insights = response.choices[0].message
+        return insights.content.strip()
 
 
-def perform_analysis_with_gpt4(instructions):
-    response = client.chat.completions.create(
-        model="gpt-4",  # Use the correct identifier for GPT-4
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": instructions},
-        ],
-        max_tokens=500,
-        temperature=0.5,
-    )
-    insights = response.choices[0].message
-    return insights
+def generate_insights_with_gpt4(query,image):
+    if image is None:
+        print('loop[1]')
+        data_for_analysis = generate_instructions(query)
+        prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
+        response = client.chat.completions.create(
+                model="gpt-4-turbo-preview",
+                messages=[{"role": "user", "content": prompt_for_gpt4}],
+                max_tokens=1000,
+                temperature=0.5,
+        )
+        return response.choices[0].message.content.strip()
+    else:
+        print('loop[2]')
+        data_for_analysis = generate_instructions(query,image)
+        prompt_for_gpt4 = f"{query}\\n{image}\\n{data_for_analysis}"
 
-def handle_user_query(user_query, image=None):
-    # Generate instructions for analysis based on the user query
-    prompt, analysis_type = generate_instructions(user_query, image=image)
-    # If analysis involves the user's database or images, you would include logic here
-    # to fetch relevant data from the database or analyze the image as required.
-    # For simplicity, this example focuses on generating and querying prompts.
-
-    return {
-        "analysis_type": analysis_type,
-        "insights": perform_analysis_with_gpt4(prompt),
-    }
-
-
-# # Example usage
-user_query = "How to improve my ad conversion rate?"
-response = perform_analysis_with_gpt4(user_query)
-print(response)
+        response = client.chat.completions.create(
+                model="gpt-4-vision-preview",
+                messages=[{"role": "user", "content": prompt_for_gpt4}],
+                max_tokens=1000,
+                temperature=0.5,
+        )
+        return response.choices[0].message.content.strip()
