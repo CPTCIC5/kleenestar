@@ -105,7 +105,7 @@ def generate_instructions(user_query,image=None):
         return insights.content.strip()
 
 
-def generate_insights_with_gpt4(query,image):
+def generate_insights_with_gpt4(query,image=None):
     if image is None:
         print('loop[1]')
         data_for_analysis = generate_instructions(query)
@@ -115,7 +115,7 @@ def generate_insights_with_gpt4(query,image):
                 model="gpt-4-turbo-preview",
                 messages=[{"role": "user", "content": prompt_for_gpt4}],
                 max_tokens=1000,
-                temperature=0.5,
+                temperature=0.5
         )
         return response.choices[0].message.content.strip()
     else:
