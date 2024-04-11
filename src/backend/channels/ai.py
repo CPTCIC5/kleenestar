@@ -73,7 +73,6 @@ def generate_instructions(user_query, image=None):
 def generate_instructions(user_query,image=None):
     #fetch = base(user_query,image)
     if not image:
-        print('scope 1')
         response = client.chat.completions.create(
             model="gpt-4-turbo-preview",  # Use the correct identifier for GPT-4
             messages = [
@@ -88,7 +87,6 @@ def generate_instructions(user_query,image=None):
         insights = response.choices[0].message
         return insights.content.strip()
     else:
-        print('scope 2')
         response = client.chat.completions.create(
             model="gpt-4-vision-preview",  # Use the correct identifier for GPT-4
             messages = [
@@ -107,7 +105,6 @@ def generate_instructions(user_query,image=None):
 
 def generate_insights_with_gpt4(query,image=None):
     if image is None:
-        print('loop[1]')
         data_for_analysis = generate_instructions(query)
         prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
@@ -119,7 +116,6 @@ def generate_insights_with_gpt4(query,image=None):
         )
         return response.choices[0].message.content.strip()
     else:
-        print('loop[2]')
         data_for_analysis = generate_instructions(query,image)
         prompt_for_gpt4 = f"{query}\\n{image}\\n{data_for_analysis}"
 
