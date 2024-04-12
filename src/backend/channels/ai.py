@@ -92,7 +92,7 @@ def generate_instructions(user_query,convo_id,image=None):
             model="gpt-4-turbo-preview",  # Use the correct identifier for GPT-4
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}, 
-                #{'role':'system',},
+                {'role':'system', "content": convo},
                 #{"role": "system", "content": fetch["analysis_type"]},
                 #{"role" : "user", "content":fetch["prompt"]},
                 {"role":"user", "content": user_query}
@@ -107,6 +107,7 @@ def generate_instructions(user_query,convo_id,image=None):
             model="gpt-4-vision-preview",  # Use the correct identifier for GPT-4
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}, 
+                {'role':'system', "content": convo},
                 #{"role": "system", "content": fetch["analysis_type"]},
                 #{"role" : "user", "content":fetch["prompt"]},
                 {"role":"user", "content": user_query},
@@ -126,7 +127,9 @@ def generate_insights_with_gpt4(query,image=None):
 
         response = client.chat.completions.create(
                 model="gpt-4-turbo-preview",
-                messages=[{"role": "user", "content": prompt_for_gpt4}],
+                messages=[
+                    {"role": "user", "content": prompt_for_gpt4}
+                    ],
                 max_tokens=1000,
                 temperature=0.5
         )
