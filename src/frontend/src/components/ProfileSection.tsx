@@ -42,7 +42,7 @@ function ProfileSection(): JSX.Element {
 				<div className="w-[95%] mx-auto">
 					<div className="flex items-center justify-center mq750:flex-col gap-4">
 						<div className="w-full text-primary-300 font-bold text-xl mq750:text-[14px]">
-							Frist name
+							First name
 							<div className="w-full mt-2 bg-background rounded-[2rem] p-4 flex items-center mq750:h-[45px] ">
 								<input
 									type="text"
@@ -58,7 +58,7 @@ function ProfileSection(): JSX.Element {
 								<input
 									type="text"
 									placeholder="Last name"
-									className="w-full font-montserrat  text-xl mq750:text-[15px]"
+									className="autofill:bg-transparent outline-none bg-transparent w-full font-montserrat  text-xl mq750:text-[15px]"
 								/>
 								<PencilLine className="text-primary-300" />
 							</div>

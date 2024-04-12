@@ -39,7 +39,7 @@ function ChangePasswordSection(): JSX.Element {
 						</div>
 					</div>
 					<div className="flex justify-between px-4 gap-4 mq750:flex-col text-royalblue">
-						<div className="flex gap-4 ">
+						<div className="flex gap-2 justify-between mq750:justify-start ">
 							{password_security_array.map((level, index) => {
 								return level <= current_security ? (
 									<div
@@ -52,7 +52,7 @@ function ChangePasswordSection(): JSX.Element {
 								)
 							})}
 						</div>
-						<div className="mq750:text-[13px] mq750:pt-4">
+						<div className="mq750:text-[13px] text-right mq750:pt-4">
 							Password confirmation matches
 						</div>
 					</div>
