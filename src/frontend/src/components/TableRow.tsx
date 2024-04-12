@@ -6,6 +6,7 @@ import avatar4 from "../../public/avatar4.png"
 function TableRow({
 	Invoice,
 	Amount,
+	Date,
 	Status,
 }: {
 	Invoice: string
@@ -16,7 +17,7 @@ function TableRow({
 
 	return (
 		<tr className="last-of-type:border-t-0">
-			<td className="flex  whitespace-nowrap text-[18px] font-bold items-center pl-[35.98px] py-[37.84px] border-t-[0.01px] border-solid border-t-gray-300">
+			<td className="flex text-left gap-4 text-[18px] font-bold items-center pl-[35.98px] py-[37.84px] border-t-[0.01px] border-solid border-t-gray-300">
 				<input
 					style={{ width: "50px", height: "20px" }}
 					type="checkbox"
@@ -25,15 +26,13 @@ function TableRow({
 				/>
 				{Invoice}
 			</td>
-			<td
-				className="py-[30.84px] border-t-[0.01px] border-solid border-t-gray-300"
-				style={{ width: "25%" }}>
+			<td className="py-[30.84px] border-t-[0.01px] border-solid border-t-gray-300">
 				USD {String(Amount)}
 			</td>
 			<td
-				className="py-[30.84px] border-t-[0.01px] border-solid border-t-gray-300"
-				style={{ width: "25%" }}>
-				Dec 1,2023
+				style={{ width: "25%" }}
+				className="py-[30.84px] border-t-[0.01px] border-solid border-t-gray-300">
+				{Date}
 			</td>
 			<td className="py-[30.84px] h-max-[84.5px] border-t-[0.01px] border-solid border-t-gray-300">
 				{Status == "paid" ? (
@@ -46,10 +45,8 @@ function TableRow({
 					</span>
 				)}
 			</td>
-			<td
-				className="py-[30.84px] pl-36 border-t-[0.01px] border-solid border-t-gray-300"
-				style={{ width: "25%" }}>
-				<div className="flex">
+			<td className="py-[30.84px] pl-36 border-t-[0.01px] border-solid border-t-gray-300">
+				<div className="flex justify-evenly">
 					<div className="border-solid relative right-10 bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
 						<img
 							src={avatar1}

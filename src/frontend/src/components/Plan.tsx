@@ -6,8 +6,8 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
   return (
 		<>
 			{current_plan == plan_name ? (
-				<div className="bg-primary-300 mq750:pr-[31px] text-white pb-[60px] flex-col max-w-[405.307px] w-full rounded-xl ">
-					<p className=" relative left-[32.82px]  top-[23.28px] font-[700] text-[35px] pr-8  font-syne">
+				<div className="bg-primary-300 mq750:pr-[31px] text-white pb-[60px] flex-col w-full rounded-xl ">
+					<p className=" relative left-[32.82px]  top-[23.28px] font-[700] mq750:text-[8vw] text-[3vw] pr-12  font-syne">
 						${price_m}/month
 					</p>
 					<p className=" relative top-[20.58px] left-[32.82px] font-[600] font-montserrat text-[18px] ">
@@ -18,13 +18,13 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 					</p>
 					<div className="bg-white h-[0.529px] mx-auto max-w-[90%] w-full relative top-[40.93px]"></div>
 
-					<div className="relative top-[60.16px] left-[32.81px] pr-[20px]">
+					<div className="relative top-[60.16px] px-[32.81px]">
 						{features.map((point) => {
 							return (
 								<>
 									<div className="flex gap-2 items-center pb-[28.81px]">
 										<div>
-											<Check  className="bg-white w-[20x] p-1 h-fit rounded-full text-primary-300" />
+											<Check className="bg-white w-[20x] p-1 h-fit rounded-full text-primary-300" />
 										</div>
 										<p className="pl-2 font-montserrat font-[500] text-[15px]">
 											{point}
@@ -39,8 +39,8 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 					</div>
 				</div>
 			) : (
-				<div className="mq750:hidden text-primary-300 bg-white h-full pb-[70px] flex-col max-w-[405.307px] w-full rounded-xl ">
-					<p className=" relative left-[32.82px] top-[23.28px] pr-[20px] font-[700] text-[35px] font-syne">
+				<div className="mq750:hidden text-primary-300 bg-white h-full pb-[70px] flex-col   w-full rounded-xl ">
+					<p className=" relative left-[32.82px]  pr-12  top-[23.28px]  font-[700] mq750:text-[35px] text-[3vw] font-syne">
 						${price_m}/month
 					</p>
 					<p className=" relative top-[20.58px] left-[32.82px] font-[600] font-montserrat text-[18px] ">
@@ -51,7 +51,7 @@ function Plan({price_m, plan_name, description, features, current_plan}: {price_
 					</p>
 					<div className="bg-primary-300 h-[0.529px] mx-auto max-w-[90%] w-full relative top-[40.93px]"></div>
 
-					<div className="relative top-[60.16px] left-[32.81px] pr-[20px]">
+					<div className="relative top-[60.16px] px-[32.81px]">
 						{features.map((point) => {
 							return (
 								<>

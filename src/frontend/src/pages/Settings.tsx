@@ -21,18 +21,20 @@ function Settings(): JSX.Element {
 			<div className="w-full pl-8 mq1000:pl-0 ">
 				<div className="text-primary-300 mq1000:fixed z-30 w-full mq1000:bg-white py-[20px]  mq1000:px-10 flex gap-8 mq1000:justify-between items-center">
 					<CircleArrowLeft
-						className="w-[30px] min-w-[30px] h-[30px]  "
+						className="w-[30px] min-w-[20px] h-[30px] mq1000:w-[20px] mq1000:h-[20px]  "
 						onClick={() => navigate(-1)}
 					/>
 					<div className="text-primary-300 font-syne text-[1.6rem] font-bold mq1000:text-[20px]">
 						Settings
 					</div>
 					<div className="hidden mq1000:block">
-						<FolderClosed size={30} />
+						<FolderClosed
+							className="w-[30px] min-w-[20px] h-[30px] mq1000:w-[20px] mq1000:h-[20px]"
+						/>
 					</div>
 				</div>
-				<div className="font-montserrat mq1000:top-[100.5px] mq1000:relative text-primary-300 flex px-[5rem] mq1000:w-full mq1000:px-[2.2rem] mq1000:text-center justify-between">
-					<p className="whitespace-nowrap mq1000:mx-auto">
+				<div className="font-montserrat mq1000:top-[100.5px] mq1000:relative text-primary-300 flex px-[5rem] mq1000:w-full mq1000:px-[10vw] mq1000:text-center justify-between">
+					<p className="whitespace-nowrap text-center mq1000:mx-auto">
 						Manage your profile details.
 					</p>
 					<p className="mq1000:hidden">
@@ -72,9 +74,7 @@ function Settings(): JSX.Element {
 			</div>
 			<div className="w-[90%] mq1000:w-[85%] mx-auto mt-20 mq1000:mt-40 bg-white rounded-[2rem]">
 				<div className="text-primary-300 pt-[28px]  font-montserrat px-8 pb-4 mq1000:pl-4  mq1000:pr-2 ">
-					<p className=" font-bold text-[16px]">
-						Delete Account
-					</p>
+					<p className=" font-bold text-[16px]">Delete Account</p>
 					<p className="text-[14px] pt-2">
 						Deleting your account will close your workspace, stop all activities
 						from our service, and purge all your information from our database.

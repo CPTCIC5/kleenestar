@@ -4,10 +4,7 @@ import { plans } from "../utils/dummyPlans.json"
 import { billing_details } from "../utils/dummyBilling.json"
 import Plan from "../components/Plan"
 import TableRow from "../components/TableRow"
-import avatar1 from "../../public/avatar1.png"
-import avatar2 from "../../public/avatar2.png"
-import avatar3 from "../../public/avatar3.png"
-import avatar4 from "../../public/avatar4.png"
+
 
 function PlanBilling(): JSX.Element {
 	const current_plan = "Scale"
@@ -26,31 +23,31 @@ function PlanBilling(): JSX.Element {
 					<div className="font-syne mq750:absolute mq750:top-[118.5px] mq750:left-[36.75px] rounded-xl px-[13px] py-[7px] font-[700] text-[17px] text-white bg-royalblue  ">
 						Scale
 					</div>
-					<div className="mq750:flex hidden  mq750:absolute mq750:top-[118.5px] mq750:left-[50%]">
+					<div className="mq750:flex hidden  mq750:absolute mq750:top-[118.5px] mq750:right-[10%]">
 						<div className="border-solid relative  bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
 							<img
-								src={avatar1}
+								src="/avatar1.png"
 								className="w-fit h-full"
 								alt=""
 							/>
 						</div>
 						<div className="border-solid relative right-[10px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
 							<img
-								src={avatar2}
+								src="/avatar2.png"
 								className="w-fit h-full"
 								alt=""
 							/>
 						</div>
 						<div className="border-solid relative right-[20px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
 							<img
-								src={avatar3}
+								src="/avatar3.png"
 								className="w-fit h-full"
 								alt=""
 							/>
 						</div>
 						<div className="border-solid relative right-[30px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
 							<img
-								src={avatar4}
+								src="/avatar4.png"
 								className="w-fit h-full"
 								alt=""
 							/>
@@ -62,8 +59,8 @@ function PlanBilling(): JSX.Element {
 					<u>Manage plan and billing</u>
 				</div>
 			</div>
-			<div className="px-[113px] mq750:px-[31px] w-max-[1512px] mx-auto relative top-[148.14px]">
-				<div className="flex gap-[36.01px] ">
+			<div className="w-[85%] mq750:px-[31px] w-max-[1512px] mx-auto relative top-[148.14px]">
+				<div className="flex justify-between  gap-[36.01px] ">
 					{plans.map((plan) => (
 						<Plan
 							{...plan}
@@ -79,10 +76,10 @@ function PlanBilling(): JSX.Element {
 				</div>
 				{/* Table */}
 				<div className=" bg-white w-full relative top-[60px] rounded-2xl">
-					<table className="w-full mq750:hidden text-[15px] font-montserrat font-[400] bg-white rounded-2xl">
+					<table className="w-full table-auto mq750:hidden text-[15px] font-montserrat font-[400] bg-white rounded-2xl">
 						<thead className="text-center">
 							<tr className="">
-								<td className="py-[30.84px] flex items-center pl-[35.98px] ">
+								<td className="py-[30.84px] gap-2 flex items-center pl-[14%] ">
 									<input
 										style={{ width: "50px", height: "20px" }}
 										type="checkbox"
@@ -115,7 +112,7 @@ function PlanBilling(): JSX.Element {
 							))}
 						</tbody>
 					</table>
-					<div className="relative top-[62px] mq750:top-[-30px]  mq650:text-center font-montserrat whitespace-nowrap text-[16px] font-[400] text-primary-300">
+					<div className="relative mq750:text-center top-[62px] mq750:top-[-30px]  mq650:text-center font-montserrat whitespace-nowrap text-[16px] font-[400] text-primary-300">
 						<u>I need help with a bill issue</u>
 					</div>
 				</div>
