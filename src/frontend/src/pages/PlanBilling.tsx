@@ -1,31 +1,124 @@
-import { FunctionComponent } from "react";
+import { CircleArrowLeft, CreditCardIcon, FolderClosed } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { plans } from "../utils/dummyPlans.json"
+import { billing_details } from "../utils/dummyBilling.json"
+import Plan from "../components/Plan"
+import TableRow from "../components/TableRow"
 
-const PlanBilling: FunctionComponent = () => {
-    return (
-        <div className="w-full relative bg-whitesmoke flex flex-col items-start justify-start pt-[73px] px-[50px] pb-[72.89999999999999px] box-border gap-[55.10000000000002px] tracking-[normal] text-left text-mini text-darkslateblue-100 font-montserrat lg:pl-[25px] lg:pr-[25px] lg:box-border mq750:gap-[28px_55.1px]">
-            <div className="w-[1218.7px] flex flex-row items-start justify-center max-w-full">
-                <div className="w-[948.7px] flex flex-row items-start justify-between gap-[20px] max-w-full mq750:flex-wrap">
-                    <div className="w-[162.1px] flex flex-col items-start justify-start">
-                        <div className="relative inline-block min-w-[57.1px] z-[1]">Invoice</div>
-                    </div>
-                    <div className="w-[119.9px] flex flex-col items-start justify-start">
-                        <div className="relative inline-block min-w-[66.7px] z-[1]">Amount</div>
-                    </div>
-                    <div className="flex flex-col items-start justify-start py-0 pr-[27.899999999999864px] pl-0">
-                        <div className="relative inline-block min-w-[39.2px] z-[1]">Date</div>
-                    </div>
-                    <div className="relative inline-block min-w-[50.8px] z-[1]">Status</div>
-                    <div className="relative inline-block min-w-[44.4px] z-[1]">Users</div>
-                </div>
-            </div>
-            <section className="w-[1097.4px] flex flex-row items-start justify-center pt-0 px-0 pb-[9.999999999999917px] box-border max-w-full"></section>
-            <div className="w-[383.5px] flex flex-row items-start justify-start py-0 pr-16 pl-[63.700000000000045px] box-border max-w-full text-base mq450:pl-5 mq450:pr-5 mq450:box-border">
-                <div className="flex-1 relative [text-decoration:underline] shrink-0">
-                    I need help with a billing issue
-                </div>
-            </div>
-        </div>
-    );
-};
 
-export default PlanBilling;
+function PlanBilling(): JSX.Element {
+	const current_plan = "Scale"
+	const navigate = useNavigate()
+	return (
+		<div className="w-screen h-full min-h-screen bg-background pb-80 mq750:pb-20">
+			<div className="w-full max-w-[1115] mx-auto flex relative mq750:top-[0px] top-[73px] pl-8 mq750:pl-0  ">
+				<div className="text-primary-300 mq750:justify-between mq750:px-[32px] mq750:py-[30px] mq750:bg-white z-30 w-full text-center	  flex gap-8 items-center">
+					<CircleArrowLeft
+						className="w-[30px] mq750:w-[23px] h-[30px]   "
+						onClick={() => navigate(-1)}
+					/>
+					<div className="text-primary-300 mq750:text-[20px] whitespace-nowrap font-syne text-[1.6rem] font-bold">
+						Plans and billing
+					</div>
+					<div className="font-syne mq750:absolute mq750:top-[118.5px] mq750:left-[36.75px] rounded-xl px-[13px] py-[7px] font-[700] text-[17px] text-white bg-royalblue  ">
+						Scale
+					</div>
+					<div className="mq750:flex hidden  mq750:absolute mq750:top-[118.5px] mq750:right-[10%]">
+						<div className="border-solid relative  bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
+							<img
+								src="/avatar1.png"
+								className="w-fit h-full"
+								alt=""
+							/>
+						</div>
+						<div className="border-solid relative right-[10px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
+							<img
+								src="/avatar2.png"
+								className="w-fit h-full"
+								alt=""
+							/>
+						</div>
+						<div className="border-solid relative right-[20px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
+							<img
+								src="/avatar3.png"
+								className="w-fit h-full"
+								alt=""
+							/>
+						</div>
+						<div className="border-solid relative right-[30px] bg-pink-300 border-2 w-10 h-10 border-primary-300 rounded-full object-cover object-center">
+							<img
+								src="/avatar4.png"
+								className="w-fit h-full"
+								alt=""
+							/>
+						</div>
+					</div>
+					<CreditCardIcon className="hidden mq750:block " />
+				</div>
+				<div className="mq750:hidden relative right-[110px] font-montserrat whitespace-nowrap text-[16px] font-[400] text-primary-300">
+					<u>Manage plan and billing</u>
+				</div>
+			</div>
+			<div className="w-[85%] mq750:px-[31px] w-max-[1512px] mx-auto relative top-[148.14px]">
+				<div className="flex justify-between  gap-[36.01px] ">
+					{plans.map((plan) => (
+						<Plan
+							{...plan}
+							current_plan={current_plan}
+						/>
+					))}
+				</div>
+				<div className="mq750:hidden w-full flex justify-between relative top-[43px] ">
+					<p className="font-montserrat text-[18px] font-[600] text-primary-300 ">
+						Billing details
+					</p>
+					<FolderClosed />
+				</div>
+				{/* Table */}
+				<div className=" bg-white w-full relative top-[60px] rounded-2xl">
+					<table className="w-full table-auto mq750:hidden text-[15px] font-montserrat font-[400] bg-white rounded-2xl">
+						<thead className="text-center">
+							<tr className="">
+								<td className="py-[30.84px] gap-2 flex items-center pl-[14%] ">
+									<input
+										style={{ width: "50px", height: "20px" }}
+										type="checkbox"
+										name=""
+										id=""
+									/>
+									Invoice
+								</td>
+								<td
+									className="py-[30.84px] "
+									style={{ width: "25%" }}>
+									Amount
+								</td>
+								<td
+									className="py-[30.84px] "
+									style={{ width: "25%" }}>
+									Date
+								</td>
+								<td className="py-[30.84px]">Status</td>
+								<td
+									className="py-[30.84px]"
+									style={{ width: "25%" }}>
+									Users
+								</td>
+							</tr>
+						</thead>
+						<tbody className="text-center">
+							{billing_details.map((bill) => (
+								<TableRow {...bill} />
+							))}
+						</tbody>
+					</table>
+					<div className="relative mq750:text-center top-[62px] mq750:top-[-30px]  mq650:text-center font-montserrat whitespace-nowrap text-[16px] font-[400] text-primary-300">
+						<u>I need help with a bill issue</u>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+export default PlanBilling

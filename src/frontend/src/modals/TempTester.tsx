@@ -6,7 +6,8 @@ import React from "react";
 // import LinkedinAds from "./LinkedinAds";
 // import TiktokAds from "./TiktokAds";
 // import ArchiveChats from "./ArchiveChats";
-import InviteTeam from "./InviteTeam";
+// import InviteTeam from "./InviteTeam";
+import HelpCenter from "./HelpCenter";
 // import ChatFeedback from "./ChatFeedback";
 // import ArchiveChats from "./ArchiveChats";
 // import LinkedinAds from "./LinkedinAds";
@@ -32,7 +33,7 @@ const TempTester: React.FC<TempTesterProps> = () => {
     return (
         <div className="flex items-center justify-center ">
             <button onClick={() => onClose(isOpen)}>Open Modal</button>
-            {isOpen && <InviteTeam isOpen={isOpen} onClose={() => onClose(isOpen)} />}
+            {isOpen && <HelpCenter isOpen={isOpen} onClose={() => onClose(isOpen)} />}
         </div>
     );
 };

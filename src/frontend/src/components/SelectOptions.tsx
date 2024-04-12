@@ -32,6 +32,7 @@ function getStyles(
 
 function SelectOptions({ options, InputText }: { options: Array<string>, InputText: string }) {
   const names = options;
+const isSmallScreen = window.innerWidth < 1000
 const theme = useTheme();
 const [personName, setPersonName] = React.useState<string>("");
 
@@ -50,7 +51,7 @@ return (
 			{!personName && (
 				<InputLabel
 					shrink={false}
-					className="text-gray-500 focus:text-gray-500  border-transparent font-montserrat text-xl mq750:text-[15px]">
+					className="text-gray-500 focus:text-gray-500   border-transparent font-montserrat  text-[15px]">
 					{InputText}
 				</InputLabel>
 			)}
@@ -63,12 +64,12 @@ return (
 					personName ? (
 						<Input
 							disableUnderline
-							className="w-full px-[10px] py-[10px] bg-transparent min-h-[47px] h-full  border-transparent font-montserrat text-xl mq750:text-[15px]"
+							className="w-full  bg-transparent max-h-[47px] h-full  border-transparent font-montserrat text-[15px]"
 						/>
 					) : (
 						<Input
 							disableUnderline
-							className="w-full px-[10px]  bg-transparent min-h-[47px] h-full  border-transparent font-montserrat text-xl mq750:text-[15px]"
+							className="w-full px-[10px]  bg-transparent  max-h-[47px] h-full  border-transparent font-montserrat text-[15px]"
 						/>
 					)
 				}
@@ -82,8 +83,8 @@ return (
 							...getStyles(name, [personName], theme),
 							fontFamily: "Montserrat",
 							fontWeight: 400,
-							fontSize: "14px",
-							lineHeight: "17.07px",
+							fontSize: isSmallScreen ? "11px" : "14px",
+							lineHeight: isSmallScreen ? "15px" : "17.07px",
 						}}>
 						{name}
 					</MenuItem>
