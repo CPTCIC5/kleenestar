@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+from channels.models import Convo
+from django.shortcuts import get_object_or_404
 import openai
 import os
 
@@ -70,13 +72,27 @@ def generate_instructions(user_query, image=None):
     return prompt, analysis_type
 """
 
-def generate_instructions(user_query,image=None):
+def get_convo(convo):
+    get_convo= get_object_or_404(Convo,id=convo)
+    history = get_convo.prompt_set.all()
+    if history.count() >= 1:
+        history_list = []
+        for i in history:
+            history_list.append(i.text_query)
+        return str(history_list)
+    else:
+        return False
+
+
+def generate_instructions(user_query,convo_id,image=None):
+    convo = get_convo(convo_id)
     #fetch = base(user_query,image)
     if not image:
         response = client.chat.completions.create(
             model="gpt-4-turbo-preview",  # Use the correct identifier for GPT-4
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}, 
+                #{'role':'system',},
                 #{"role": "system", "content": fetch["analysis_type"]},
                 #{"role" : "user", "content":fetch["prompt"]},
                 {"role":"user", "content": user_query}
