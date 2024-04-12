@@ -120,9 +120,9 @@ def generate_instructions(user_query,convo_id,image=None):
         return insights.content.strip()
 
 
-def generate_insights_with_gpt4(query,image=None):
+def generate_insights_with_gpt4(query,convo_id,image=None):
     if image is None:
-        data_for_analysis = generate_instructions(query)
+        data_for_analysis = generate_instructions(query,convo_id)
         prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
         response = client.chat.completions.create(
@@ -135,7 +135,7 @@ def generate_insights_with_gpt4(query,image=None):
         )
         return response.choices[0].message.content.strip()
     else:
-        data_for_analysis = generate_instructions(query,image)
+        data_for_analysis = generate_instructions(query,convo_id,image)
         prompt_for_gpt4 = f"{query}\\n{image}\\n{data_for_analysis}"
 
         response = client.chat.completions.create(
