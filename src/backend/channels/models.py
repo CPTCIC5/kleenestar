@@ -1,6 +1,7 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
+from channels.ai  import generate_insights_with_gpt4
 
 
 class APICredentials(models.Model):
@@ -49,18 +50,20 @@ class Prompt(models.Model):
     
     text_query = models.TextField(max_length=10_000)
     image_query = models.ImageField(upload_to='Prompts-Query/', blank=True,null=True)
-
-    refactored_text = models.TextField(max_length=20_000,blank=True) #gpt4 refactored text
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
-    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
+    #response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    """
+
     def save(self,*args,**kwargs):
+        if not self.image_query:
+            self.response_text = generate_insights_with_gpt4(self.text_query,self.convo)
+        else:
+            self.response_text = generate_insights_with_gpt4(self.text_query,self.convo,self.image_query)    
         super().save(*args,**kwargs)
-    """
+    
 
     class Meta:
         ordering  = ['author','id']

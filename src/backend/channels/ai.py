@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
+from channels.models import Convo
+from django.shortcuts import get_object_or_404
 import openai
 import os
 
@@ -70,13 +72,27 @@ def generate_instructions(user_query, image=None):
     return prompt, analysis_type
 """
 
-def generate_instructions(user_query,image=None):
+def get_convo(convo):
+    get_convo= get_object_or_404(Convo,id=convo)
+    history = get_convo.prompt_set.all()
+    if history.count() >= 1:
+        history_list = []
+        for i in history:
+            history_list.append(i.text_query)
+        return str(history_list)
+    else:
+        return False
+
+
+def generate_instructions(user_query,convo_id,image=None):
+    convo = get_convo(convo_id)
     #fetch = base(user_query,image)
     if not image:
         response = client.chat.completions.create(
             model="gpt-4-turbo-preview",  # Use the correct identifier for GPT-4
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}, 
+                {'role':'system', "content": convo},
                 #{"role": "system", "content": fetch["analysis_type"]},
                 #{"role" : "user", "content":fetch["prompt"]},
                 {"role":"user", "content": user_query}
@@ -91,6 +107,7 @@ def generate_instructions(user_query,image=None):
             model="gpt-4-vision-preview",  # Use the correct identifier for GPT-4
             messages = [
                 {"role": "system", "content": SYSTEM_PROMPT}, 
+                {'role':'system', "content": convo},
                 #{"role": "system", "content": fetch["analysis_type"]},
                 #{"role" : "user", "content":fetch["prompt"]},
                 {"role":"user", "content": user_query},
@@ -103,20 +120,22 @@ def generate_instructions(user_query,image=None):
         return insights.content.strip()
 
 
-def generate_insights_with_gpt4(query,image=None):
+def generate_insights_with_gpt4(query,convo_id,image=None):
     if image is None:
-        data_for_analysis = generate_instructions(query)
+        data_for_analysis = generate_instructions(query,convo_id)
         prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
         response = client.chat.completions.create(
                 model="gpt-4-turbo-preview",
-                messages=[{"role": "user", "content": prompt_for_gpt4}],
+                messages=[
+                    {"role": "user", "content": prompt_for_gpt4}
+                    ],
                 max_tokens=1000,
                 temperature=0.5
         )
         return response.choices[0].message.content.strip()
     else:
-        data_for_analysis = generate_instructions(query,image)
+        data_for_analysis = generate_instructions(query,convo_id,image)
         prompt_for_gpt4 = f"{query}\\n{image}\\n{data_for_analysis}"
 
         response = client.chat.completions.create(
