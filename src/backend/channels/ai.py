@@ -2,8 +2,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from channels.models import Convo
 from django.shortcuts import get_object_or_404
-import openai
-import os
+
 
 load_dotenv()
 
@@ -136,7 +135,7 @@ def generate_insights_with_gpt4(query,convo_id,image=None):
         return response.choices[0].message.content.strip()
     else:
         data_for_analysis = generate_instructions(query,convo_id,image)
-        prompt_for_gpt4 = f"{query}\\n{image}\\n{data_for_analysis}"
+        prompt_for_gpt4 = f"{query}\\n\\n{data_for_analysis}"
 
         response = client.chat.completions.create(
                 model="gpt-4-vision-preview",
