@@ -1,47 +1,45 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import { ChevronDown, CircleArrowLeft, PencilLine } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import PrimaryInputBox from "../components/PrimaryInputBox";
 import PrimaryButton from "../components/PrimaryButton";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const schema = z.object({
+    businessName: z.string().nonempty("Business name is required"),
+    Website: z
+        .string()
+        .url({ message: "Invalid URL" })
+        .refine((value) => value.includes("."), {
+            message: "Website should contain a .",
+        }),
+    industry: z.string().nonempty("Industry is required"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const OnboardingStep2: FunctionComponent = () => {
     const navigate = useNavigate();
-    const [businessName, setBusinessName] = useState<string>("");
-    const [industry, setIndustry] = useState<string>("");
-    const [url, setUrl] = useState<string>("");
-    const [validUrl, setValidUrl] = useState<boolean>(false);
 
-    const handleBusinessNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setBusinessName(event.target.value);
-    };
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<FormData>({
+        resolver: zodResolver(schema),
+        mode: "onChange",
+    });
 
-    const validateAndChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setUrl(event.target.value);
-        const url = event.target.value;
-        const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
-        if (urlRegex.test(url)) {
-            setValidUrl(true);
-        } else {
-            setValidUrl(false);
-        }
-    };
-    const handleIndustryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIndustry(event.target.value);
-    };
-
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(businessName, industry, url);
-
-        {
-            /* add axios post request here */
-        }
+    const onSubmit = (data: FormData) => {
+        console.log(data);
+        // Navigate or perform other actions
     };
 
     return (
         <div className="w-full h-screen flex items-center justify-center bg-background p-4  flex-col gap-[30px]">
             <div className="hidden mq551:block">
-                <img src={"/public/MainLogo.svg"} alt="" />
+                <img src={"/MainLogo.svg"} alt="" />
             </div>
             <div className="max-w-[722px] max-h-[684px] w-full h-full flex flex-col items-center justify-center rounded-3xl p-4 relative bg-white ">
                 <div className="absolute top-5 left-5">
@@ -62,7 +60,7 @@ const OnboardingStep2: FunctionComponent = () => {
 
                 <form
                     method="post"
-                    onSubmit={handleFormSubmit}
+                    onSubmit={handleSubmit(onSubmit)}
                     className={`max-w-[454px] max-h-[353.99px] w-full  mt-[41px] flex flex-col gap-[16px]`}
                 >
                     <div className="w-full h-[72.33px] gap-[10px] flex flex-col justify-between">
@@ -70,16 +68,13 @@ const OnboardingStep2: FunctionComponent = () => {
                             Business name*
                         </span>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
+                            <input
                                 type="text"
-                                name="business_name"
-                                placeholder="Business name"
-                                onChange={handleBusinessNameChange}
-                                className="focus:outline-primary-100 focus:outline"
-                                value={businessName}
-                                required
+                                {...register("businessName")}
+                                placeholder="Business Name"
+                                className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
-                            {/* PrimaryInputBox component for business name*/}
+                            {/* input component for business name*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <PencilLine className="bg-inherit" />
                             </div>
@@ -87,32 +82,29 @@ const OnboardingStep2: FunctionComponent = () => {
                     </div>
                     <div
                         className={`w-full ${
-                            !validUrl ? "h-[114.33px]" : "h-[88.33px]"
+                            errors.Website ? "h-[114.33px]" : "h-[88.33px]"
                         } gap-[10px] flex flex-col justify-between`}
                     >
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">
                             Website*
                         </span>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
+                            <input
                                 type="url"
-                                name="Website"
+                                {...register("Website")}
                                 placeholder="https://"
-                                onChange={validateAndChange}
-                                className="focus:outline-primary-100 focus:outline"
-                                value={url}
-                                required
+                                className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
-                            {/* PrimaryInputBox component for website*/}
+                            {/* input component for website*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <PencilLine className="bg-inherit" />
                             </div>
                         </div>
 
-                        {!validUrl && (
+                        {errors.Website && (
                             <div className="w-full h-[16px] flex items-center justify-start">
                                 <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
-                                    Invalid url
+                                    {errors.Website.message}
                                 </span>
                             </div>
                         )}
@@ -122,24 +114,20 @@ const OnboardingStep2: FunctionComponent = () => {
                             Industry
                         </span>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
+                            <input
                                 type="text"
-                                name="industy"
-                                onChange={handleIndustryChange}
+                                {...register("industry")}
                                 placeholder="What’s your industry?"
-                                className="focus:outline-primary-100 focus:outline"
-                                value={industry}
+                                className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
-                            {/* PrimaryInputBox component for industry*/}
+                            {/* input component for industry*/}
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <ChevronDown className="bg-inherit" />
                             </div>
                         </div>
                     </div>
                     <div className="h-[40px] max-w-[454px] w-full mt-[17px]">
-                        <PrimaryButton disabled={!validUrl || !businessName || !url || !industry}>
-                            Create
-                        </PrimaryButton>{" "}
+                        <PrimaryButton disabled={!isValid}>Create</PrimaryButton>
                         {/* Use the PrimaryButton component */}
                     </div>
                 </form>
