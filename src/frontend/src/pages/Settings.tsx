@@ -8,15 +8,26 @@ import SelectOptions from "../components/SelectOptions"
 
 function Settings(): JSX.Element {
 	const reasonsToDeleteAccount = [
-		"Found a better platform/service",
-		"Concerns about privacy/security",
-		"No longer need the account/service",
-		"Dissatisfaction with the platform/service",
-		"Simplifying digital footprint",
+		{
+			name: "Found a better platform/service",
+			value: "Found a better platform/service",
+		},
+		{
+			name: "No longer need the account/service",
+			value: "No longer need the account/service",
+		},
+		{
+			name: "Dissatisfaction with the platform/service",
+			value: "Dissatisfaction with the platform/service",
+		},
+		{
+			name: "Simplifying digital footprint",
+			value: "Simplifying digital footprint",
+		},
 	]
-  
-  const navigate = useNavigate()
-  return (
+
+	const navigate = useNavigate()
+	return (
 		<div className=" h-ful w-screen min-h-screen bg-background pb-20">
 			<div className="w-full pl-8 mq1000:pl-0 ">
 				<div className="text-primary-300 mq1000:fixed z-30 w-full mq1000:bg-white py-[20px]  mq1000:px-10 flex gap-8 mq1000:justify-between items-center">
@@ -28,9 +39,7 @@ function Settings(): JSX.Element {
 						Settings
 					</div>
 					<div className="hidden mq1000:block">
-						<FolderClosed
-							className="w-[30px] min-w-[20px] h-[30px] mq1000:w-[20px] mq1000:h-[20px]"
-						/>
+						<FolderClosed className="w-[30px] min-w-[20px] h-[30px] mq1000:w-[20px] mq1000:h-[20px]" />
 					</div>
 				</div>
 				<div className="font-montserrat mq1000:top-[100.5px] mq1000:relative text-primary-300 flex px-[5rem] mq1000:w-full mq1000:px-[10vw] mq1000:text-center justify-between">
