@@ -61,6 +61,7 @@ function ProfileSection(): JSX.Element {
 			number: "",
 		},
 		resolver: zodResolver(schema),
+		mode: "onChange",
 	})
 	const { register, handleSubmit, formState, setError } = form
 	const { errors,isValid } = formState

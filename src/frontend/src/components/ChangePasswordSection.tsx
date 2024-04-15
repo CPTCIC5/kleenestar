@@ -61,13 +61,15 @@ function ChangePasswordSection(): JSX.Element {
 		setPasswordValue(event.target.value)
 	}
 
-	const { register, handleSubmit, setError, formState, watch, clearErrors } = useForm<FormFields>({
-		defaultValues: {
-			password: "",
-			confirmPassword: "",
-		},
-		resolver: zodResolver(schema),
-	})
+	const { register, handleSubmit, setError, formState, watch, clearErrors } =
+		useForm<FormFields>({
+			defaultValues: {
+				password: "",
+				confirmPassword: "",
+			},
+			resolver: zodResolver(schema),
+			mode: "onChange",
+		})
 	const onSubmit: SubmitHandler<FormFields> = (data) => {
 		if (data.password !== data.confirmPassword) {
 			setPasswordMatch(false)
