@@ -111,7 +111,10 @@ function ChangePasswordSection(): JSX.Element {
 								})}
 								type="password"
 								placeholder="New password"
-								onChange={handlePasswordChange}
+								onChange={(event) => {
+									handlePasswordChange(event);
+									register("password").onChange(event);
+								}}
 								className="autofill:bg-transparent outline-none bg-transparent w-full bg-clip-text font-montserrat text-[15px]"
 							/>
 							<PencilLine className="text-primary-300" />
@@ -136,10 +139,10 @@ function ChangePasswordSection(): JSX.Element {
 							<PencilLine className="text-primary-300" />
 						</div>
 						{errors.confirmPassword && (
-						<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
-							{errors.confirmPassword?.message ?? ""}
-						</div>
-							)}
+							<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
+								{errors.confirmPassword?.message ?? ""}
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="flex justify-between px-4 gap-4 mq1000:flex-col text-royalblue">
@@ -156,22 +159,25 @@ function ChangePasswordSection(): JSX.Element {
 							)
 						})}
 					</div>
-					
-						{
-						passwordMatch &&
-						isValid && (
-							<div className="text-[13px] text-right mq1000:pt-4">
-								{"Password confirmation matches"}
-							</div>
-						)
-					}
+
+					{passwordMatch && isValid && (
+						<div className="text-[13px] text-right mq1000:pt-4">
+							{"Password confirmation matches"}
+						</div>
+					)}
 				</div>
-				<div
-					aria-disabled={!isValid}
-					onClick={handleSubmit(onSubmit)}
-					className="w-full text-[15px] mq1000:py-[0.7rem]  font-bold rounded-[2rem] my-8 cursor-pointer text-white bg-primary-300 text-center py-[12px]">
-					Change password
-				</div>
+				{!isValid && (
+					<div className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+						Change password
+					</div>
+				)}
+				{isValid && (
+					<div
+						onClick={handleSubmit(onSubmit)}
+						className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+						Change password
+					</div>
+				)}
 			</div>
 		</div>
 	)

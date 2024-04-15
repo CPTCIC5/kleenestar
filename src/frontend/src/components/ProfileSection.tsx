@@ -94,7 +94,7 @@ function ProfileSection(): JSX.Element {
 		<div className="w-[50%] bg-white mq1000:w-[95%] mq1000:mx-auto rounded-[2rem] ">
 			<div className="text-primary-300  font-montserrat pt-[28px] pl-8 pb-4 mq1000:pl-4 border-solid border-b-2 border-[#BEB9B1] ">
 				<p className=" font-bold text-[16px]"> Profile</p>
-				<p className="text-[14px] whitespace-nowrap">
+				<p className="text-[14px] pt-2  whitespace-nowrap">
 					Mange your profile details
 				</p>
 			</div>
@@ -238,12 +238,22 @@ function ProfileSection(): JSX.Element {
 							)}
 						</div>
 					</div>
-					<div
-						aria-disabled={!isValid}
+					{!isValid && (
+						<div
+							className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+							Save changes
+						</div>
+					)}
+					{
+						isValid && (
+							<div
 						onClick={handleSubmit(onSubmit)}
 						className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
 						Save changes
 					</div>
+						)
+					}
+					
 				</div>
 			</div>
 		</div>
