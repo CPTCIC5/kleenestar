@@ -9,7 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form"
 import axios from "axios"
 
 const schema = z.object({
-	email: z.string().email({ message: "Unauthorized email" }),
+	email: z.string().email({ message: "Invalid Email Address" }),
 	password: z
 		.string()
 		.min(8, { message: "Password must be at least 8 characters long" }),

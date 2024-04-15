@@ -31,11 +31,16 @@ const TempTester: React.FC<TempTesterProps> = () => {
     }
 
     return (
-        <div className="flex items-center justify-center ">
-            <button onClick={() => onClose(isOpen)}>Open Modal</button>
-            {isOpen && <HelpCenter isOpen={isOpen} onClose={() => onClose(isOpen)} />}
-        </div>
-    );
+			<div className="flex items-center justify-center ">
+				<button onClick={() => onClose(isOpen)}>Open Modal</button>
+				{isOpen && (
+					<HelpCenter
+						isOpen={isOpen}
+						onClose={() => onClose(isOpen)}
+					/>
+				)}
+			</div>
+		)
 };
 
 export default TempTester;
