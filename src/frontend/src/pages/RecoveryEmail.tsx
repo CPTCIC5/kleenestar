@@ -1,30 +1,28 @@
-import { FunctionComponent, useState } from "react";
-import PrimaryInputBox from "../components/PrimaryInputBox";
+import { FunctionComponent} from "react";
 import { PencilLine } from "lucide-react";
 import PrimaryButton from "../components/PrimaryButton";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const schema = z.object({
+    email: z.string().email(),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const RecoveryEmail: FunctionComponent = () => {
-    const [email, setEmail] = useState<string>("");
-    const [unauthorisedEmail, setUnauthorisedEmail] = useState<boolean>(true);
+    const {
+        handleSubmit,
+        register,
+        formState: { errors, isValid },
+    } = useForm<FormData>({
+        resolver: zodResolver(schema),
+        mode: "onChange",
+    });
 
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-        const email = event.target.value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailRegex.test(email)) {
-            setUnauthorisedEmail(true);
-        } else {
-            setUnauthorisedEmail(false);
-        }
-    };
-
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(email);
-        {
-            /* add axios post request here */
-        }
+    const onSubmit = (data: FormData) => {
+        console.log(data);
     };
 
     const handleSendCode = () => {
@@ -55,33 +53,30 @@ const RecoveryEmail: FunctionComponent = () => {
 
                 <form
                     method="post"
-                    onSubmit={handleFormSubmit}
+                    onSubmit={handleSubmit(onSubmit)}
                     className={`max-w-[454px] w-full max-h-[434px] mt-[39px] flex flex-col items-center gap-[16px]`}
                 >
                     <div
                         className={`w-full  ${
-                            unauthorisedEmail ? "h-[99.66px]" : "h-[73.66px]"
+                            errors.email ? "h-[99.66px]" : "h-[73.66px]"
                         } gap-[10px] flex flex-col justify-between`}
                     >
                         <span className="w-full h-[17px] font-montserrat font-[500] text-[14px] leading-[17.07px] text-primary">
                             Email*
                         </span>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
+                            <input
                                 type="email"
-                                name="email"
+                                {...register("email")}
                                 placeholder="@work-email.com"
-                                onChange={handleEmailChange}
-                                className="focus:outline-primary-100 focus:outline"
-                                value={email}
-                                required
+                                className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
                             <div className="absolute bg-background text-primary flex items-center right-4">
                                 <PencilLine className="bg-inherit" />
                             </div>
                         </div>
 
-                        {unauthorisedEmail && (
+                        {errors.email && (
                             <div className="w-full h-[16px] flex items-center justify-start">
                                 <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
                                     Email not recognized
@@ -90,9 +85,7 @@ const RecoveryEmail: FunctionComponent = () => {
                         )}
                     </div>
                     <div className="h-[40px] max-w-[454px] w-full mt-[23px]">
-                        <PrimaryButton disabled={unauthorisedEmail || !email}>
-                            Send email
-                        </PrimaryButton>
+                        <PrimaryButton disabled={!isValid}>Send email</PrimaryButton>
                         {/* Use the PrimaryButton component */}
                     </div>
                 </form>
