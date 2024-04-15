@@ -1,4 +1,4 @@
-import { FunctionComponent} from "react";
+import { FunctionComponent } from "react";
 import { PencilLine } from "lucide-react";
 import PrimaryButton from "../components/PrimaryButton";
 import { zodResolver } from "@hookform/resolvers/zod";
