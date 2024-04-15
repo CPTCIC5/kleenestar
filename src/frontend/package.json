@@ -22,6 +22,8 @@
         "@types/material-ui": "^0.21.17",
         "@types/node": "^20.12.6",
         "axios": "^1.6.8",
+        "i18n-iso-countries": "^7.11.0",
+        "libphonenumber-js": "^1.10.60",
         "lucide": "^0.366.0",
         "lucide-react": "^0.366.0",
         "process": "^0.11.10",
