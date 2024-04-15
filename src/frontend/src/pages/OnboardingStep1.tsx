@@ -15,7 +15,7 @@ const OnboardingStep1: FunctionComponent = () => {
                         <span className="font-syne m-0  font-[700] text-[30px] font-inherit inline-block z-[1] leading-[36px] text-primary-300">
                             Get Started
                         </span>
-                        <div className="max-width self-stretch text-[16px] leading-[19.5px] text-center font-montserrat z-[1] font-[400] text-primary-300 flex">
+                        <div className="max-width self-stretch text-[16px] leading-[19.5px] text-center font-montserrat z-[1] font-[400] text-primary-300 flex flex-col">
                             <span>A new way to run highly efficient marketing analytics </span>
                             <span>across channels and learn real-time insights 🚀</span>
                         </div>
