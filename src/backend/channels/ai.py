@@ -9,13 +9,12 @@ client = OpenAI()
 
 
 
-
 def get_convo_prompts(convo:int):
     get_convo= get_object_or_404(Convo,id=convo)
     history = get_convo.prompt_set.all()
     return history
     
-def send_history(convo_id:int):
+def get_history(convo_id:int):
     history = get_convo_prompts(convo_id)
     if history.count() >= 1:
         history_list = []
@@ -26,11 +25,15 @@ def send_history(convo_id:int):
         return False
 
 
-
-def generate_insights_with_gpt4(user_query:str,convo:int):
+def generate_insights_with_gpt4(user_query:str,convo:int,user_img_query=None):
     # Creating a new conversation thread
-    thread = client.beta.threads.create()
+    all_prompts = get_convo_prompts(convo).count()
 
+
+    if all_prompts >= 1:
+        thread = client.beta.threads.retrieve()
+    else:
+        thread = client.beta.threads.create()
     # Posting user's query as a message in the thread
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
@@ -43,7 +46,6 @@ def generate_insights_with_gpt4(user_query:str,convo:int):
         thread_id=thread.id,
         assistant_id="asst_wljmLStVyrLtU7AyxcyXlU7d"
     )
-    print(run.instructions)
 
 
     while run.status != "completed":
