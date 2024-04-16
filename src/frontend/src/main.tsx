@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { CssBaseline, ThemeProvider, createTheme, StyledEngineProvider } from "@mui/material";
+import { Theme } from "@radix-ui/themes";
 
 const muiTheme = createTheme();
 
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={muiTheme}>
                     <CssBaseline />
-                    <App />
+                    <Theme>
+                        <App />
+                    </Theme>
                 </ThemeProvider>
             </StyledEngineProvider>
         </BrowserRouter>

@@ -1,35 +1,36 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import GoogleOauthButton from "../components/GoogleOauthButton";
-import PrimaryInputBox from "../components/PrimaryInputBox";
-import { ChevronDown, CircleArrowLeft, CircleHelp, PencilLine } from "lucide-react";
+import { CircleArrowLeft, CircleHelp, PencilLine } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import CustomSelect from "../components/CustomSelect";
 
 const OnboardingStep4: FunctionComponent = () => {
     const navigate = useNavigate();
-    const [businessSize, setBusinessSize] = useState<string>("");
-    const [businessObjectives, setBusinessObjectives] = useState<string>("");
-    const [challenges, setChallenges] = useState<string>("");
+    const {
+        register,
+        control,
+        handleSubmit,
+        formState: { isValid },
+    } = useForm({
+        mode: "onChange",
+    });
 
-    const handleBusinessSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setBusinessSize(event.target.value);
-    };
+    const BusinessSize = [
+        { value: "startup", label: "startup" },
+        { value: "growth", label: "growth" },
+        { value: "maturity", label: "maturity" },
+    ];
 
-    const handleBusinessObjectivesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setBusinessObjectives(event.target.value);
-    };
+    const BusinessObjectives = [
+        { value: "apple", label: "Apple" },
+        { value: "banana", label: "Banana" },
+        { value: "orange", label: "Orange" },
+    ];
 
-    const handleChallengesChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setChallenges(event.target.value);
-    };
-
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(businessSize, businessObjectives, challenges);
-
-        {
-            /* add axios post request here */
-        }
+    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        console.log(data);
     };
 
     return (
@@ -56,7 +57,7 @@ const OnboardingStep4: FunctionComponent = () => {
 
                 <form
                     method="post"
-                    onSubmit={handleFormSubmit}
+                    onSubmit={handleSubmit(onSubmit)}
                     className={`max-w-[454px] w-full mt-[50.05px] flex flex-col items-center gap-[18px]`}
                 >
                     <div className="max-w-[454px] w-full flex flex-col gap-[9px]">
@@ -68,18 +69,12 @@ const OnboardingStep4: FunctionComponent = () => {
                             <CircleHelp className="h-[20.88px] w-[20.88px] bg-transparent text-primary-300" />
                         </div>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
-                                type="text"
-                                name="businessSize"
-                                onChange={handleBusinessSizeChange}
+                            <CustomSelect
+                                name="BusinessSize"
+                                control={control}
                                 placeholder="Answer"
-                                className="focus:outline-primary-100 focus:outline"
-                                value={businessSize}
+                                options={BusinessSize}
                             />
-                            {/* PrimaryInputBox component for industry*/}
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <ChevronDown className="bg-inherit" />
-                            </div>
                         </div>
                     </div>
                     <div className="max-w-[454px] w-full flex flex-col gap-[9px]">
@@ -90,18 +85,12 @@ const OnboardingStep4: FunctionComponent = () => {
                             <CircleHelp className="h-[20.88px] w-[20.88px] bg-transparent text-primary-300" />
                         </div>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <PrimaryInputBox
-                                type="text"
-                                name="businessObjectives"
-                                onChange={handleBusinessObjectivesChange}
+                            <CustomSelect
+                                name="BusinessObjectives"
+                                control={control}
                                 placeholder="Answer"
-                                className="focus:outline-primary-100 focus:outline"
-                                value={businessObjectives}
+                                options={BusinessObjectives}
                             />
-                            {/* PrimaryInputBox component for industry*/}
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <ChevronDown className="bg-inherit" />
-                            </div>
                         </div>
                     </div>
                     <div className="max-w-[454px] w-full flex flex-col gap-[9px]">
@@ -114,11 +103,9 @@ const OnboardingStep4: FunctionComponent = () => {
                         </div>
                         <div className="relative w-full min-h-[51px] flex items-center ">
                             <textarea
-                                name="challenges"
+                                {...register("textareaFieldName", { required: true })}
                                 placeholder="Answer"
-                                onChange={handleChallengesChange}
                                 className="bg-background rounded-t-3xl rounded-b-3xl w-full h-full px-4  pr-10 py-4 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300 outline-none focus:outline-primary-100 focus:outline resize-y"
-                                value={challenges}
                             />
                             {/* PrimaryInputBox component for note*/}
                             <div className="absolute bg-background text-primary flex items-center right-4 bottom-4">
@@ -127,11 +114,7 @@ const OnboardingStep4: FunctionComponent = () => {
                         </div>
                     </div>
                     <div className="h-[40px] max-w-[454px] w-full mt-[23px]">
-                        <PrimaryButton
-                            disabled={!businessSize || !businessObjectives || !challenges}
-                        >
-                            Continue
-                        </PrimaryButton>
+                        <PrimaryButton disabled={!isValid}>Continue</PrimaryButton>
                         {/* Use the PrimaryButton component */}
                     </div>
                 </form>
