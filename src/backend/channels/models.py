@@ -1,7 +1,7 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
-#from channels.ai import generate_insights_with_gpt4
+from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
     key_1 = models.CharField(max_length=255,unique=True)
@@ -57,12 +57,12 @@ class Prompt(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    """
+    
     def save(self,*args,**kwargs):
-        self.response_text= generate_insights_with_gpt4(self.text_query,self.convo.id).text.value
-        self.response_image = generate_insights_with_gpt4(self.text_query,self.convo.id).image_file
+        self.response_text= generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).text.value
+        self.response_image = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).image_file
         super().save(*args,**kwargs)
-    """
+    
     
     
 
