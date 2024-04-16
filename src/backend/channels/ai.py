@@ -8,12 +8,15 @@ load_dotenv()
 client = OpenAI()
 
 
-
+"""
 def get_convo_prompts(convo:int):
     get_convo= get_object_or_404(Convo,id=convo)
     history = get_convo.prompt_set.all()
     return history
-    
+"""
+
+
+"""
 def get_history(convo_id:int):
     history = get_convo_prompts(convo_id)
     if history.count() >= 1:
@@ -23,22 +26,34 @@ def get_history(convo_id:int):
         return str(history_list)
     else:
         return False
+"""
 
 
-def generate_insights_with_gpt4(user_query:str,convo:int,user_img_query=None):
+def generate_insights_with_gpt4(user_query:str,convo:int):
+    get_convo = get_object_or_404(Convo,id=convo)
+    history = get_convo.prompt_set.all()
+    all_prompts = history.count()
+
     # Creating a new conversation thread
-    all_prompts = get_convo_prompts(convo).count()
-
-
     if all_prompts >= 1:
-        thread = client.beta.threads.retrieve()
+        thread = client.beta.threads.retrieve(
+            thread_id=get_convo.assistant_id
+        )
+
     else:
         thread = client.beta.threads.create()
+        print(thread)
+        get_convo.assistant_id = thread.id
+        get_convo.save()
+        #convo.assistant_id = thread
+
+
+
     # Posting user's query as a message in the thread
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=user_query
+        content=user_query,
     )
 
     # Initiating a run
@@ -65,6 +80,5 @@ def generate_insights_with_gpt4(user_query:str,convo:int,user_img_query=None):
     )
 
     # Print the messages from the user and the assistant
-    print("###################################################### \n")
     print(f"USER: {message.content[0].text.value}")
     print(f"ASSISTANT: {all_messages.data[0].content[0].text.value}")
