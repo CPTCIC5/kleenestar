@@ -1,19 +1,17 @@
 import { PencilLine } from "lucide-react"
-import { ChevronDown } from "lucide-react"
 import { useRef } from "react"
-import SelectOptions from "./SelectOptions"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import parsePhoneNumber, { CountryCode } from "libphonenumber-js"
 import { getNames, registerLocale } from "i18n-iso-countries"
 import english from "i18n-iso-countries/langs/en.json"
+import CustomSelect from "./CustomSelect"
 
 registerLocale(english)
 
 const countryList = Object.entries(getNames("en")).map(([value, name]) => ({
-	name,
-	value,
+	value: value, label: name
 }))
 type FormFields = z.infer<typeof schema>
 
@@ -52,18 +50,18 @@ function ProfileSection(): JSX.Element {
 	}
 
 	const form = useForm<FormFields>({
-		defaultValues: {
+		defaultValues:{
 			first_name: "",
 			last_name: "",
 			email: "",
 			workspace: "",
 			country: "",
-			number: "",
+			number:""
 		},
 		resolver: zodResolver(schema),
 		mode: "onChange",
 	})
-	const { register, handleSubmit, formState, setError } = form
+	const { register, handleSubmit, formState, setError, control } = form
 	const { errors,isValid } = formState
 
 	const onSubmit: SubmitHandler<FormFields> = (data) => {
@@ -138,7 +136,6 @@ function ProfileSection(): JSX.Element {
 								</div>
 							)}
 						</div>
-
 						<div className="w-full text-primary-300 font-bold text-[14px]">
 							Last name
 							<div className="w-full mt-2 bg-background h-[45px] rounded-[2rem] p-4 flex items-center ">
@@ -202,15 +199,13 @@ function ProfileSection(): JSX.Element {
 					<div className="flex  justify-center gap-4 pt-2 mq1000:flex-col">
 						<div className="w-full text-primary-300 font-bold text-[14px]">
 							Country
-							<div className="w-full px-[19.34px]  mt-2 bg-background  rounded-[2rem]  flex items-center ">
-								<SelectOptions
-									{...register("country", {
-										required: "Country is required",
-									})}
+							<div className="relative w-full h-[45px] flex items-center mt-2">
+								<CustomSelect
+									name="country"
+									control={control}
+									placeholder="Country"
 									options={countryList}
-									InputText={"Country"}
 								/>
-								<ChevronDown className="text-primary-300 w-fit" />
 							</div>
 							{errors.country && (
 								<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
@@ -239,21 +234,17 @@ function ProfileSection(): JSX.Element {
 						</div>
 					</div>
 					{!isValid && (
-						<div
-							className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+						<div className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
 							Save changes
 						</div>
 					)}
-					{
-						isValid && (
-							<div
-						onClick={handleSubmit(onSubmit)}
-						className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
-						Save changes
-					</div>
-						)
-					}
-					
+					{isValid && (
+						<div
+							onClick={handleSubmit(onSubmit)}
+							className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+							Save changes
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

@@ -1,5 +1,5 @@
 import { Select } from "@radix-ui/themes";
-import { Controller, Control, FieldValues } from "react-hook-form";
+import { Controller, Control } from "react-hook-form";
 
 interface Option {
     value: string;
@@ -8,7 +8,7 @@ interface Option {
 
 interface CustomSelectProps {
     name: string;
-    control: Control<FieldValues>;
+    control: Control;
     placeholder?: string;
     options: Option[];
 }
