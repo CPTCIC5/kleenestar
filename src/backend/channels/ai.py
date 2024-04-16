@@ -29,7 +29,7 @@ def get_history(convo_id:int):
 """
 
 
-def generate_insights_with_gpt4(user_query:str,convo:int):
+def generate_insights_with_gpt4(user_query:str,convo:int,image_file=""):
     get_convo = get_object_or_404(Convo,id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
@@ -53,6 +53,7 @@ def generate_insights_with_gpt4(user_query:str,convo:int):
         thread_id=thread.id,
         role="user",
         content=user_query,
+        #please pass  the img_file here idk how to
     )
 
     # Initiating a run
@@ -77,7 +78,12 @@ def generate_insights_with_gpt4(user_query:str,convo:int):
     all_messages = client.beta.threads.messages.list(
         thread_id=thread.id
     )
-
+    
     # Print the messages from the user and the assistant
-    print(f"USER: {message.content[0].text.value}")
-    print(f"ASSISTANT: {all_messages.data[0].content[0].text.value}")
+    print(all_messages.data[0].content[0])
+    """
+    if all_messages.data[0].content[0].type != "image_file":
+        return (all_messages.data[0].content[0].text.value)
+    else:
+        return (all_messages.data[0].content[0].image_file)
+    """
