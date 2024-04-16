@@ -16,6 +16,7 @@ import PlanBilling from "./pages/PlanBilling";
 import Settings from "./pages/Settings";
 import OnboardingStep4 from "./pages/OnboardingStep4";
 // import TempTester from "./modals/TempTester";
+import "@radix-ui/themes/styles.css";
 
 function App() {
     const action = useNavigationType();

@@ -104,8 +104,8 @@ const JoinWorkspace: FunctionComponent = () => {
                                 placeholder="@work-email.com"
                                 className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <PencilLine className="bg-inherit" />
+                            <div className="absolute  text-primary flex items-center right-4">
+                                <PencilLine className="bg-transparent" />
                             </div>
                         </div>
 
@@ -131,12 +131,12 @@ const JoinWorkspace: FunctionComponent = () => {
                             {/*PrimaryInputBox component for password*/}
                             <div
                                 onClick={() => setPasswordShow1(!passwordShow1)}
-                                className="absolute bg-background text-primary flex items-center right-4 cursor-pointer"
+                                className="absolute  text-primary flex items-center right-4 cursor-pointer"
                             >
                                 {passwordShow1 ? (
-                                    <EyeOff className="bg-inherit" />
+                                    <EyeOff className="bg-transparent" />
                                 ) : (
-                                    <Eye className="bg-inherit" />
+                                    <Eye className="bg-transparent" />
                                 )}
                             </div>
                         </div>

@@ -67,8 +67,8 @@ function ConnectChannels() {
                 </div>
             </div>
             <div className="w-full mq750:relative bg-background mq750:top-[50.83px] pb-10 flex-wrap gap-[35.8px] flex font-montserrat relative top-[175.83px]  justify-center">
-                {channel.map((props) => {
-                    return <ChannelCard {...props} />;
+                {channel.map((props, index) => {
+                    return <ChannelCard key={index} {...props} />;
                 })}
             </div>
         </div>

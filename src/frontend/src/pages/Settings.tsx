@@ -1,30 +1,41 @@
 import ChangePasswordSection from "../components/ChangePasswordSection"
 import ProfileSection from "../components/ProfileSection"
 import SlideSwitch from "../components/SlideSwitch"
-import { ChevronDown, CircleArrowLeft } from "lucide-react"
+import {CircleArrowLeft } from "lucide-react"
 import { FolderClosed } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import SelectOptions from "../components/SelectOptions"
+import CustomSelect from "../components/CustomSelect"
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 
 function Settings(): JSX.Element {
 	const reasonsToDeleteAccount = [
 		{
-			name: "Found a better platform/service",
+			label: "Found a better platform/service",
 			value: "Found a better platform/service",
 		},
 		{
-			name: "No longer need the account/service",
+			label: "No longer need the account/service",
 			value: "No longer need the account/service",
 		},
 		{
-			name: "Dissatisfaction with the platform/service",
+			label: "Dissatisfaction with the platform/service",
 			value: "Dissatisfaction with the platform/service",
 		},
 		{
-			name: "Simplifying digital footprint",
+			label: "Simplifying digital footprint",
 			value: "Simplifying digital footprint",
 		},
 	]
+    const {
+			control,
+			handleSubmit
+		} = useForm({
+			mode: "onChange",
+		})
+
+    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+			console.log(data)
+	}
 
 	const navigate = useNavigate()
 	return (
@@ -91,15 +102,18 @@ function Settings(): JSX.Element {
 					</p>
 					<div className="flex justify-between items-center pr-4 py-4 mq1000:flex-col">
 						<div className="w-[60%]  mq1000:w-full text-primary-300 font-bold text-xl">
-							<div className=" mt-2   bg-background rounded-[2rem] px-[26.57px] flex items-center ">
-								<SelectOptions
+							<div className="relative w-full h-[45px] flex items-center mt-2">
+								<CustomSelect
+									name="deleteReason"
+									control={control}
+									placeholder="To confirm, tell us why you are leaving."
 									options={reasonsToDeleteAccount}
-									InputText={"To confirm, tell us why you are leaving."}
 								/>
-								<ChevronDown className="text-primary-300" />
 							</div>
 						</div>
-						<div className="border-2 items-center flex whitespace-nowrap text-[15px] mq1000:mt-4 mq1000:py-[0.5rem] mq1000:px-14 hover:text-white hover:bg-red-500 cursor-pointer w-fit px-10 rounded-[2rem] py-[10px] border-solid border-red-500 text-red-500">
+						<div
+							onClick={handleSubmit(onSubmit)}
+							className="border-2 items-center flex whitespace-nowrap text-[15px] mq1000:mt-4 mq1000:py-[0.5rem] mq1000:px-14 hover:text-white hover:bg-red-500 cursor-pointer w-fit px-10 rounded-[2rem] py-[10px] border-solid border-red-500 text-red-500">
 							Delete Account
 						</div>
 					</div>
