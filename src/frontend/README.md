@@ -4,23 +4,23 @@
 
 ### Completed:
 
--   Login
--   Onboard-step-1
--   Onboard-step-2
--   Onboard-step-3
--   Onboard-step-3
--   Onboard-done
--   Join-workspace
--   Recovery-email
--   Password-recovery
--   Password-saved
+-   Login (Done validations)
+-   Onboard-step-1(Done validations)
+-   Onboard-step-2(Done validations)
+-   Onboard-step-3(Done validations)
+-   Onboard-step-3(Doen validations)
+-   Onboard-done(Done)
+-   Join-workspace(Done validations)
+-   Recovery-email(Done validations)
+-   Password-recovery(Done validation)
+-   Password-saved(Done)
+-   connect-channel(Done)
+-   plan-billing(Done)
+-   settings (Done)
 
 ### Uncompleted:
 
 -   chat (almost done - need the sidebar)
--   connect-channel ( need retouch )
--   plan-billing
--   settings (need retouch)
 
 ## Modals( Overlays ):
 
@@ -29,15 +29,14 @@
 -   Chat feedbback
 -   Delete chat
 -   Archive chat
--   Invite Team
+-   Invite Team(Done validations)
 -   Google Ads
 -   Linkedin Ads
 -   Tiktok Ads
 -   Twitter Ads
 -   Meta Ads
+-   Help center
 
 ### Uncompleted:
 
-- Help center
-- Share Chat
-
+-   Share Chat

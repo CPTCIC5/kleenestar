@@ -1,10 +1,11 @@
 import { FunctionComponent } from "react";
-import { ChevronDown, CircleArrowLeft, PencilLine } from "lucide-react";
+import { CircleArrowLeft, PencilLine } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import CustomSelect from "../components/CustomSelect";
 
 const schema = z.object({
     businessName: z.string().nonempty("Business name is required"),
@@ -14,26 +15,31 @@ const schema = z.object({
         .refine((value) => value.includes("."), {
             message: "Website should contain a .",
         }),
-    industry: z.string().nonempty("Industry is required"),
+    selectedOption: z.string().nonempty("Please select an option"),
 });
-
-type FormData = z.infer<typeof schema>;
 
 const OnboardingStep2: FunctionComponent = () => {
     const navigate = useNavigate();
 
     const {
         register,
+        control,
         handleSubmit,
+
         formState: { errors, isValid },
-    } = useForm<FormData>({
+    } = useForm({
         resolver: zodResolver(schema),
         mode: "onChange",
     });
 
-    const onSubmit = (data: FormData) => {
+    const Industries = [
+        { value: "Ecommerce", label: "Ecommerce" },
+        { value: "Sales", label: "Sales" },
+        { value: "Enterprise", label: "Enterprise" },
+    ];
+
+    const onSubmit: SubmitHandler<FieldValues> = (data) => {
         console.log(data);
-        // Navigate or perform other actions
     };
 
     return (
@@ -75,8 +81,8 @@ const OnboardingStep2: FunctionComponent = () => {
                                 className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
                             {/* input component for business name*/}
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <PencilLine className="bg-inherit" />
+                            <div className="absolute text-primary flex items-center right-4">
+                                <PencilLine className="bg-transparent" />
                             </div>
                         </div>
                     </div>
@@ -96,15 +102,17 @@ const OnboardingStep2: FunctionComponent = () => {
                                 className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
                             />
                             {/* input component for website*/}
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <PencilLine className="bg-inherit" />
+                            <div className="absolute text-primary flex items-center right-4">
+                                <PencilLine className="bg-transparent" />
                             </div>
                         </div>
 
                         {errors.Website && (
                             <div className="w-full h-[16px] flex items-center justify-start">
                                 <span className=" h-[16px] font-montserrat font-[300] text-[13px] leading-[15.85px] text-orangered-300">
-                                    {errors.Website.message}
+                                    {typeof errors.Website.message === "string"
+                                        ? errors.Website.message
+                                        : null}
                                 </span>
                             </div>
                         )}
@@ -114,16 +122,12 @@ const OnboardingStep2: FunctionComponent = () => {
                             Industry
                         </span>
                         <div className="relative w-full h-[45px] flex items-center ">
-                            <input
-                                type="text"
-                                {...register("industry")}
-                                placeholder="What’s your industry?"
-                                className={`bg-background rounded-full w-full h-full px-4  pr-10 font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300  text-opacity-50 outline-none focus:outline-primary-100 focus:outline`}
+                            <CustomSelect
+                                name={"selectedOption"}
+                                control={control}
+                                placeholder="Answer"
+                                options={Industries}
                             />
-                            {/* input component for industry*/}
-                            <div className="absolute bg-background text-primary flex items-center right-4">
-                                <ChevronDown className="bg-inherit" />
-                            </div>
                         </div>
                     </div>
                     <div className="h-[40px] max-w-[454px] w-full mt-[17px]">
