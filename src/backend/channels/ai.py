@@ -29,7 +29,7 @@ def get_history(convo_id:int):
 """
 
 
-def generate_insights_with_gpt4(user_query:str,convo:int,image_file=""):
+def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
     get_convo = get_object_or_404(Convo,id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
@@ -47,14 +47,23 @@ def generate_insights_with_gpt4(user_query:str,convo:int,image_file=""):
         #convo.assistant_id = thread
 
 
-
+    if file != None:
+        print('file h')
     # Posting user's query as a message in the thread
-    message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=user_query,
-        #please pass  the img_file here idk how to
-    )
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_query,
+            file_ids= [file]
+        )
+    else:
+        print('nhi h file')
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_query
+        )
+
 
     # Initiating a run
     run = client.beta.threads.runs.create(
@@ -80,7 +89,7 @@ def generate_insights_with_gpt4(user_query:str,convo:int,image_file=""):
     )
     
     # Print the messages from the user and the assistant
-    print(all_messages.data[0].content[0])
+    return (all_messages.data[0].content[0])
     """
     if all_messages.data[0].content[0].type != "image_file":
         return (all_messages.data[0].content[0].text.value)

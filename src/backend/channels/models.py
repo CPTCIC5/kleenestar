@@ -1,8 +1,7 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
-from channels.ai import generate_insights_with_gpt4
-#here i am unable to call this fn at line 4
+#from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
     key_1 = models.CharField(max_length=255,unique=True)
@@ -51,18 +50,19 @@ class Prompt(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     text_query = models.TextField(max_length=10_000)
-    image_query = models.ImageField(upload_to='Prompts-Query/', blank=True,null=True)
+    file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    
+    """
     def save(self,*args,**kwargs):
         self.response_text= generate_insights_with_gpt4(self.text_query,self.convo.id).text.value
         self.response_image = generate_insights_with_gpt4(self.text_query,self.convo.id).image_file
         super().save(*args,**kwargs)
+    """
     
     
 
