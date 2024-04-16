@@ -42,7 +42,6 @@ def generate_insights_with_gpt4(user_query:str,convo:int):
 
     else:
         thread = client.beta.threads.create()
-        print(thread)
         get_convo.assistant_id = thread.id
         get_convo.save()
         #convo.assistant_id = thread
