@@ -43,8 +43,8 @@ class SignupView(views.APIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-
-        if serializer.validated_data["invite_code"]:
+        if serializer.validated_data.get("invite_code"):
+            print('here?')
             try:
                 invite = WorkSpaceInvite.objects.get(
                     invite_code=serializer.validated_data["invite_code"]
@@ -59,7 +59,8 @@ class SignupView(views.APIView):
             except WorkSpaceInvite.DoesNotExist:
                 return Response(serializer.error,status=status.HTTP_404_NOT_FOUND)
 
-        login(request, user)
+        login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+        print('here!!')
         return Response(status=status.HTTP_201_CREATED)
 
 

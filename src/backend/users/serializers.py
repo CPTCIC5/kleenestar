@@ -3,6 +3,7 @@ from .models import User, Profile, Feedback
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField()
     invite_code = serializers.CharField(required=False)
 
     class Meta:
@@ -12,6 +13,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if validated_data["password"] == validated_data["confirm_password"]:
+            print('matchingg')
             return User.objects.create_user(
                 email=validated_data["email"], password=validated_data["password"]
             )
