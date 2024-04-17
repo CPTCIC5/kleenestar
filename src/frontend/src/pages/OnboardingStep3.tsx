@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Controller } from "react-hook-form";
+import axios, {AxiosError} from 'axios'
+import {toast} from 'sonner'
 
 const schema = z.object({
     email: z.string().email(),
@@ -59,7 +61,7 @@ const OnboardingStep3: FunctionComponent = () => {
         }
     }, [password, confirmPassword, clearErrors]);
 
-    const onSubmit = (data: FormData) => {
+    const onSubmit = async(data: FormData) => {
         if (data.password !== data.confirmPassword) {
             setPasswordUnmatch(true);
             setError("confirmPassword", {
@@ -69,7 +71,32 @@ const OnboardingStep3: FunctionComponent = () => {
         } else {
             console.log(data);
         }
+        try{
+            const response = await axios.post("http://127.0.0.1:8000/api/auth/signup/",{
+                email: data.email,
+                password: data.password,
+                confirm_password: data.confirmPassword,
+            },{
+                headers: {
+                    "Content-Type": 'application/json'
+                }
+            })
+            if(response.status == 201){
+                toast.success("Registration Successfull!")
+                setTimeout(()=>{
+                    navigate("/onboard/step1")
+                },1000)
+            }
+
+        }
+        catch(error){
+            console.log(error)
+            const err = error as AxiosError
+                if (err.response?.data) toast.error(err.response?.data.email[0])
+        }
     };
+
+
 
     return (
         <div className="w-full h-screen flex items-center justify-center bg-background p-4 flex-col gap-[30px]">
