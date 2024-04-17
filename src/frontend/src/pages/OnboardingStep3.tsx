@@ -76,6 +76,7 @@ const OnboardingStep3: FunctionComponent = () => {
                 email: data.email,
                 password: data.password,
                 confirm_password: data.confirmPassword,
+                newsletter: data.newsletter
             },{
                 headers: {
                     "Content-Type": 'application/json'
