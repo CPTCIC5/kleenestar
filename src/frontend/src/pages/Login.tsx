@@ -6,7 +6,8 @@ import { Eye, EyeOff, PencilLine } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
+import {toast} from 'sonner'
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid Email Address" }),
@@ -18,7 +19,7 @@ type FormFields = z.infer<typeof schema>;
 const Login: FunctionComponent = () => {
     const [passwordShow, setPasswordShow] = useState<boolean>(false);
 
-    const { handleSubmit, register, formState, setError, clearErrors } = useForm<FormFields>({
+    const { handleSubmit, register, formState, clearErrors } = useForm<FormFields>({
         defaultValues: {
             email: "",
             password: "",
@@ -27,23 +28,30 @@ const Login: FunctionComponent = () => {
         mode: "onChange",
     });
     const { errors, isValid } = formState;
-    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    const onSubmit: SubmitHandler<FormFields> = async(data) => {
         console.log(data);
         const { email, password } = data;
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-                email: email,
-                password: password,
-            });
-            console.log(response.data); // Do something with the response
-            clearErrors("password");
-            alert("Logged In!");
-        } catch (error) {
-            setError("password", {
-                message: String(error),
-            });
-            console.error("Error submitting the form:", error);
-        }
+					const response = await axios.post(
+						"http://127.0.0.1:8000/api/auth/login/",
+						{
+							email: email,
+							password: password,
+						},
+						{
+							headers: {
+								"Content-Type": "application/json",
+							},
+						}
+					)
+					if (response.status == 200) {
+						clearErrors("password")
+						toast.success("Login Successfull!")
+					}
+				} catch (error) {
+					const err = error as AxiosError
+					if (err.response?.data) toast.error(err.response.data.detail)
+				}
     };
     return (
         <div className="w-full h-screen flex items-center justify-center bg-background p-4  flex-col gap-[30px]">
