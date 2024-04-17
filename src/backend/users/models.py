@@ -82,4 +82,4 @@ class Feedback(models.Model):
     emoji = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return self.user.email

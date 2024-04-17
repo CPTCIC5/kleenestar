@@ -18,7 +18,7 @@ class WorkSpace(models.Model):
         (3, "Enterprise")
     )
     subscription_type = models.IntegerField(
-        choices=SUBSCRIPTION_CHOICES, null=False, blank=False
+        choices=SUBSCRIPTION_CHOICES, null=True, blank=True
     )
 
     root_user = models.OneToOneField(
@@ -32,6 +32,9 @@ class WorkSpace(models.Model):
     industry = models.CharField(
         max_length=60, choices=INDUSTRIES, blank=True, null=True
     )
+    size = models.CharField(max_length=50)
+    objective = models.CharField(max_length=100)
+    challenges = models.CharField(max_length=100)
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -62,3 +65,6 @@ class WorkSpaceInvite(models.Model):
     email = models.EmailField(null=True, blank=True)
     accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return str(self.workspace)

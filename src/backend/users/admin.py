@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+#from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from .models import Profile, Feedback, User
@@ -7,8 +7,9 @@ from .models import Profile, Feedback, User
 # Register your models here.
 admin.site.register(Profile)
 admin.site.register(Feedback)
+admin.site.register(User)
 
-
+"""
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets = fieldsets = (
@@ -34,3 +35,4 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
+"""
