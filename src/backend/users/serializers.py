@@ -9,7 +9,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         write_only = ["password", "confirm_password"]
-        fields = ["email", "password", "confirm_password", "invite_code"]
+        fields = ["email", "password", "confirm_password", "invite_code","newsletter"]
 
     def create(self, validated_data):
         if validated_data["password"] == validated_data["confirm_password"]:
