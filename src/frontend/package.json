@@ -24,6 +24,7 @@
         "@types/node": "^20.12.6",
         "axios": "^1.6.8",
         "i18n-iso-countries": "^7.11.0",
+        "js-cookie": "^3.0.5",
         "libphonenumber-js": "^1.10.60",
         "lucide": "^0.366.0",
         "lucide-react": "^0.366.0",
@@ -37,6 +38,7 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
+        "@types/js-cookie": "^3.0.6",
         "@types/react": "^18.2.66",
         "@types/react-dom": "^18.2.22",
         "@typescript-eslint/eslint-plugin": "^7.2.0",

@@ -72,14 +72,12 @@ function Settings(): JSX.Element {
 								Google Authenticator
 								<SlideSwitch on={true} />
 							</div>
-							<p className="text-[14px] mq1000:pr-2">
+							<p className="text-[14px] pt-2 mq1000:pr-2">
 								Use the Google Authenticator app to generate one time security
 								codes.
 							</p>
 						</div>
-					</div>
-					<div className="bg-white rounded-[2rem] h-fit mt-4 ">
-						<div className="text-primary-300 font-montserrat pt-2 pl-8 pb-4">
+						<div className="text-primary-300 font-montserrat pl-8 pb-12">
 							<div className=" font-bold text-[16px] pr-10 mq1000:pr-4  flex justify-between my-4">
 								Two Factor Authentication
 								<SlideSwitch on={true} />
@@ -90,6 +88,7 @@ function Settings(): JSX.Element {
 							</p>
 						</div>
 					</div>
+					<div className="bg-white rounded-[2rem] h-fit mt-4 "></div>
 				</div>
 			</div>
 			<div className="w-[90%] mq1000:w-[85%] mx-auto mt-20 mq1000:mt-40 bg-white rounded-[2rem]">

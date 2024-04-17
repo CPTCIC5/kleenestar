@@ -88,7 +88,7 @@ class ChangePasswordView(views.APIView):
     
     def post(self,request):
         serializer = serializers.ChangePasswordSerializer(
-            data=request.DATA
+            data=request.data
         )
         serializer.is_valid(raise_exception=True)
         user = request.user
