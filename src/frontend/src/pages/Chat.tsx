@@ -1,8 +1,7 @@
 // import React, { useEffect, useState } from "react";
 import { FunctionComponent } from "react";
-import { CircleHelp, ImageUp, SendHorizonal } from "lucide-react";
+import { CircleHelp, ImageUp, SendHorizonal, SquarePen } from "lucide-react";
 import NewChatDisplay from "../components/NewChatDisplay";
-import ChatSideBar from '../components/ChatSideBar';
 // import axios from "axios";
 
 const Chat: FunctionComponent = () => {
@@ -62,7 +61,19 @@ const Chat: FunctionComponent = () => {
         <div className="h-screen w-full bg-background px-[63.55px] py-[47.38px]">
             <div className="flex w-full h-full gap-[38.32px] bg-inherit justify-center">
                 {/* Chat Header */}
-                <ChatSideBar/>
+                <aside className="bg-inherit  max-w-[375.93px] w-full h-full flex flex-col gap-[26.18px]">
+                    <div className="bg-white h-[86.91px] w-full flex items-center justify-between rounded-3xl px-[26.54px] py-[16.06px]">
+                        <div className="flex items-center justify-center gap-[18.13px]">
+                            <img className="w-[52.07px] h-[54.78px]" src="/group-672.svg" alt="" />
+                            <span className="w-[156.02px] font-syne font-[700] text-[25px] leading-[30px]">
+                                Kleenestar
+                            </span>
+                        </div>
+                        <SquarePen className="w-[20.94px] h-[20.94px] cursor-pointer" />
+                    </div>
+                    <div className="bg-white max-h-[580.12px] h-full w-full rounded-3xl"></div>
+                    <div className=" bg-white h-[124.61px] w-full rounded-3xl"></div>
+                </aside>
                 {/* Chat Body */}
                 <section className="rounded-3xl max-w-[960.56px] w-full h-full p-4 md:px-[91.97px] md:py-[21.35px] flex flex-col relative gap-[29.94px] scrollbar bg-white">
                     <div className=" w-full h-full flex flex-col overflow-auto ">
