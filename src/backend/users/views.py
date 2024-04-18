@@ -94,7 +94,7 @@ class ChangePasswordView(views.APIView):
         user = request.user
         if user.check_password(serializer.validated_data.get('current_password')):
             if serializer.validated_data.get('new_password') == serializer.validated_data.get('confirm_new_password'):
-                user.set_password(serializer.data.get('new_password'))
+                user.set_password(serializer.validated_data.get('new_password'))
                 user.save()
                 update_session_auth_hash(request, user)
                 return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
