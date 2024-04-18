@@ -74,6 +74,15 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend'
     ]
 
+CORS_ALLOW_HEADERS = [
+    'X-CSRFToken',  # Add any other headers you need to allow
+    'Content-Type',  # Include Content-Type header
+]
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SECURE = False
+
+CSRF_COOKIE_SECURE = False
+
 CORS_ALLOWED_ORIGINS = [
     'https://:3000'
 ]
