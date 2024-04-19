@@ -1,6 +1,14 @@
 from django.db import models
 from workspaces.models import WorkSpace
 from django.conf import settings
+from dotenv import load_dotenv
+from openai import OpenAI
+from django.shortcuts import get_object_or_404
+
+load_dotenv()
+
+client = OpenAI()
+
 #from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
@@ -25,7 +33,8 @@ class Channel(models.Model):
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
     connected = models.BooleanField(default=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    credential = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
+    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     class Meta:
@@ -44,6 +53,70 @@ class Convo(models.Model):
     def __str__(self):
         return self.title
     
+
+
+def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
+    get_convo = get_object_or_404(Convo,id=convo)
+    history = get_convo.prompt_set.all()
+    all_prompts = history.count()
+
+    # Creating a new conversation thread
+    if all_prompts >= 1:
+        print('thiss')
+        thread = client.beta.threads.retrieve(
+            thread_id=get_convo.assistant_id
+        )
+
+    else:
+        print('thiss')
+        thread = client.beta.threads.create()
+        get_convo.assistant_id = thread.id
+        get_convo.save()
+        #convo.assistant_id = thread
+
+
+    if file != None:
+    # Posting user's query as a message in the thread
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_query,
+            file_ids= [file]
+        )
+    else:
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_query
+        )
+
+
+    # Initiating a run
+    run = client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id="asst_wljmLStVyrLtU7AyxcyXlU7d"
+    )
+
+
+    while run.status != "completed":
+        keep_retrieving_run = client.beta.threads.runs.retrieve(
+            thread_id=thread.id,
+            run_id=run.id
+        )
+        print(f"Run status: {keep_retrieving_run.status}")
+
+        if keep_retrieving_run.status == "completed":
+            break
+
+    # Retrieve messages added by the Assistant to the thread
+    all_messages = client.beta.threads.messages.list(
+        thread_id=thread.id
+    )
+        
+    # Print the messages from the user and the assistant
+    return (all_messages.data[0].content[0])
+
+
     
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
@@ -57,13 +130,12 @@ class Prompt(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    """
     
     def save(self,*args,**kwargs):
         self.response_text= generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).text.value
-        self.response_image = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).image_file
+        if self.response_image:
+            self.response_image = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).image_file
         super().save(*args,**kwargs)
-    """
     
     
     
