@@ -113,7 +113,7 @@ function App() {
             <Route path="/onboard/step1" element={<OnboardingStep1 />} />
             <Route path="/onboard/step2" element={<OnboardingStep2 />} />
             <Route path="/onboard/step3" element={<OnboardingStep3 />} />
-            <Route path="/onboard/step4" element={<OnboardingStep4 />} />
+            {/* <Route path="/onboard/step4" element={<OnboardingStep4 />} /> */}
             <Route path="/onboard/done" element={<OnboardingDone />} />
             <Route path="/join-workspace" element={<JoinWorkspace />} />
             <Route path="/recovery-email" element={<RecoveryEmail />} />

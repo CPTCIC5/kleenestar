@@ -4,8 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ChangeEvent, useEffect, useState } from "react";
 import axios,{AxiosError} from 'axios'
-
-
+import Cookies from 'js-cookie'
 
 const schema = z.object({
 	password: z
@@ -95,7 +94,7 @@ function ChangePasswordSection(): JSX.Element {
             });
             return;
         }
-
+		const csrfToken = Cookies.get("csrfToken")
         try{
             const response = await axios.post(
 							"http://127.0.0.1:8000/api/auth/change-password/",
@@ -106,6 +105,9 @@ function ChangePasswordSection(): JSX.Element {
 							},
 							{
 								withCredentials: true,
+								headers: {
+									'X-CSRFToken': csrfToken
+								}
 							}
 						)
             if(response.status == 200){
