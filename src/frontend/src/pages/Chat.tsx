@@ -14,18 +14,19 @@ const Chat: FunctionComponent = () => {
     const handleHide = () => {
         if (SideBar.current) {
             if (SideBar.current.style.transform === "translateX(-100%)") {
-                  setTimeout(() => {
-                    if (SideBar.current) { SideBar.current.style.transform = "translateX(0)";
-                    }
-                }, 20); // Adjust this delay to match your transition duration
-               
-                SideBar.current.style.display = "block";
-            } else {
-                  SideBar.current.style.transform = "translateX(-100%)"
-                
                 setTimeout(() => {
                     if (SideBar.current) {
-                      SideBar.current.style.display = "none"
+                        SideBar.current.style.transform = "translateX(0)";
+                    }
+                }, 20); // Adjust this delay to match your transition duration
+
+                SideBar.current.style.display = "block";
+            } else {
+                SideBar.current.style.transform = "translateX(-100%)";
+
+                setTimeout(() => {
+                    if (SideBar.current) {
+                        SideBar.current.style.display = "none";
                     }
                 }, 75); // Adjust this delay to match your transition duration
             }
@@ -33,6 +34,8 @@ const Chat: FunctionComponent = () => {
     };
 
     return (
+        <div className="h-screen flex overflow-hidden">
+            <ChatSideBar SideBar={SideBar} handleHide={handleHide} />
         <div className="h-screen flex">
             <ChatSideBar SideBar={SideBar} handleHide={handleHide} setInviteOpen={setInviteOpen} />
             <ChatDisplay handleHide={handleHide} />
