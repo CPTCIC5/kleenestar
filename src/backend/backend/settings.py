@@ -16,7 +16,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,7 +75,8 @@ AUTHENTICATION_BACKENDS = [
     ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://:3000'
+    'https://:3000',
+    #'https://1.0.0.127.in-addr.arpa'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
@@ -170,7 +171,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_USER_MODEL = "users.User"
-
 # Email settings
 
 EMAIL_HOST = os.environ["EMAIL_HOST"]
@@ -178,7 +178,7 @@ EMAIL_PORT = int(os.environ["EMAIL_PORT"])
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [

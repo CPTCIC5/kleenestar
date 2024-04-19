@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from users.models import User
 from . import models
-import json
+
 
 class APICredentialsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +13,7 @@ class ChannelSerializer(serializers.ModelSerializer):
     credentials = APICredentialsSerializer()
     class Meta:
         model = models.Channel
-        fields  = ['activated','channel_type','connected','workspace','credential']
+        fields  = ['activated','channel_type','connected','workspace','credentials']
 
 
 class PromptFeedbackSerializer(serializers.ModelSerializer):
@@ -24,13 +24,13 @@ class PromptFeedbackSerializer(serializers.ModelSerializer):
 class ConvoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
-        fields = ('id', 'workspace', 'title')
+        fields = ('id','assistant_id', 'workspace', 'title')
 
 class PromptInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
-        fields = ('id', 'convo', 'author', 'text_query', 'image_query', 
-                  'refactored_text', 'response_text', 'response_image', 'created_at')
+        fields = ('id', 'convo', 'author', 'text_query', 'file_query', 
+                  'response_text', 'response_image',  'created_at')
 
 """
 class PromptInputSerializer(serializers.Serializer):

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.serializers import UserSerializer
-from .models import WorkSpace
+from .models import WorkSpace,WorkSpaceInvite
 
 
 class WorkSpaceCreateSerializer(serializers.ModelSerializer):
@@ -15,6 +15,7 @@ class WorkSpaceSerializer(WorkSpaceCreateSerializer):
     users = UserSerializer(many=True)
 
     class Meta(WorkSpaceCreateSerializer.Meta):
+        model = WorkSpace
         fields = (
             "id",
             "root_user",
@@ -27,6 +28,7 @@ class WorkSpaceSerializer(WorkSpaceCreateSerializer):
 
 
 class WorkSpaceInviteCreateSerializer(serializers.ModelSerializer):
-    workspace = WorkSpaceSerializer(read_only=True)
+    #workspace = WorkSpaceSerializer(read_only=True)
     class Meta:
+        model = WorkSpaceInvite
         fields = ["workspace","invite_code","email","accepted","created_at"]

@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import views,viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
+from workspaces.serializers import WorkSpaceSerializer
 
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 10
@@ -19,6 +20,12 @@ class PromptFeedbackView(views.APIView):
 class ChannelViewSet(viewsets.ModelViewSet):
     queryset = models.Channel.objects.all()
     serializer_class = serializers.ChannelSerializer
+
+    def get_queryset(self,pk):
+        obj = get_object_or_404(models.WorkSpace,pk=pk)
+        serializer = WorkSpaceSerializer(obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+        
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

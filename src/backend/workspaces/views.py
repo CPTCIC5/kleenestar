@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import create_workspace_invite
 from django.core.mail import send_mail
+import os
 
 from . import permissions
 from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpaceInviteCreateSerializer
@@ -42,23 +43,23 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
 
     @action(methods=("POST",), detail=True, url_path="create-invite")
     def create_workspace_invite(self, request, pk):
-        workspace = self.get_object()
+        workspace = self.get_object().id
         invite_code = create_workspace_invite()
         email = request.data["email"]  # Assuming email is provided in request data
-        serializer = WorkSpaceSerializer(data= {
+        serializer = WorkSpaceInviteCreateSerializer(data= {
             "workspace": workspace,
             "invite_code": invite_code,
             "email": email
             })
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        print(os.environ['EMAIL_HOST_USER'])
         
         # Send an email with the  invitation link
         send_mail(
         'Subject here',
         'Here is the message.',
-        'from@example.com',
-        [email],
-        fail_silently=False,
+        [os.environ['EMAIL_HOST_USER']],
+        [email]
     )
         return Response(serializer.data,status=status.HTTP_201_CREATED)
