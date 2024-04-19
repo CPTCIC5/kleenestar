@@ -37,3 +37,24 @@ body {
 *::-webkit-scrollbar {
     width: 8px;
 }
+.hide-scrollbar::-webkit-scrollbar {
+    width: 0px !important;
+    height: fit-content;
+}
+
+.hide-scrollbar::-webkit-scrollbar-thumb {
+    max-height: 10px;
+}
+.hide-scrollbar:hover::-webkit-scrollbar {
+    width: 8px !important;
+    height: fit-content;
+}
+
+@media screen and (max-width: 750px) {
+    .hide-scrollbar::-webkit-scrollbar {
+        width: 4px !important;
+        height: fit-content;
+    }
+}
+
+

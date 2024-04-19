@@ -1,15 +1,17 @@
 export const dummyChatListToday = [
     "New Chat",
-    "Campaign overview",
+    "Campaign overviewsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsd",
     "Strategy improvement",
     "KPI analysis on Google Ads",
     "Keywords brainstorming"
 ];
 
 export const dummyChatListPrevious = [
-    "New campaign analysis",
+    "New campaign analysis1",
     "Brand sentiment overview",
-    "Weekly keywords previewwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-    "Market insight recomma…",
-    "Competitor analysis on t…",
+    "Weekly keywords preview",
+    "Market insight recommendation",
+    "Competitor analysis on Twitter",
+    "New campaign analysis",
+    "Brand sentiment overview2"
 ];
