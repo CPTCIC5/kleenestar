@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import axios, {AxiosError} from "axios";
 import {toast} from 'sonner'
-import Cookies from "js-cookie"
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid Email Address" }),
@@ -44,11 +43,9 @@ const Login: FunctionComponent = () => {
 							headers: {
 								"Content-Type": "application/json",
 							},
+                            
 						}
 					)
-                    const csrfToken = Cookies.get('csrftoken')
-                    
-                    // Cookies.set("auth_token_kleenestar", csrfToken as String)
 					if (response.status == 200) {
 						clearErrors("password")
 						toast.success("Login Successfull!")

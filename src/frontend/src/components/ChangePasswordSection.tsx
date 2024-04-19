@@ -1,12 +1,10 @@
-import { EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ChangeEvent, useEffect, useState } from "react";
-import Cookies from "js-cookie"
 import axios,{AxiosError} from 'axios'
-
-
+import Cookies from 'js-cookie'
 
 const schema = z.object({
 	password: z
@@ -38,10 +36,10 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 function ChangePasswordSection(): JSX.Element {
-
-    useEffect(()=>{
-
-    },[])
+	
+	const [passwordShow1, setPasswordShow1] = useState<boolean>(false)
+	const [passwordShow2, setPasswordShow2] = useState<boolean>(false)
+	const [passwordShow3, setPasswordShow3] = useState<boolean>(false)
 
     const calculateSecurity = (password: string) => {
         let security = 0;
@@ -96,20 +94,22 @@ function ChangePasswordSection(): JSX.Element {
             });
             return;
         }
-
-        const CSRFToken = Cookies.get("csrftoken")
-        console.log(CSRFToken)
+		const csrfToken = Cookies.get("csrfToken")
         try{
-            const response = await axios.post("http://127.0.0.1:8000/api/auth/change-password/",{
-                current_password: data.currentPassword,
-                new_password: data.password,
-                confirm_new_password:data.confirmPassword
-            },{
-                headers: {
-                    "X-CSRFToken" : CSRFToken,
-                    "Content-Type":  "application/json"
-                }
-            })
+            const response = await axios.post(
+							"http://127.0.0.1:8000/api/auth/change-password/",
+							{
+								current_password: data.currentPassword,
+								new_password: data.password,
+								confirm_new_password: data.confirmPassword,
+							},
+							{
+								withCredentials: true,
+								headers: {
+									'X-CSRFToken': csrfToken
+								}
+							}
+						)
             if(response.status == 200){
                 console.log("Done", response)
             }
@@ -145,14 +145,22 @@ function ChangePasswordSection(): JSX.Element {
 							Current password
 							<div className="w-full mt-2 h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
+									type={passwordShow1 ? "text" : "password"}
 									{...register("currentPassword", {
 										required: "Confirm Password is Required",
 									})}
-									type="password"
 									placeholder="Current password"
 									className="autofill:bg-transparent outline-none bg-transparent bg-clip-text w-full font-montserrat text-[15px]"
 								/>
-								<EyeOff className="text-primary-300" />
+								<div
+									onClick={() => setPasswordShow1(!passwordShow1)}
+								>
+									{passwordShow1 ? (
+										<EyeOff className="bg-inherit" />
+									) : (
+										<Eye className="bg-inherit" />
+									)}
+								</div>
 							</div>
 							{errors.currentPassword && (
 								<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
@@ -166,10 +174,10 @@ function ChangePasswordSection(): JSX.Element {
 							New password
 							<div className="w-full h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
+									type={passwordShow2 ? "text" : "password"}
 									{...register("password", {
 										required: "Password is Required",
 									})}
-									type="password"
 									placeholder="New password"
 									onChange={(event) => {
 										handlePasswordChange(event)
@@ -177,7 +185,15 @@ function ChangePasswordSection(): JSX.Element {
 									}}
 									className="autofill:bg-transparent outline-none bg-transparent w-full bg-clip-text font-montserrat text-[15px]"
 								/>
-								<EyeOff className="text-primary-300" />
+								<div
+									onClick={() => setPasswordShow2(!passwordShow2)}
+								>
+									{passwordShow2 ? (
+										<EyeOff className="bg-inherit" />
+									) : (
+										<Eye className="bg-inherit" />
+									)}
+								</div>
 							</div>
 							{errors.password && (
 								<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
@@ -189,14 +205,22 @@ function ChangePasswordSection(): JSX.Element {
 							Confirm password
 							<div className="w-full mt-2 h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
+									type={passwordShow3 ? "text" : "password"}
 									{...register("confirmPassword", {
 										required: "Confirm Password is Required",
 									})}
-									type="password"
 									placeholder="Confirm password"
 									className="autofill:bg-transparent outline-none bg-transparent bg-clip-text w-full font-montserrat text-[15px]"
 								/>
-								<EyeOff className="text-primary-300" />
+								<div
+									onClick={() => setPasswordShow3(!passwordShow3)}
+								>
+									{passwordShow3 ? (
+										<EyeOff className="bg-inherit" />
+									) : (
+										<Eye className="bg-inherit" />
+									)}
+								</div>
 							</div>
 							{errors.confirmPassword && (
 								<div className="text-red-500 font-[300] text-sm  relative text-right  p-2">
