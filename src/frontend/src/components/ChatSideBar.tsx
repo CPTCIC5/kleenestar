@@ -287,7 +287,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 							/>
 							Add team to workspace
 						</div>
-						<div ref={profile}  className="w-full bg-white bottom-[60px] left-[30px] absolute h-[301px] max-w-[310px] mq750:max-w-[269.73px] rounded-3xl drop-shadow-2xl z-30">
+						<div ref={profile}  className="w-full hidden bg-white bottom-[60px] left-[30px] absolute h-[301px] max-w-[310px] mq750:max-w-[269.73px] rounded-3xl drop-shadow-2xl z-30">
 							<div className="w-fit ml-[30.02px] font-[500] font-montserrat text-primary-300 text-[15px] py-[23px]">
 								<div
 									onClick={() => {
