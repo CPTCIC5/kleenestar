@@ -1,66 +1,43 @@
 // import React, { useEffect, useState } from "react";
-import { FunctionComponent } from "react";
-import { CircleHelp, ImageUp, SendHorizonal, SquarePen } from "lucide-react";
-import NewChatDisplay from "../components/NewChatDisplay";
+import { FunctionComponent, useRef } from "react";
+// import { CircleHelp, ImageUp, SendHorizonal, SquarePen } from "lucide-react";
+// import NewChatDisplay from "../components/NewChatDisplay";
+import ChatSideBar from "../components/ChatSideBar";
+import ChatDisplay from "../components/ChatDisplay";
 // import axios from "axios";
 
 const Chat: FunctionComponent = () => {
-    // const [message, setMessage] = useState<{ role: string; content: string }>({
-    //     role: "",
-    //     content: "",
-    // });
-    // const [response, setResponse] = useState<string>("");
-    // const [currentTitle, setCurrentTitle] = useState<string>("");
-    // const [previousChat, setPreviousChat] = useState<object[]>([]); // Update the type argument to specify an array of objects
-    // const apiKey = "YOUR_API_KEY"; // Replace 'YOUR_API_KEY' with your actual API key
+    const SideBar = useRef<HTMLDivElement>(null);
 
-    // const createNewChat = () => {
-    //     setResponse("");
-    //     setCurrentTitle("");
-    // };
-
-    // const sendMessage = async () => {
-    //     try {
-    //         const response = await axios.post(
-    //             "https://api.openai.com/v1/completions",
-    //             {
-    //                 model: "text-davinci-002", // Adjust the model based on your preference
-    //                 prompt: message,
-    //                 max_tokens: 150,
-    //             },
-    //             {
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     Authorization: `Bearer ${apiKey}`,
-    //                 },
-    //             },
-    //         );
-
-    //         // Update state with the response from the API
-    //         setResponse(response.data.choices[0].text.trim());
-    //     } catch (error) {
-    //         console.error("Error fetching data:", error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (!currentTitle && response && message.content) {
-    //         setCurrentTitle(response);
-    //     }
-
-    //     if (currentTitle && response && message.content) {
-    //         setPreviousChat((prev) => [
-    //             ...previousChat,
-    //             { title: currentTitle, role: message.role, content: message.content },
-    //         ]);
-    //         setMessage({ role: "", content: "" });
-    //     }
-    // }, [currentTitle, message]);
+    const handleHide = () => {
+        if (SideBar.current) {
+            if (SideBar.current.style.transform === "translateX(-100%)") {
+                SideBar.current.style.transform = "translateX(0)";
+                SideBar.current.style.display = "block";
+            } else {
+                SideBar.current.style.transform = "translateX(-100%)";
+                setTimeout(() => {
+                    if (SideBar.current) {
+                        SideBar.current.style.display = "none";
+                    }
+                }, 500); // Adjust this delay to match your transition duration
+            }
+        }
+    };
 
     return (
-        <div className="h-screen w-full bg-background px-[63.55px] py-[47.38px]">
+        <div className="h-screen flex">
+            <ChatSideBar SideBar={SideBar} handleHide={handleHide} />
+            <ChatDisplay handleHide={handleHide} />
+        </div>
+    );
+};
+
+export default Chat;
+
+{
+    /* <div className="h-screen w-full bg-background px-[63.55px] py-[47.38px]">
             <div className="flex w-full h-full gap-[38.32px] bg-inherit justify-center">
-                {/* Chat Header */}
                 <aside className="bg-inherit  max-w-[375.93px] w-full h-full flex flex-col gap-[26.18px]">
                     <div className="bg-white h-[86.91px] w-full flex items-center justify-between rounded-3xl px-[26.54px] py-[16.06px]">
                         <div className="flex items-center justify-center gap-[18.13px]">
@@ -74,14 +51,12 @@ const Chat: FunctionComponent = () => {
                     <div className="bg-white max-h-[580.12px] h-full w-full rounded-3xl"></div>
                     <div className=" bg-white h-[124.61px] w-full rounded-3xl"></div>
                 </aside>
-                {/* Chat Body */}
                 <section className="rounded-3xl max-w-[960.56px] w-full h-full p-4 md:px-[91.97px] md:py-[21.35px] flex flex-col relative gap-[29.94px] scrollbar bg-white">
                     <div className=" w-full h-full flex flex-col overflow-auto ">
                         <div className="flex-1 ">
                             <NewChatDisplay />
                         </div>
                     </div>
-                    {/* Chat body bottom */}
                     <div className="w-full flex flex-col gap-[16.39px] items-center">
                         <div className="relative flex item-center max-w-[776.62px] w-full h-[54.45px]">
                             <input
@@ -104,14 +79,10 @@ const Chat: FunctionComponent = () => {
                             KleeneStar can make mistakes. Consider checking important information.
                         </span>
                     </div>
-                    {/* note button */}
                     <div className="absolute bottom-[12.45px] right-[12.54px] bg-inherit text-primary-300 mq850:hidden ">
                         <CircleHelp className="bg-transparent" />
                     </div>
                 </section>
             </div>
-        </div>
-    );
-};
-
-export default Chat;
+        </div> */
+}
