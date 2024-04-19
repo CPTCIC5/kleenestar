@@ -35,8 +35,6 @@ const Chat: FunctionComponent = () => {
 
     return (
         <div className="h-screen flex overflow-hidden">
-            <ChatSideBar SideBar={SideBar} handleHide={handleHide} />
-        <div className="h-screen flex">
             <ChatSideBar SideBar={SideBar} handleHide={handleHide} setInviteOpen={setInviteOpen} />
             <ChatDisplay handleHide={handleHide} />
             <InviteTeam  isOpen={inviteOpen} onClose={setInviteOpen} />
