@@ -32,9 +32,6 @@ class WorkSpace(models.Model):
     industry = models.CharField(
         max_length=60, choices=INDUSTRIES, blank=True, null=True
     )
-    size = models.CharField(max_length=50)
-    objective = models.CharField(max_length=100)
-    challenges = models.CharField(max_length=100)
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)
 
