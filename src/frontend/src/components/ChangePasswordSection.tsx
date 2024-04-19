@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { ChangeEvent, useEffect, useState } from "react";
 import axios,{AxiosError} from 'axios'
 import Cookies from 'js-cookie'
+import {toast} from 'sonner'
 
 const schema = z.object({
 	password: z
@@ -110,13 +111,14 @@ function ChangePasswordSection(): JSX.Element {
 								}
 							}
 						)
-            if(response.status == 200){
-                console.log("Done", response)
-            }
+			console.log(response.data)
+			toast.success("Password Changes Successfully!")
+           
         }
         catch(error){
             const err = error as AxiosError
             console.log(err)
+			toast.warning("Failed to change password")
         }
     };
     const [passwordMatch, setPasswordMatch] = useState<boolean>(false);

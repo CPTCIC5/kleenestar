@@ -1,13 +1,15 @@
 import { CircleX, Ellipsis, Folders, FolderUp, LogOut, PenLine, Settings, ShoppingBag, SquarePen, Trash2, UsersRound, Zap } from "lucide-react";
 import { dummyChatListToday, dummyChatListPrevious } from "../utils/dummyChatList.js";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, SetStateAction, MouseEventHandler } from "react";
 import { useNavigate } from "react-router-dom";
+
 interface ChatSideBarProps {
-    SideBar: React.RefObject<HTMLDivElement>;
-    handleHide: () => void;
+	SideBar: React.RefObject<HTMLDivElement>
+	handleHide: () => void
+	setInviteOpen: React.Dispatch<SetStateAction<boolean>>;
 }
 
-const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
+const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide, setInviteOpen }) => {
     const [currentConvo, setCurrentConvo] = useState("");
     const [renameActive, setRenameActive] = useState("");
     const list = useRef<HTMLDivElement>(null);
@@ -52,6 +54,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 			}
 		}
 	}
+
     return (
 			<aside
 				ref={SideBar}
@@ -88,7 +91,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									if (name === currentConvo) {
 										return (
 											<div
-												onClick={(e) => {e.stopPropagation()
+												onClick={(e) => {
+													e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -98,7 +102,6 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 												</div>
 												<Ellipsis
 													onClick={() => {
-														
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -132,7 +135,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									} else {
 										return (
 											<div
-												onClick={(e) => {	e.stopPropagation()
+												onClick={(e) => {
+													e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -184,7 +188,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									if (name === currentConvo) {
 										return (
 											<div
-												onClick={(e) => {	e.stopPropagation()
+												onClick={(e) => {
+													e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -194,7 +199,6 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 												</div>
 												<Ellipsis
 													onClick={() => {
-													
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -228,7 +232,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									} else {
 										return (
 											<div
-												onClick={(e) => {e.stopPropagation()
+												onClick={(e) => {
+													e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -238,7 +243,6 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 												</div>
 												<Ellipsis
 													onClick={() => {
-														
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -279,7 +283,9 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 					<div className="border text-center border-opacity-50 border-solid border-dimwhite w-[95%] mx-auto my-[2px]"></div>
 
 					<div className="px-[25.77px] py-[15.18px]">
-						<div className="w-full font-[500] text-[15px] hover:bg-gray-100 hover:text-primary-300  hover:transform hover:transition-all hover:duration-200 justify-start gap-[25.37px] flex pr-[17.75px] pl-[19.05px] pt-[10.83px] rounded-3xl h-[47.12px] bg-background">
+						<div
+							onClick={setInviteOpen}
+							className="w-full cursor-pointer font-[500] text-[15px] hover:bg-gray-100 hover:text-primary-300  hover:transform hover:transition-all hover:duration-200 justify-start gap-[25.37px] flex pr-[17.75px] pl-[19.05px] pt-[10.83px] rounded-3xl h-[47.12px] bg-background">
 							<img
 								src="/profile-chat.png"
 								alt=""
@@ -287,7 +293,9 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 							/>
 							Add team to workspace
 						</div>
-						<div ref={profile}  className="w-full hidden bg-white bottom-[60px] left-[30px] absolute h-[301px] max-w-[310px] mq750:max-w-[269.73px] rounded-3xl drop-shadow-2xl z-30">
+						<div
+							ref={profile}
+							className="w-full hidden bg-white bottom-[60px] left-[30px] absolute h-[301px] max-w-[310px] mq750:max-w-[269.73px] rounded-3xl drop-shadow-2xl z-30">
 							<div className="w-fit ml-[30.02px] font-[500] font-montserrat text-primary-300 text-[15px] py-[23px]">
 								<div
 									onClick={() => {
@@ -327,8 +335,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 								</div>
 								<div className="border absolute right-2 text-center border-opacity-50 border-solid border-dimwhite w-[95%] mx-auto my-[2px]"></div>
 
-								<div
-									className="flex gap-[16.3px] cursor-pointer pt-[20px] ">
+								<div className="flex gap-[16.3px] cursor-pointer pt-[20px] ">
 									<LogOut />
 									Log out
 								</div>
