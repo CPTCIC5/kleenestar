@@ -88,7 +88,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									if (name === currentConvo) {
 										return (
 											<div
-												onClick={() => {
+												onClick={(e) => {e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -97,8 +97,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 													{name}
 												</div>
 												<Ellipsis
-													onClick={(e) => {
-														e.stopPropagation()
+													onClick={() => {
+														
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -132,7 +132,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									} else {
 										return (
 											<div
-												onClick={() => {
+												onClick={(e) => {	e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -142,8 +142,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 												</div>
 
 												<Ellipsis
-													onClick={(e) => {
-														e.stopPropagation()
+													onClick={() => {
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -185,7 +184,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									if (name === currentConvo) {
 										return (
 											<div
-												onClick={() => {
+												onClick={(e) => {	e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -194,8 +193,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 													{name}
 												</div>
 												<Ellipsis
-													onClick={(e) => {
-														e.stopPropagation()
+													onClick={() => {
+													
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
@@ -229,7 +228,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 									} else {
 										return (
 											<div
-												onClick={() => {
+												onClick={(e) => {e.stopPropagation()
 													setCurrentConvo(name)
 												}}
 												key={index}
@@ -238,8 +237,8 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({ SideBar, handleHide }) => {
 													{name}
 												</div>
 												<Ellipsis
-													onClick={(e) => {
-														e.stopPropagation()
+													onClick={() => {
+														
 														name === renameActive
 															? setRenameActive("")
 															: setRenameActive(name)
