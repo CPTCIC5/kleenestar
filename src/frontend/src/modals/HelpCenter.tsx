@@ -1,7 +1,9 @@
 import { CircleX, PencilLine } from "lucide-react";
 import React from "react";
 import PrimaryButton from "../components/PrimaryButton";
-
+import axios from 'axios'
+import {toast} from 'sonner'
+import Cookies from "js-cookie";
 interface HelpCenterProps {
     isOpen: boolean;
     onClose: () => void;
@@ -37,11 +39,28 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ isOpen, onClose }) => {
         setSelectedEmoji(emoji);
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async(event: React.FormEvent) => {
         event.preventDefault();
         // Send selectedOptions
         console.log(selectedOption, selectedCategory, message, selectedEmoji);
-
+        try{
+            const response = await axios.post('http://127.0.0.1:8000/api/auth/add-feedback/',{
+                    "urgency":1,
+                    "category":"General",
+                    "message": "My mesage"
+                },{
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': Cookies.get('csrftoken')
+                    }
+                })
+            console.log(response.data)
+            toast.success("Thanks for Submitting your Feedback!")
+        }catch(err){
+            console.log(err)
+            toast.error("Failed to submit feedback")
+        }
         // add axios API call
     };
 
