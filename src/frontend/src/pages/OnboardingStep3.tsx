@@ -90,10 +90,13 @@ const OnboardingStep3: FunctionComponent = () => {
             }
 
         }
-        catch(error){
-            console.log(error)
-            const err = error as AxiosError
-                if (err.response?.data) toast.error(err.response?.data.email[0])
+        catch (error) {
+            console.log(error);
+            const err = error as AxiosError;
+            if (err.response?.data) {
+                const { email } = err.response.data as { email: string[] };
+                toast.error(email[0]);
+            }
         }
     };
 

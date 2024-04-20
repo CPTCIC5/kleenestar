@@ -1,6 +1,18 @@
-import {create} from 'zustand'
+import { create } from "zustand";
+import chatStore from './store/chat/index'
+import { devtools, persist } from "zustand/middleware";
 
 
-type ChatStore = {
-    chat: [],
-}
+
+
+
+
+const useChatStore = create(
+    devtools(
+        persist(chatStore, {
+            name: "chat-store",
+        }),
+    ),
+);
+
+export default useChatStore;
