@@ -109,6 +109,5 @@ class AddFeedback(views.APIView):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        print('xyz')
         serializer.save(user=request.user)
         return Response(serializer.data,status=status.HTTP_201_CREATED)

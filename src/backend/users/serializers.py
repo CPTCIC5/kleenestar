@@ -54,7 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
-        fields = ("id", "user", "urgency", "category", "message", "emoji", "attachment")
+        fields = ("user", "urgency", "category", "message", "emoji", "attachment")
 
     """
     def create(self, validated_data):
