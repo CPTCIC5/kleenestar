@@ -100,3 +100,15 @@ class ChangePasswordView(views.APIView):
                 return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
             return Response({'message':'Password and Confirm Password didnt match'},status=status.HTTP_400_BAD_REQUEST)
         return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
+
+class AddFeedback(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self,request):
+        serializer = serializers.FeedbackSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        print('xyz')
+        serializer.save(user=request.user)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)

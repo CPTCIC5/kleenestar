@@ -8,22 +8,15 @@ class CustomPagination(pagination.PageNumberPagination):
     page_size = 10
 
 
-class PromptFeedbackView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        serializer = serializers.PromptFeedbackSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ChannelViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = models.Channel.objects.all()
     serializer_class = serializers.ChannelSerializer
 
     def get_queryset(self,pk):
         obj = get_object_or_404(models.WorkSpace,pk=pk)
-        serializer = WorkSpaceSerializer(obj)
+        serializer = WorkSpaceSerializer(instance=obj)
         return Response(serializer.data,status=status.HTTP_200_OK)
         
 
@@ -50,10 +43,24 @@ class ChannelViewSet(viewsets.ModelViewSet):
 
 class ConvoViewSet(viewsets.ModelViewSet):
     queryset = models.Convo.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.ConvoSerializer
     pagination_class = CustomPagination
 
+    def get_queryset(self):
+        return super().get_queryset()
+
 class PromptViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated)
     queryset = models.Prompt.objects.all()
     serializer_class = serializers.PromptInputSerializer
     pagination_class = CustomPagination
+
+class PromptFeedbackView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = serializers.PromptFeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

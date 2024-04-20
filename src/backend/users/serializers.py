@@ -56,6 +56,14 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = ("id", "user", "urgency", "category", "message", "emoji", "attachment")
 
+    """
+    def create(self, validated_data):
+        return Feedback.objects.create(
+            user=self.context['request'].user,
+            **validated_data
+        )
+    """
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

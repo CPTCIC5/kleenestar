@@ -62,13 +62,11 @@ def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
 
     # Creating a new conversation thread
     if all_prompts >= 1:
-        print('thiss')
         thread = client.beta.threads.retrieve(
             thread_id=get_convo.assistant_id
         )
 
     else:
-        print('thiss')
         thread = client.beta.threads.create()
         get_convo.assistant_id = thread.id
         get_convo.save()

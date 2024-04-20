@@ -16,21 +16,26 @@ class ChannelSerializer(serializers.ModelSerializer):
         fields  = ['activated','channel_type','connected','workspace','credentials']
 
 
-class PromptFeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PromptFeedback
-        fields = ['user','note']
 
 class ConvoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
-        fields = ('id','assistant_id', 'workspace', 'title')
+        fields = ('id','assistant_id', 'workspace', 'title','created_at')
+
 
 class PromptInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
         fields = ('id', 'convo', 'author', 'text_query', 'file_query', 
                   'response_text', 'response_image',  'created_at')
+
+
+class PromptFeedbackSerializer(serializers.ModelSerializer):
+    prompt= PromptInputSerializer()
+    class Meta:
+        model = models.PromptFeedback
+        fields = ['user','prompt','note']
+
 
 """
 class PromptInputSerializer(serializers.Serializer):

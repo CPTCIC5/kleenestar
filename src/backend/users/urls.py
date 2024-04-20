@@ -12,7 +12,9 @@ urlpatterns = [
     path("signup/", views.SignupView.as_view(), name="signup"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
     path("change-password/",views.ChangePasswordView.as_view()
-         ,name='change-password')
+         ,name='change-password'),
+    path("add-feedback/",views.AddFeedback.as_view(),
+         name='add-feedback')
 ] + router.urls
 
 

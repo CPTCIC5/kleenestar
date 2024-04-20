@@ -80,6 +80,7 @@ class Feedback(models.Model):
     category = models.CharField(max_length=30, choices=FEEDBACK_CATEGORIES)
     message = models.TextField()
     emoji = models.IntegerField(blank=True, null=True)
+    attachment = models.ImageField(upload_to='Platform-Feedbacks/',validators=[validate_image_file_extension],blank=True,null=True)
 
     def __str__(self):
         return self.user.email
