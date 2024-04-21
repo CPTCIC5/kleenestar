@@ -51,7 +51,32 @@ class ConvoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         workspace = self.request.user_workspace.set.all()[0]
-        print(workspace)
+        return models.Convo.objects.filter(workspace=workspace)
+    
+
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.ConvoCreateSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(workspace=self.request.user_workspace.set.all()[0])
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = serializers.ConvoCreateSerializer(
+            instance=instance, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+    def destroy(self, request, *args, **kwargs):
+        self.perform_destroy()
+        return Response(status=status.HTTP_200_OK)
 
         
 
@@ -65,7 +90,7 @@ class PromptFeedbackView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        serializer = serializers.PromptFeedbackSerializer(data=request.data)
+        serializer = serializers.PromptFeedbackCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

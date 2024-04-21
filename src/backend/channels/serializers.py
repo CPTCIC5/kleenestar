@@ -27,6 +27,7 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 class ConvoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
+        fields = ['title','archived']
         
 
 class ConvoSerializer(serializers.ModelSerializer):
@@ -43,7 +44,7 @@ class PromptInputSerializer(serializers.ModelSerializer):
                   'response_text', 'response_image',  'created_at')
 
 
-class PromptFeedbackSerializer(serializers.ModelSerializer):
+class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
     prompt= PromptInputSerializer()
     class Meta:
         model = models.PromptFeedback

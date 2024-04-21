@@ -6,8 +6,8 @@ from . import views
 
 router = DefaultRouter()
 router.register("", views.ChannelViewSet, basename="channels")
-router.register(r'convos', ConvoViewSet)
-router.register(r'promptinputs', PromptViewSet)
+router.register('convos/', ConvoViewSet,basename="convos")
+router.register('promptinputs/', PromptViewSet,basename="prompt")
 
 
 urlpatterns = [
