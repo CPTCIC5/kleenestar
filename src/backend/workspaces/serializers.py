@@ -28,7 +28,7 @@ class WorkSpaceSerializer(WorkSpaceCreateSerializer):
 
 
 class WorkSpaceInviteCreateSerializer(serializers.ModelSerializer):
-    #workspace = WorkSpaceSerializer(read_only=True)
+    workspace = WorkSpaceSerializer(read_only=True)
     class Meta:
         model = WorkSpaceInvite
         fields = ["workspace","invite_code","email","accepted","created_at"]

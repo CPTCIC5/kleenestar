@@ -67,7 +67,7 @@ FEEDBACK_CATEGORIES = (
     ("General", "General"),
     ("Technical", "Technical"),
     ("To improve", "To improve"),
-    ("Feeback", "Feedback"),
+    ("Feedback", "Feedback"),
     ("Others", "Others"),
 )
 
@@ -75,7 +75,7 @@ URGENCYY = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 
 
 
 class Feedback(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     urgency = models.IntegerField(choices=URGENCYY)
     category = models.CharField(max_length=30, choices=FEEDBACK_CATEGORIES)
     message = models.TextField()

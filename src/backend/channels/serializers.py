@@ -9,11 +9,12 @@ class APICredentialsSerializer(serializers.ModelSerializer):
         fields  = ['key_1','key_2','key_3','key_4']
 
 
-class ChannelSerializer(serializers.ModelSerializer):
+class ChannelCreateSerializer(serializers.ModelSerializer):
     credentials = APICredentialsSerializer()
     class Meta:
         model = models.Channel
-        fields  = ['activated','channel_type','connected','workspace','credentials']
+        fields  = ['activated','channel_type','connected','credentials']
+        read_only = ['workspace']
 
 
 

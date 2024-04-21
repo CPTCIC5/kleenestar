@@ -105,7 +105,7 @@ class AddFeedback(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self,request):
-        serializer = serializers.FeedbackSerializer(
+        serializer = serializers.FeedbackCreateSerializer(
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
