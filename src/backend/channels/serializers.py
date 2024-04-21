@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from workspaces.serializers import WorkSpaceSerializer
 from users.models import User
 from . import models
 
@@ -9,19 +10,30 @@ class APICredentialsSerializer(serializers.ModelSerializer):
         fields  = ['key_1','key_2','key_3','key_4']
 
 
+class ChannelSerializer(serializers.ModelSerializer):
+    workspace = WorkSpaceSerializer()
+    credentials = APICredentialsSerializer()
+    class Meta:
+        model = models.Channel
+        fields  = ['activated','channel_type','connected','workspace','credentials','created_at']
+        read_only = ['workspace']
+
 class ChannelCreateSerializer(serializers.ModelSerializer):
     credentials = APICredentialsSerializer()
     class Meta:
         model = models.Channel
-        fields  = ['activated','channel_type','connected','credentials']
-        read_only = ['workspace']
+        fields = ["channel_type","credentials"]
 
-
-
-class ConvoSerializer(serializers.ModelSerializer):
+class ConvoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
-        fields = ('id','assistant_id', 'workspace', 'title','created_at')
+        
+
+class ConvoSerializer(serializers.ModelSerializer):
+   #workspace = WorkSpaceSerializer()
+    class Meta:
+        model = models.Convo
+        fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')
 
 
 class PromptInputSerializer(serializers.ModelSerializer):
