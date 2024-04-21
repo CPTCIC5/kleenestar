@@ -78,10 +78,43 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # dont list all users
         raise Http404
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial",False)
+        instance= self.get_object()
+        serializer = serializers.UserSerializer(
+            instance=instance,data=request.data,partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+         
 
     @action(methods=("GET",), detail=False, url_path="me")
     def get_current_user_data(self, request):
         return Response(self.get_serializer(request.user).data)
+    
+
+    """
+    @action(methods=("PATCH",), detail=True, url_path="update-me")
+    def update_current_user_data(self,request,pk):
+        instance = self.get_object()
+        serializer = serializers.UserSerializer(
+            instance=instance, data={
+                "first_name": request.data.get("first_name",instance.first_name),
+                "email" : instance.email,
+                "profile": instance.profile
+            }
+            )
+        print(instance.first_name)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    """
+
+
 
 class ChangePasswordView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
