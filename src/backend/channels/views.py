@@ -17,14 +17,8 @@ class ChannelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Customize queryset based on the request or user
         user = self.request.user
-        if user.is_authenticated:
-            # Filter queryset based on user's workspace
-            user_channels= models.Channel.objects.filter(workspace=user.workspace_set.all()[0])
-            return models.Channel.objects.filter(workspace=user_channels)
-        else:
-            # Default queryset if user is not authenticated
-            return models.Channel.objects.none()
-        
+        return models.Channel.objects.filter(workspace=user.workspace_set.all()[0])
+    
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
