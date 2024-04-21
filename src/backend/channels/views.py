@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import views,viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
+from rest_framework.decorators import action
 from workspaces.permissions import WorkSpaceViewSetPermissions
 
 class CustomPagination(pagination.PageNumberPagination):
@@ -50,7 +51,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        workspace = self.request.user_workspace.set.all()[0]
+        workspace = self.request.user.workspace_set.all()[0]
         return models.Convo.objects.filter(workspace=workspace)
     
 
@@ -83,9 +84,44 @@ class ConvoViewSet(viewsets.ModelViewSet):
 class PromptViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated)
     queryset = models.Prompt.objects.all()
-    serializer_class = serializers.PromptInputSerializer
+    serializer_class = serializers.PromptSerializer
     pagination_class = CustomPagination
 
+    def get_queryset(self):
+        user = self.request.user
+        workspace = user.workspace_set.all()[0]
+        all_prompts = workspace.convo_set.all()
+        return (all_prompts)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.PromptCreateSerializer(
+            data=request.data
+        )
+        serializer.save(convo=self.kwargs['pk'], author=self.request.user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial',False)
+        instance = self.get_object()
+        serializer = serializers.PromptCreateSerializer(
+            instance,request.data,partial=partial
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance= self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_200_OK)
+    
+    @action(methods=("POST",) ,detail=True, url_path="feedback")
+    def prompt_feedback_upload(self,request,pk):
+        serializer = serializers.PromptFeedbackCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user, prompt= self.get_object())
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+"""
 class PromptFeedbackView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -94,3 +130,4 @@ class PromptFeedbackView(views.APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+"""

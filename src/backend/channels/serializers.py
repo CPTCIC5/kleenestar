@@ -31,13 +31,19 @@ class ConvoCreateSerializer(serializers.ModelSerializer):
         
 
 class ConvoSerializer(serializers.ModelSerializer):
-   #workspace = WorkSpaceSerializer()
+    workspace = WorkSpaceSerializer()
     class Meta:
         model = models.Convo
         fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')
 
+class PromptCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Prompt
+        fields = ("text_query","file_query")
 
-class PromptInputSerializer(serializers.ModelSerializer):
+
+
+class PromptSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
         fields = ('id', 'convo', 'author', 'text_query', 'file_query', 
@@ -45,7 +51,7 @@ class PromptInputSerializer(serializers.ModelSerializer):
 
 
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
-    prompt= PromptInputSerializer()
+    prompt= PromptSerializer()
     class Meta:
         model = models.PromptFeedback
         fields = ['user','prompt','note']
