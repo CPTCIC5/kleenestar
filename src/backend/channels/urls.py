@@ -5,7 +5,7 @@ from .views import ConvoViewSet, PromptViewSet
 from . import views
 
 router = DefaultRouter()
-router.register("channels/", views.ChannelViewSet, basename="channels")
+router.register("/", views.ChannelViewSet, basename="channels")
 router.register(r'convos', ConvoViewSet)
 router.register(r'promptinputs', PromptViewSet)
 

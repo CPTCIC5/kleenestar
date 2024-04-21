@@ -14,10 +14,16 @@ class ChannelViewSet(viewsets.ModelViewSet):
     queryset = models.Channel.objects.all()
     serializer_class = serializers.ChannelSerializer
 
-    def get_queryset(self,pk):
-        obj = get_object_or_404(models.WorkSpace,pk=pk)
-        serializer = WorkSpaceSerializer(instance=obj)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    def get_queryset(self):
+        # Customize queryset based on the request or user
+        user = self.request.user
+        if user.is_authenticated:
+            # Filter queryset based on user's workspace
+            user_channels= models.Channel.objects.filter(workspace=user.workspace_set.all()[0])
+            return models.Channel.objects.filter(workspace=user_channels)
+        else:
+            # Default queryset if user is not authenticated
+            return models.Channel.objects.none()
         
 
     def create(self, request, *args, **kwargs):

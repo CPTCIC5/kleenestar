@@ -47,7 +47,8 @@ class Channel(models.Model):
 class Convo(models.Model):
     assistant_id = models.CharField(max_length=100,blank=True,null=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,default= 'New Chat')
+    archived =  models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
