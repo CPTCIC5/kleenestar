@@ -142,7 +142,14 @@ class Prompt(models.Model):
 
     def __str__(self):
         return str(self.author)
-    
+
+""" 
+class BlockNote(models.Model):
+    user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    prompt= models.ForeignKey(Prompt,on_delete=models.CASCADE)
+    title=  models.CharField(max_length=50)
+    image= models.ImageField(upload_to='BlockNote',default='xyz.jpeg')
+"""
 
 class PromptFeedback(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

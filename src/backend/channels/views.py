@@ -88,10 +88,13 @@ class PromptViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PromptSerializer
     pagination_class = CustomPagination
 
-    def get_queryset(self):
+    def get_queryset(self,*args,**kwargs):
         convo_id = self.kwargs.get('pk')  # Retrieve 'pk' from URL kwargs
-        convo = get_object_or_404(models.Convo, pk=convo_id)
-        return convo.prompt_set.all()  # Return prompts associated with the Convo
+        convo  = models.Convo.objects.get(id=convo_id)
+        #n1=models.Prompt.objects.filter(convo=convo)
+        #return models.Prompt.objects.filter(convo=convo)
+        #print(convo.prompt_set.all())
+        return convo.prompt_set.all()  # Return prompts associated with the 
     
     def create(self, request, *args, **kwargs):
         serializer = serializers.PromptCreateSerializer(data=request.data)
