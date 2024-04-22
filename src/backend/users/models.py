@@ -39,7 +39,7 @@ class Profile(models.Model):
     country = models.CharField(
         choices=CountryField().choices, max_length=50, blank=True, null=True
     )
-    phone_number = models.CharField(max_length=10, blank=True, null=True, unique=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True, unique=True)
 
     referral_code = models.CharField(max_length=6, unique=True, blank=True)
     total_referrals = models.IntegerField(default=0)
