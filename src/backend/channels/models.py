@@ -137,8 +137,6 @@ class Prompt(models.Model):
         super().save(*args,**kwargs)
     
     
-    
-
     class Meta:
         ordering  = ['author','id']
 

@@ -51,10 +51,9 @@ class PromptSerializer(serializers.ModelSerializer):
 
 
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
-    prompt= PromptSerializer()
     class Meta:
         model = models.PromptFeedback
-        fields = ['user','prompt','note']
+        fields = ['note']
 
 
 """

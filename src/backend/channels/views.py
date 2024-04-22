@@ -89,16 +89,15 @@ class PromptViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        user = self.request.user
-        workspace = user.workspace_set.all()[0]
-        #return workspace.convo_set.all()
-        return workspace
+        convo_id = self.kwargs.get('pk')  # Retrieve 'pk' from URL kwargs
+        convo = get_object_or_404(models.Convo, pk=convo_id)
+        return convo.prompt_set.all()  # Return prompts associated with the Convo
     
     def create(self, request, *args, **kwargs):
-        serializer = serializers.PromptCreateSerializer(
-            data=request.data
-        )
-        serializer.save(convo=self.kwargs['pk'], author=self.request.user)
+        serializer = serializers.PromptCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        convo = get_object_or_404(models.Convo, pk=self.kwargs['pk'])
+        serializer.save(convo=convo, author=request.user)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
@@ -108,6 +107,8 @@ class PromptViewSet(viewsets.ModelViewSet):
         serializer = serializers.PromptCreateSerializer(
             instance,request.data,partial=partial
         )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def destroy(self, request, *args, **kwargs):
