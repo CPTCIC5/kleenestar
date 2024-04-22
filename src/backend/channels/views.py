@@ -60,7 +60,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(workspace=self.request.user_workspace.set.all()[0])
+        serializer.save(workspace=self.request.user.workspace_set.all()[0])
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     
     
@@ -76,13 +76,14 @@ class ConvoViewSet(viewsets.ModelViewSet):
     
 
     def destroy(self, request, *args, **kwargs):
-        self.perform_destroy()
+        instance = self.get_object()
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
 
         
 
 class PromptViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.IsAuthenticated)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = models.Prompt.objects.all()
     serializer_class = serializers.PromptSerializer
     pagination_class = CustomPagination
@@ -90,8 +91,8 @@ class PromptViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         workspace = user.workspace_set.all()[0]
-        all_prompts = workspace.convo_set.all()
-        return (all_prompts)
+        #return workspace.convo_set.all()
+        return workspace
     
     def create(self, request, *args, **kwargs):
         serializer = serializers.PromptCreateSerializer(
