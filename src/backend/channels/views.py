@@ -3,7 +3,6 @@ from rest_framework import views,viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
 from rest_framework.decorators import action
-from workspaces.permissions import WorkSpaceViewSetPermissions
 
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 10
