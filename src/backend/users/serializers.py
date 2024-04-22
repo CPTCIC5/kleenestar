@@ -50,6 +50,20 @@ class UserSerializer(serializers.ModelSerializer):
             "profile",
         )
 
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update or create profile related to the user
+        if profile_data:
+            profile_instance, _ = Profile.objects.update_or_create(user=instance, defaults=profile_data)
+            # Update profile instance with nested serializer data
+            ProfileSerializer(profile_instance, data=profile_data).is_valid(raise_exception=True)
+            profile_instance.save()
+        return instance
+
 
 class FeedbackCreateSerializer(serializers.ModelSerializer):
     class Meta:
