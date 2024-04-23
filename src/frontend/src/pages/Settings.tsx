@@ -6,8 +6,59 @@ import { FolderClosed } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import CustomSelect from "../components/CustomSelect"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
+import Cookies from 'js-cookie'
+import {toast} from 'sonner'
+import axios from 'axios'
+import { useEffect, useState } from "react"
+
+
 
 function Settings(): JSX.Element {
+	const [isLoggedIn, setIsLoggedIn] = useState(false)
+	const [userDetails, setUserDetails] = useState<{
+		id: string
+		profile: { country: string }
+	}>({
+		id: "",
+		profile: {
+			country: "",
+		},
+	})
+	useEffect(() => {
+		const fetchWorkspaceDetails = async () => {
+			try{
+				const response = await axios.get("http://127.0.0.1:8000/api/workspaces/", {
+				withCredentials: true,
+				headers: {
+					"Content-Type": "application/json",
+					"X-CSRFToken": Cookies.get("csrftoken"),
+				},
+			})
+			setIsLoggedIn(true)
+			setUserDetails(response.data[0].root_user)
+			}catch(err){
+				navigate("/")
+			}
+		}
+		fetchWorkspaceDetails()
+	}, [])
+	
+	const LogOut = async() => {
+		try {
+			await axios.post("http://127.0.0.1:8000/api/auth/logout/",{}, {
+				withCredentials: true,
+				headers: {
+					"Content-Type": "application/json",
+					"X-CSRFToken": Cookies.get("csrftoken"),
+				},
+			})
+
+		} catch (err) {
+			console.error("Logout Failed")
+			throw new Error("Logout Failed")
+		}
+			
+	}
 	const reasonsToDeleteAccount = [
 		{
 			label: "Found a better platform/service",
@@ -33,11 +84,36 @@ function Settings(): JSX.Element {
 			mode: "onChange",
 		})
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit: SubmitHandler<FieldValues> = async(data) => {
 			console.log(data)
-	}
+			console.log(userDetails)
+			const user_id = userDetails.id
+			try{
+				await axios.delete(
+					`http://127.0.0.1:8000/api/auth/users/${user_id}/`,
+					{
+						withCredentials: true,
+						headers: {
+							"X-CSRFToken": Cookies.get("csrftoken"),
+						},
+					}
+				)
+				toast.success("Account Deleted Successfully!")
+				setTimeout(()=>{
+					LogOut()
+					navigate("/")
+				}, 1000)
+			}catch(err){
+				console.error(err)
+				toast.error("Faild to delete the account")
+			}
 
+	}
 	const navigate = useNavigate()
+
+	if(!isLoggedIn){
+		return <></>
+	}
 	return (
 		<div className=" h-ful w-screen min-h-screen bg-background pb-20">
 			<div className="w-full pl-8 mq1000:pl-0 ">
@@ -63,7 +139,7 @@ function Settings(): JSX.Element {
 				</div>
 			</div>
 			<div className="w-[90%] gap-[5%] relative top-10 mq1000:top-[139px] mx-auto mq1000:flex-col flex">
-				<ProfileSection />
+				<ProfileSection  />
 				<div className="w-[50%] mq1000:w-[95%] mq1000:mx-auto mq1000:mt-10 flex-col ">
 					<ChangePasswordSection />
 					<div className="bg-white rounded-[2rem] h-fit  mt-4 ">

@@ -23,7 +23,7 @@ const OnboardingStep1: FunctionComponent = () => {
                 </div>
 
                 <div className="mt-[41px] max-w-[454px] w-full h-[40px] ">
-                    <Link to={"/onboard/step2"} className="no-underline">
+                    <Link to={"/onboard/step3"} className="no-underline">
                         <PrimaryButton className="flex items-center justify-center gap-[10px]">
                             <span className="bg-primary-300 text-white">Create a workspace</span>
                             <MoveRight className="bg-primary-300 text-white" />

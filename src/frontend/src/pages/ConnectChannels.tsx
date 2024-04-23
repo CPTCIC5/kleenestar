@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import json from "../utils/dummyConnectChannels.json";
 import ChannelCard from "../components/ChannelCard";
 import { useRef } from "react";
+// import { GoogleAdsApi } from "google-ads-api"
 
 function ConnectChannels() {
     const channel: {
@@ -12,6 +13,14 @@ function ConnectChannels() {
         connected: boolean;
         available: boolean;
     }[] = json.data.channels;
+
+    // const connectGoogleAdsApi = () => {
+    //     const client = new GoogleAdsApi({
+	// 				client_id: import.meta.env.GOOGLE_ADS_CLIENT_ID,
+	// 				client_secret: import.meta.env.GOOGLE_ADS_CLIENT_SECRET,
+	// 				developer_token: import.meta.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+	// 			})
+    // }
 
     const infoBox = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
