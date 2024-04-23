@@ -71,13 +71,15 @@ const OnboardingStep3: FunctionComponent = () => {
         } else {
             console.log(data);
         }
-        try{
+        try{ 
+
             const response = await axios.post("http://127.0.0.1:8000/api/auth/signup/",{
                 email: data.email,
                 password: data.password,
                 confirm_password: data.confirmPassword,
                 newsletter: data.newsletter
             },{
+
                 headers: {
                     "Content-Type": 'application/json'
                 }
@@ -85,7 +87,7 @@ const OnboardingStep3: FunctionComponent = () => {
             if(response.status == 201){
                 toast.success("Registration Successfull!")
                 setTimeout(()=>{
-                    navigate("/onboard/step1")
+                    navigate("/onboard/step2")
                 },1000)
             }
 

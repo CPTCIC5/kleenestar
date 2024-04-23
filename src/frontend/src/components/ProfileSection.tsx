@@ -1,17 +1,21 @@
 import { PencilLine } from "lucide-react"
-import { useRef } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import parsePhoneNumber, { CountryCode } from "libphonenumber-js"
 import { getNames, registerLocale } from "i18n-iso-countries"
 import english from "i18n-iso-countries/langs/en.json"
 import CustomSelect from "./CustomSelect"
+import Cookies from "js-cookie"
+import axios, { AxiosError } from "axios"
+import {toast} from 'sonner'
 
 registerLocale(english)
 
 const countryList = Object.entries(getNames("en")).map(([value, name]) => ({
-	value: value, label: name
+	value: value,
+	label: name,
 }))
 type FormFields = z.infer<typeof schema>
 
@@ -20,7 +24,8 @@ const schema = z.object({
 		.string()
 		.min(5, "The first name should be at least 5 characters long")
 		.max(100, "The first name should not exceed 100 characters")
-		.regex(/^[a-zA-Z '-]+$/, "Name can only include letters and hypen(-)"),
+		.regex(/^[a-zA-Z '-]+$/, "Name can only include letters and hypen(-)")
+		,
 	last_name: z
 		.string()
 		.min(5, "The last name should be at least 5 characters long")
@@ -34,58 +39,207 @@ const schema = z.object({
 		.regex(
 			/^[a-zA-Z0-9 _-]+$/,
 			"Workspace name can include letters, underscores, hypens(-) and numbers only"
-		),
+		)
+		,
 	country: z.string().min(1, { message: "Country is required" }),
-	number: z.string().min(10, {
-		message: "Invalid Phone Number"
-	}),
+	number: z
+		.string()
+		.min(10, {
+			message: "Invalid Phone Number",
+		}),
 })
 
 function ProfileSection(): JSX.Element {
+	const [avatar, setAvatar] = useState("")
+	const [userDetails, setUserDetails] = useState<{ id: string , profile: {country: string} }>({
+		id: "",
+		profile: {
+			country: ""
+		}
+	})
+	const [isValid, setIsValid] = useState(false)
 	const imageRef = useRef<HTMLInputElement>(null)
 	const handleAvatarClick = () => {
 		if (imageRef.current) {
 			imageRef.current.click()
 		}
 	}
+	const handleAvatarUpload = async(e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if(!file){
+			return
+		}else{
+			const formData = new FormData()
+			formData.append("profile[avatar]", file)
+			console.log(formData)
+			const user_id = userDetails.id
+			try{
+				await axios.patch(
+					`http://127.0.0.1:8000/api/auth/users/${user_id}/`,
+					formData,
+					{
+						withCredentials: true,
+						headers: {
+							"Content-Type": "multipart/form-data",
+							"X-CSRFToken": Cookies.get("csrftoken"),
+						},
+					}
+				)
+			}catch(err){
+				console.error(err)
+			}
+		}	
 
+	}
 	const form = useForm<FormFields>({
-		defaultValues:{
+		defaultValues: {
 			first_name: "",
 			last_name: "",
 			email: "",
 			workspace: "",
-			country: "",
-			number:""
+			country: "india",
+			number: "",
 		},
 		resolver: zodResolver(schema),
 		mode: "onChange",
 	})
-	const { register, handleSubmit, formState, setError, control } = form
-	const { errors,isValid } = formState
 
-	const onSubmit: SubmitHandler<FormFields> = (data) => {
-		const validPhoneNumber = parsePhoneNumber(
-			data.number,
-			data.country as CountryCode
-		)
-		if (
-			!validPhoneNumber ||
-			!validPhoneNumber.isValid() ||
-			!(validPhoneNumber.country === data.country)
-		) {
-			setError("number", {
-				message: "Invalid Phone Number",
-			})
-			return
+	const { register, formState, setError, control, reset, clearErrors, watch } =
+		form
+	const { errors, isDirty, dirtyFields } = formState
+	
+	useEffect(() => {
+		Object.keys(errors).forEach((fieldName) => {
+			if (!dirtyFields[fieldName as keyof typeof dirtyFields] && fieldName !== 'country') {
+				clearErrors(fieldName as keyof typeof dirtyFields) // Add type assertion
+			}
+			if(fieldName === "country"){
+				if(watch().country){
+					clearErrors("country")
+				}
+			}
+		})
+		if (Object.keys(errors).length > 0) {
+			setIsValid(false)
+		} else {
+			setIsValid(true)
 		}
-		if (!data.country) {
-			setError("number", {
-				message: "Country Not Selected!",
+	}, [dirtyFields, errors, clearErrors, Object.keys(errors)])
+
+	useEffect(() => {
+		const fetchWorkspaceDetails = async () => {
+			const response = await axios.get(
+				"http://127.0.0.1:8000/api/workspaces/",
+				{
+					withCredentials: true,
+					headers: {
+						"Content-Type": "application/json",
+						"X-CSRFToken": Cookies.get("csrftoken"),
+					},
+				}
+			)
+			const formDetails = response.data[0]
+			setUserDetails(response.data[0].root_user)
+
+			reset({
+				first_name: formDetails.root_user.first_name || "",
+				last_name: formDetails.root_user.last_name || "",
+				email: formDetails.root_user.email || "",
+				workspace: formDetails.business_name || "",
+				country: formDetails.root_user.profile.country || "",
+				number: formDetails.root_user.profile.phone_number || "",
 			})
-			return
+			setAvatar(formDetails.root_user.profile.avatar)
 		}
-		console.log(data)
+		fetchWorkspaceDetails()
+	}, [reset])
+	
+	const getConfig = (data: { [key: string]: string }) => {
+		const config: { [key: string]: any } = {}
+		const profile: { [key: string]: string } = {}
+
+		Object.keys(data).forEach((key) => {
+			if (dirtyFields[key as keyof typeof dirtyFields]) {
+				if (data[key]) {
+					if (key === "number") {
+						profile["phone_number"] = data[key]
+					} else if (key === "country") {
+						profile["country"] = data[key]
+					} else {
+						config[key] = data[key]
+					}
+				}
+			}
+		})
+
+		if (profile["phone_number"] || profile["country"]) {
+			config["profile"] = profile
+			// profile["user"] = userDetails.id
+		}
+
+		return config
+	}
+	
+	const onSubmit = async() => {
+		const data = watch()
+		if (data.number) {
+			if (!data.country) {
+				setError("country", {
+					message: "Country Not Selected!",
+				})
+				setIsValid(false)
+				return
+			} else {
+				
+				const validPhoneNumber = parsePhoneNumber(data.number, {
+					defaultCountry: data.country as CountryCode,
+					extract: false,
+				})
+			if (
+				!validPhoneNumber ||
+				!validPhoneNumber.isValid() ||
+				!(validPhoneNumber.country === data.country)
+			) {
+				setError("number", {
+					message: "Invalid Phone Number",
+				})
+				setIsValid(false)
+				return
+			}
+			}
+		}
+		const config = getConfig(data)
+		console.log(config)
+		const user_id = userDetails.id
+		console.log(user_id)
+		if(config){
+			try {
+				await axios.patch(
+					`http://127.0.0.1:8000/api/auth/users/${user_id}/`,
+					config,
+					{
+						withCredentials: true,
+						headers: {
+							"X-CSRFToken": Cookies.get("csrftoken"),
+							"Content-Type": "application/json",
+						},
+					}
+				)
+				toast.success("Profile Saved Successfully")
+			} catch (err) {
+				if (
+					(err as AxiosError).response &&
+					(err as AxiosError)?.response?.status === 400 &&
+					(err as AxiosError)?.response?.data?.user[0]
+				) {
+					toast.success("Profile Saved Successfully")
+				} else {
+					console.error(err)
+					toast.error("Failed to save profile")
+				}
+				
+			}
+		}
 	}
 
 	return (
@@ -105,10 +259,11 @@ function ProfileSection(): JSX.Element {
 						type="file"
 						name="files"
 						id=""
+						onChange={handleAvatarUpload}
 					/>
 					<img
 						onClick={handleAvatarClick}
-						src="/add_image.png"
+						src={"/add_image.png"}
 						className="w-[30px] mq1000:w-6"
 						alt=""
 					/>
@@ -121,9 +276,7 @@ function ProfileSection(): JSX.Element {
 							First name
 							<div className="w-full mt-2 bg-background rounded-[2rem] p-4 flex items-center h-[45px] ">
 								<input
-									{...register("first_name", {
-										required: "First Name is required",
-									})}
+									{...register("first_name")}
 									type="text"
 									placeholder="First name"
 									className="font-montserrat autofill:bg-transparent bg-clip-text outline-none bg-transparent w-full text-[15px]"
@@ -140,9 +293,7 @@ function ProfileSection(): JSX.Element {
 							Last name
 							<div className="w-full mt-2 bg-background h-[45px] rounded-[2rem] p-4 flex items-center ">
 								<input
-									{...register("last_name", {
-										required: "Last Name is required",
-									})}
+									{...register("last_name")}
 									type="text"
 									placeholder="Last name"
 									className="autofill:bg-transparent bg-clip-text outline-none bg-transparent w-full font-montserrat  text-[15px]"
@@ -161,9 +312,7 @@ function ProfileSection(): JSX.Element {
 							Email address
 							<div className="w-full h-[45px] mt-2 bg-[#D1D3DB] rounded-[2rem] p-4 flex items-center ">
 								<input
-									{...register("email", {
-										required: "Email is required",
-									})}
+									{...register("email")}
 									type="text"
 									placeholder="Email address"
 									className="autofill:bg-transparent outline-none bg-transparent font-montserrat w-full text-[15px] bg-clip-text"
@@ -180,9 +329,7 @@ function ProfileSection(): JSX.Element {
 							Workspace name
 							<div className="w-full mt-2 h-[45px] bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
-									{...register("workspace", {
-										required: "Workspace name is required",
-									})}
+									{...register("workspace")}
 									type="text"
 									placeholder="Workspace name"
 									className="autofill:bg-transparent bg-clip-text outline-none bg-transparent w-full font-montserrat text-[15px]"
@@ -203,7 +350,7 @@ function ProfileSection(): JSX.Element {
 								<CustomSelect
 									name="country"
 									control={control}
-									placeholder="Country"
+									placeholder={userDetails.profile.country || "Country"}
 									options={countryList}
 								/>
 							</div>
@@ -217,9 +364,7 @@ function ProfileSection(): JSX.Element {
 							Phone number
 							<div className="w-full h-[45px] mt-2 bg-background rounded-[2rem] p-4 flex items-center ">
 								<input
-									{...register("number", {
-										required: "Phone Number is required",
-									})}
+									{...register("number")}
 									type="text"
 									placeholder="Phone number"
 									className="autofill:bg-transparent bg-clip-text outline-none bg-transparent w-full font-montserrat text-[15px]"
@@ -233,15 +378,14 @@ function ProfileSection(): JSX.Element {
 							)}
 						</div>
 					</div>
-					{!isValid && (
-						<div className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+					{isDirty && isValid ? (
+						<div
+							onClick={onSubmit}
+							className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
 							Save changes
 						</div>
-					)}
-					{isValid && (
-						<div
-							onClick={handleSubmit(onSubmit)}
-							className="w-full font-bold rounded-[2rem] my-8 cursor-pointer text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
+					) : (
+						<div onClick={()=>{toast.warning("Please make some changes to save!")}}  className="w-full font-bold rounded-[2rem] cursor-default  bg-opacity-50  my-8  text-white text-[15px]  mq1000:py-[0.7rem] bg-primary-300 text-center py-[10px]">
 							Save changes
 						</div>
 					)}

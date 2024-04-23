@@ -10,6 +10,7 @@ import axios from 'axios'
 import {toast} from 'sonner'
 import Cookies from 'js-cookie'
 
+
 const schema = z.object({
     businessName: z.string().nonempty("Business name is required"),
     Website: z
@@ -36,7 +37,7 @@ const OnboardingStep2: FunctionComponent = () => {
     });
 
     const Industries = [
-        { value: "Ecommerce", label: "Ecommerce" },
+        { value: "E-commerce", label: "E-commerce" },
         { value: "Sales", label: "Sales" },
         { value: "Enterprise", label: "Enterprise" },
     ];
@@ -44,7 +45,7 @@ const OnboardingStep2: FunctionComponent = () => {
     const onSubmit: SubmitHandler<FieldValues> = async(data) => {
         console.log(data);
         try{
-        const response =  await axios.patch("http://127.0.0.1:8000/api/workspaces/",{
+        const response =  await axios.post("http://127.0.0.1:8000/api/workspaces/",{
             business_name: data.businessName,
             website_url:data.Website,
             industry:data.selectedOption
@@ -55,8 +56,11 @@ const OnboardingStep2: FunctionComponent = () => {
                 'X-CSRFToken': Cookies.get('csrftoken')
             }
         })
-        if(response.status === 201){
+        if(response.status === 200){
             toast.success("Workspace Created Successfully!")
+            setTimeout(()=>{
+                navigate("/chat")
+            },1000)
         }
         }catch(error){
             console.log(error)
