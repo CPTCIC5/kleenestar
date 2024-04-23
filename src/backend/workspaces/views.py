@@ -10,7 +10,7 @@ from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpac
 
 
 class WorkSpacesViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.WorkSpaceViewSetPermissions,)
+    #permission_classes = (permissions.WorkSpaceViewSetPermissions,)
     serializer_class = WorkSpaceSerializer
 
     def get_queryset(self):

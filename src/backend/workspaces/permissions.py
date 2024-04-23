@@ -7,10 +7,10 @@ class WorkSpaceViewSetPermissions:
             return False
 
         if request.method == "POST":
-            #workspaces = request.user.workspace_set.all()
-            return request.user.is_staff #or workspaces[0].subscription_type is not None
+            workspaces = request.user.workspace_set.all()
+            return request.user.is_staff or workspaces[0].subscription_type is not None
 
-        return request.user.is_staff #or workspaces[0].subscription_type is not None
+        return request.user.is_staff or workspaces[0].subscription_type is not None
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
