@@ -54,6 +54,9 @@ class Convo(models.Model):
     def __str__(self):
         return self.title
     
+    class Meta:
+        ordering = ['-id']
+    
 
 
 def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
