@@ -100,6 +100,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({
             });
 
             addConvos(response.data.results);
+            setCurrentConvoId(response.data.results[0].id)
             setInputPrompts([])
         } catch (err) {
             console.error("Error adding chat", err);
