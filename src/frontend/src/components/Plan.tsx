@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 
+
 function Plan({
     price_m,
     plan_name,
@@ -13,6 +14,7 @@ function Plan({
     features: Array<string>;
     current_plan: string;
 }): JSX.Element {
+
     return (
         <>
             {current_plan == plan_name ? (

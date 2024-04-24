@@ -14,6 +14,7 @@ import DeleteChat from "../modals/DeleteChat";
 import ArchiveChats from "../modals/ArchiveChats";
 
 const Chat: FunctionComponent = () => {
+    const updateInputPrompts = useChatStore((state) => state.updateInputPrompts)
     const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
     const [isOpenArchive, setIsOpenArchive] = useState<boolean>(false);
     const convos = useChatStore((state) => state.convos);
@@ -83,10 +84,25 @@ const Chat: FunctionComponent = () => {
             });
             addConvos(response.data.results);
             setCurrentConvoId(response.data.results[0].id);
+            fetchCurrentInputPrompts(response.data.results[0].id)
         } catch (error) {
             console.error("Error fetching convos:", error);
         }
     };
+
+    const fetchCurrentInputPrompts = async(id: number) => {
+        const response = await axios.get(
+					`http://127.0.0.1:8000/api/channels/convos/${id}/prompts/`,
+					{
+						withCredentials: true,
+						headers: {
+							"Content-Type": "application/json",
+							"X-CSRFToken": Cookies.get("csrftoken"),
+						},
+					}
+				)
+        updateInputPrompts(response.data.results)
+    }
 
     useEffect(() => {
         if (!isLoggedIn) return;

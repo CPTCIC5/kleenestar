@@ -39,6 +39,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({
     isOpenDelete,
     setDeleteId,
 }) => {
+    const setInputPrompts = useChatStore((state) => state.setInputPrompts)
     const convos = useChatStore((state) => state.convos);
     const addConvos = useChatStore((state) => state.addConvos);
     const archiveConvo = useChatStore((state) => state.archiveConvo);
@@ -99,6 +100,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({
             });
 
             addConvos(response.data.results);
+            setInputPrompts([])
         } catch (err) {
             console.error("Error adding chat", err);
         }

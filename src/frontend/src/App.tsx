@@ -82,7 +82,7 @@ function App() {
                 title = "";
                 metaDescription = "";
                 break;
-            case "/billing":
+            case "/billings":
                 title = "";
                 metaDescription = "";
                 break;
@@ -120,7 +120,7 @@ function App() {
             <Route path="/password-saved" element={<PasswordSaved />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/channels" element={<ConnectChannels />} />
-            <Route path="/billing" element={<PlanBilling />} />
+            <Route path="/billings" element={<PlanBilling />} />
             <Route path="/settings" element={<Settings />} />
         </Routes>
     );

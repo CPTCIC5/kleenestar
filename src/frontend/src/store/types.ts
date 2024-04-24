@@ -19,13 +19,15 @@ interface InputPrompt {
 }
 
 interface ChatStoreState {
-    convos: Convo[];
-    inputPrompts: InputPrompt[];
-    addConvos: (newConvos: Convo[]) => void;
-    deleteConvo: (id: number) => void;
-    renameConvo: (id: number, newName: string) => void;
-    archiveConvo: (id: number) => void;
-    unarchiveConvo: (id: number) => void;
+	convos: Convo[]
+	inputPrompts: InputPrompt[]
+	addConvos: (newConvos: Convo[]) => void
+	deleteConvo: (id: number) => void
+	renameConvo: (id: number, newName: string) => void
+	archiveConvo: (id: number) => void
+	unarchiveConvo: (id: number) => void
+	updateInputPrompts: (newInputPrompts: InputPrompt[]) => void
+	setInputPrompts: (newInputPrompts: InputPrompt[]) => void
 }
 
 export type { Convo, InputPrompt, ChatStoreState };
