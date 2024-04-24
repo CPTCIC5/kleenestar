@@ -1,14 +1,34 @@
+import axios from "axios";
 import React from "react";
+import Cookies from "js-cookie";
+import useChatStore from "../store/store";
 
 interface DeleteChatProps {
     isOpen: boolean;
     onClose: () => void;
-    id: string;
+    id: number;
 }
 
 const DeleteChat: React.FC<DeleteChatProps> = ({ isOpen, onClose, id }) => {
+    const deleteConvo = useChatStore((state) => state.deleteConvo);
+
+    const handleDeleteChat = async (id: number) => {
+        try {
+            await axios.delete(`http://127.0.0.1:8000/api/channels/convos/${id}/`, {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": Cookies.get("csrftoken"),
+                },
+            });
+            deleteConvo(id);
+        } catch (err) {
+            console.error("Error deleting chat", err);
+        }
+    };
+
     const onDeletion = () => {
-        console.log("Delete chat with id:", id);
+        handleDeleteChat(id);
         onClose();
     };
 

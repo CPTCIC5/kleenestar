@@ -1,8 +1,8 @@
 import {
+    ArchiveRestore,
     CircleHelp,
     Clipboard,
     ImageUp,
-    PencilLine,
     SendHorizonal,
     SquareMenuIcon,
     X,
@@ -10,13 +10,25 @@ import {
 import React, { useRef, useState } from "react";
 import NewChatDisplay from "./NewChatDisplay";
 import { InputPrompt } from "../utils/dummyChatData";
-// import { Convo, InputPrompt, User, Assistant } from "../utils/dummyChatData";
+import axios from "axios";
+import Cookies from "js-cookie";
+import useChatStore from "../store/store";
 
 interface ChatDisplayProps {
     handleHide: () => void;
+    currentConvoId: number;
+    isOpenArchive: boolean;
+    onCloseArchive: (option: boolean) => void;
 }
 
-const ChatDisplay: React.FC<ChatDisplayProps> = ({ handleHide }) => {
+const ChatDisplay: React.FC<ChatDisplayProps> = ({
+    handleHide,
+    currentConvoId,
+    isOpenArchive,
+    onCloseArchive,
+}) => {
+    const convos = useChatStore((state) => state.convos);
+    const renameConvo = useChatStore((state) => state.renameConvo);
     const [Data, setData] = useState(InputPrompt);
     const [text, setText] = useState("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -39,10 +51,33 @@ const ChatDisplay: React.FC<ChatDisplayProps> = ({ handleHide }) => {
         setUploadedFiles(null);
     };
 
+    const handleRenameChat = async (id: number, newName: string) => {
+        try {
+            await axios.patch(
+                `http://127.0.0.1:8000/api/channels/convos/${id}/`,
+                {
+                    title: newName,
+                },
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": Cookies.get("csrftoken"),
+                    },
+                },
+            );
+            renameConvo(id, newName);
+            console.log(convos);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleClick = () => {
         if (isEditing) {
             if (newName.trim() !== "") {
                 setButtonText(newName);
+                handleRenameChat(currentConvoId, newName);
             }
             setIsEditing(false);
         } else {
@@ -62,7 +97,10 @@ const ChatDisplay: React.FC<ChatDisplayProps> = ({ handleHide }) => {
     return (
         <div className="h-screen w-full  flex flex-col relative justify-between flex-1">
             <div className="w-full h-[56px] mb-[6px] p-[8px] px-[15px] flex justify-between items-center">
-                <SquareMenuIcon onClick={handleHide} className="w-[25px] h-[25px] " />
+                <SquareMenuIcon
+                    onClick={handleHide}
+                    className="w-[25px] h-[25px] text-primary-300"
+                />
                 <div className="overflow-hidden h-[56px] w-full mx-[30px]">
                     {isEditing ? (
                         <input
@@ -88,7 +126,10 @@ const ChatDisplay: React.FC<ChatDisplayProps> = ({ handleHide }) => {
                         </button>
                     )}
                 </div>
-                <PencilLine className="w-[25px] h-[25px]" />
+                <ArchiveRestore
+                    onClick={() => onCloseArchive(isOpenArchive)}
+                    className="w-[25px] h-[25px] text-primary-300"
+                />
             </div>
             {/* Chat Header */}
             <section className="w-full h-full flex flex-col items-center px-[8px]   overflow-auto">
