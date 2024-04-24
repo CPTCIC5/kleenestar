@@ -1,15 +1,74 @@
 import { ArchiveRestore, CircleX, Trash2 } from "lucide-react";
-import React from "react";
-import archiveChats from "../utils/dummyArchiveChats.json";
+import React, { useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import useChatStore from "../store/store";
 
 interface ArchiveChatsProps {
-    // define your props here
     isOpen: boolean;
     onClose: (option: boolean) => void;
+    isOpenDelete: boolean;
+    onCloseDelete: (option: boolean) => void;
+    setDeleteId: (id: number) => void;
 }
 
-const ArchiveChats: React.FC<ArchiveChatsProps> = ({ isOpen, onClose }) => {
-    const chats = archiveChats.chat;
+interface Chat {
+    id: number;
+    created_at: string;
+    title: string;
+}
+
+const ArchiveChats: React.FC<ArchiveChatsProps> = ({
+    isOpen,
+    onClose,
+    isOpenDelete,
+    onCloseDelete,
+    setDeleteId,
+}) => {
+    const convos = useChatStore((state) => state.convos);
+    const unarchiveConvo = useChatStore((state) => state.unarchiveConvo);
+    const [chats, setChats] = React.useState<Chat[]>([]);
+
+    useEffect(() => {
+        const archivedConvos = convos.filter((convo) => convo.archived);
+
+        const formattedConvos = archivedConvos.map((convo) => {
+            const date = new Date(convo.created_at);
+            const options = { year: "numeric", month: "long", day: "numeric" } as const;
+            const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
+
+            return {
+                id: convo.id,
+                created_at: formattedDate,
+                title: convo.title,
+            };
+        });
+
+        setChats(formattedConvos);
+    }, [convos]);
+
+    const handleUnarchiveChat = async (id: number) => {
+        try {
+            await axios.patch(
+                `http://127.0.0.1:8000/api/channels/convos/${id}/`,
+                {
+                    archived: false,
+                },
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": Cookies.get("csrftoken"),
+                    },
+                },
+            );
+            unarchiveConvo(id);
+            console.log(convos);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <>
             {isOpen ? (
@@ -38,23 +97,37 @@ const ArchiveChats: React.FC<ArchiveChatsProps> = ({ isOpen, onClose }) => {
                             </div>
                             <div className="w-full h-full flex flex-col justify-between mq551:px-4 mq551:items-center">
                                 <div className="max-w-[388.62px] w-full flex flex-col gap-[18px]">
-                                    {chats.map((chat) => {
+                                    {chats.map((convo) => {
                                         return (
-                                            <div className="w-full flex flex-col gap-[10.5px] bg-white rounded-3xl p-[17.75px] pl-[18.19px]">
+                                            <div
+                                                key={convo.id}
+                                                className="w-full flex flex-col gap-[10.5px] bg-white rounded-3xl p-[17.75px] pl-[18.19px]"
+                                            >
                                                 <span className="font-montserrat font-[600] text-[15px] leading-[18.29px] text-primary-300">
-                                                    {chat.title}
+                                                    {convo.title}
                                                 </span>
                                                 <div className="flex items-start justify-between">
                                                     <span className="font-montserrat font-[400] text-[15px] leading-[18.29px] text-primary-300 mr-[15px]">
-                                                        {chat.date}
+                                                        {convo.created_at}
                                                     </span>
 
                                                     <div className="flex justify-between max-w-[70.68px] w-full">
                                                         <div className="rounded-full h-[26px] py-[3px] px-[1px] mr-[10px]  hover:bg-primary-300 hover:bg-opacity-25">
-                                                            <ArchiveRestore className="h-[20px] bg-transparent text-primary-300   " />
+                                                            <ArchiveRestore
+                                                                onClick={() =>
+                                                                    handleUnarchiveChat(convo.id)
+                                                                }
+                                                                className="h-[20px] bg-transparent text-primary-300   "
+                                                            />
                                                         </div>
                                                         <div className="rounded-full h-[26px] py-[3px] px-[1px] hover:bg-orangered-200 hover:bg-opacity-25">
-                                                            <Trash2 className="h-[20px] bg-transparent text-orangered-200  " />
+                                                            <Trash2
+                                                                onClick={() => {
+                                                                    setDeleteId(convo.id);
+                                                                    onCloseDelete(isOpenDelete);
+                                                                }}
+                                                                className="h-[20px] bg-transparent text-orangered-200  "
+                                                            />
                                                         </div>
                                                     </div>
                                                 </div>
