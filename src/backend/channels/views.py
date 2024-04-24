@@ -92,7 +92,7 @@ class PromptViewSet(viewsets.ModelViewSet):
         convo = get_object_or_404(models.Convo, id=convo_id)
         #n1=models.Prompt.objects.filter(convo=convo)
         #return models.Prompt.objects.filter(convo=convo)
-        print(convo.prompt_set.all())
+        #print(convo.prompt_set.all())
         return convo.prompt_set.all()  # Return prompts associated with the 
     
     def create(self, request, *args, **kwargs):
@@ -115,9 +115,8 @@ class PromptViewSet(viewsets.ModelViewSet):
     
     def destroy(self, request, *args, **kwargs):
         instance= self.get_object()
-        print(instance)
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=("POST",) ,detail=True, url_path="feedback")
     def prompt_feedback_upload(self,request,pk):

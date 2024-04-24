@@ -32,7 +32,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('convos/<int:pk>/prompts/',PromptViewSet.as_view({'get': 'list'}), name='convo-prompts-list'),
     path('convos/<int:pk>/prompts/create/', PromptViewSet.as_view({'post': 'create'}), name='create-prompt'),
-    path('prompts/<int:pk>/update/', PromptViewSet.as_view({'put': 'update'}), name='update-prompt'),
+    path('prompts/<int:pk>/update/', PromptViewSet.as_view({'patch': 'update'}), name='update-prompt'),
     path('prompts/<int:pk>/delete/', PromptViewSet.as_view({'delete': 'destroy'}), name='delete-prompt'),
 
 
