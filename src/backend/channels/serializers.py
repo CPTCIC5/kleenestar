@@ -53,7 +53,7 @@ class PromptSerializer(serializers.ModelSerializer):
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PromptFeedback
-        fields = ['note']
+        fields = ['category','note']
 
 
 """
