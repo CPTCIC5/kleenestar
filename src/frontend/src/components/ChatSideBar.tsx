@@ -19,7 +19,6 @@ import Cookies from "js-cookie"
 import useChatStore from "../store/store"
 
 interface ChatSideBarProps {
-	workspace: string
 	userDetails: {
 		id: string
 		first_name: string
@@ -37,7 +36,6 @@ interface ChatSideBarProps {
 }
 
 const ChatSideBar: React.FC<ChatSideBarProps> = ({
-	workspace,
 	userDetails,
 	SideBar,
 	handleHide,
@@ -247,7 +245,7 @@ const ChatSideBar: React.FC<ChatSideBarProps> = ({
 						/>
 					</div>
 					<span className="w-[156.02px] mq750:text-[20px] font-syne text-white font-[700] text-[25px] leading-[30px]">
-						{workspace}
+						{convos[0]?.workspace?.business_name}
 					</span>
 				</div>
 				<SquarePen

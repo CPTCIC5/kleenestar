@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import { toast } from "sonner"
 import Cookies from 'js-cookie'
+import useChatStore from "../store/store"
 
 interface InviteTeamProps {
 	// define your props here
@@ -18,19 +19,21 @@ interface InviteTeamProps {
 const schema = z.object({
 	email: z.string().email({ message: "Invalid Email Address" }),
 })
-const current_workspace = 1
+
 
 type FormFields = z.infer<typeof schema>
 const InviteTeam: React.FC<InviteTeamProps> = ({ isOpen, onClose }) => {
+	const convos = useChatStore((state) => state.convos);
 	const sendEmailInvite: SubmitHandler<FormFields> = async (data) => {
-		console.log(Cookies.get("csrftoken"))
+		console.log(convos[0]?.workspace?.id)
 		try {
 			await axios.post(
-				`http://127.0.0.1:8000/api/workspaces/${current_workspace}/create-invite/`,
+				`http://127.0.0.1:8000/api/workspaces/${convos[0]?.workspace?.id}/create-invite/`,
 				{
 					email: data.email,
 				},
-				{	withCredentials: true,
+				{
+					withCredentials: true,
 					headers: {
 						"Content-Type": "application/json",
 						"X-CSRFToken": Cookies.get("csrftoken"),

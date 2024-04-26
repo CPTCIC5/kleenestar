@@ -1,10 +1,16 @@
+interface Workspace {
+	business_name: string
+	id: number
+	industry: string
+}
+
 interface Convo {
-    id: number;
-    assitant_id: string;
-    workspace: object;
-    title: string;
-    created_at: string;
-    archived: boolean;
+	id: number
+	assitant_id: string
+	workspace: Workspace
+	title: string
+	created_at: string
+	archived: boolean
 }
 
 interface InputPrompt {

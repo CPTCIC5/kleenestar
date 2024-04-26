@@ -14,7 +14,6 @@ import DeleteChat from "../modals/DeleteChat";
 import ArchiveChats from "../modals/ArchiveChats";
 
 const Chat: FunctionComponent = () => {
-    const [workspace, setWorkspace] = useState("")
     const updateInputPrompts = useChatStore((state) => state.updateInputPrompts)
     const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
     const [isOpenArchive, setIsOpenArchive] = useState<boolean>(false);
@@ -69,7 +68,6 @@ const Chat: FunctionComponent = () => {
                     },
                 });
                 setIsLoggedIn(true);
-                setWorkspace(response.data[0].business_name)
                 setUserDetails(response.data[0].root_user);
             } catch (err) {
                 console.error(err);
@@ -147,7 +145,6 @@ const Chat: FunctionComponent = () => {
     return (
         <div className="h-screen flex overflow-hidden">
             <ChatSideBar
-                workspace={workspace}
                 userDetails={userDetails}
                 SideBar={SideBar}
                 handleHide={handleHide}
