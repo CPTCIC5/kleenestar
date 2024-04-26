@@ -1,10 +1,10 @@
 import ChangePasswordSection from "../components/ChangePasswordSection"
 import ProfileSection from "../components/ProfileSection"
-import SlideSwitch from "../components/SlideSwitch"
+// import SlideSwitch from "../components/SlideSwitch"
 import {CircleArrowLeft } from "lucide-react"
 import { FolderClosed } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import CustomSelect from "../components/CustomSelect"
+// import CustomSelect from "../components/CustomSelect"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import Cookies from 'js-cookie'
 import {toast} from 'sonner'
@@ -59,26 +59,26 @@ function Settings(): JSX.Element {
 		}
 			
 	}
-	const reasonsToDeleteAccount = [
-		{
-			label: "Found a better platform/service",
-			value: "Found a better platform/service",
-		},
-		{
-			label: "No longer need the account/service",
-			value: "No longer need the account/service",
-		},
-		{
-			label: "Dissatisfaction with the platform/service",
-			value: "Dissatisfaction with the platform/service",
-		},
-		{
-			label: "Simplifying digital footprint",
-			value: "Simplifying digital footprint",
-		},
-	]
+	// const reasonsToDeleteAccount = [
+	// 	{
+	// 		label: "Found a better platform/service",
+	// 		value: "Found a better platform/service",
+	// 	},
+	// 	{
+	// 		label: "No longer need the account/service",
+	// 		value: "No longer need the account/service",
+	// 	},
+	// 	{
+	// 		label: "Dissatisfaction with the platform/service",
+	// 		value: "Dissatisfaction with the platform/service",
+	// 	},
+	// 	{
+	// 		label: "Simplifying digital footprint",
+	// 		value: "Simplifying digital footprint",
+	// 	},
+	// ]
     const {
-			control,
+			// control,
 			handleSubmit
 		} = useForm({
 			mode: "onChange",
@@ -139,10 +139,10 @@ function Settings(): JSX.Element {
 				</div>
 			</div>
 			<div className="w-[90%] gap-[5%] relative top-10 mq1000:top-[139px] mx-auto mq1000:flex-col flex">
-				<ProfileSection  />
+				<ProfileSection/>
 				<div className="w-[50%] mq1000:w-[95%] mq1000:mx-auto mq1000:mt-10 flex-col ">
 					<ChangePasswordSection />
-					<div className="bg-white rounded-[2rem] h-fit  mt-4 ">
+					{/* <div className="bg-white rounded-[2rem] h-fit  mt-4 ">
 						<div className="text-primary-300 font-montserrat pt-2 pl-8 pb-4 my-4 ">
 							<div className=" font-bold pr-10 mq1000:pr-4 text-[16px]   flex justify-between my-4">
 								Google Authenticator
@@ -163,7 +163,7 @@ function Settings(): JSX.Element {
 								password.
 							</p>
 						</div>
-					</div>
+					</div> */}
 					<div className="bg-white rounded-[2rem] h-fit mt-4 "></div>
 				</div>
 			</div>
@@ -176,7 +176,7 @@ function Settings(): JSX.Element {
 						This cannot be undone. 😱
 					</p>
 					<div className="flex justify-between items-center pr-4 py-4 mq1000:flex-col">
-						<div className="w-[60%]  mq1000:w-full text-primary-300 font-bold text-xl">
+						{/* <div className="w-[60%]  mq1000:w-full text-primary-300 font-bold text-xl">
 							<div className="relative w-full h-[45px] flex items-center mt-2">
 								<CustomSelect
 									name="deleteReason"
@@ -185,7 +185,7 @@ function Settings(): JSX.Element {
 									options={reasonsToDeleteAccount}
 								/>
 							</div>
-						</div>
+						</div> */}
 						<div
 							onClick={handleSubmit(onSubmit)}
 							className="border-2 items-center flex whitespace-nowrap text-[15px] mq1000:mt-4 mq1000:py-[0.5rem] mq1000:px-14 hover:text-white hover:bg-red-500 cursor-pointer w-fit px-10 rounded-[2rem] py-[10px] border-solid border-red-500 text-red-500">

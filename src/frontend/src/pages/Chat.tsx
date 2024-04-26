@@ -14,6 +14,7 @@ import DeleteChat from "../modals/DeleteChat";
 import ArchiveChats from "../modals/ArchiveChats";
 
 const Chat: FunctionComponent = () => {
+    const [workspace, setWorkspace] = useState("")
     const updateInputPrompts = useChatStore((state) => state.updateInputPrompts)
     const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
     const [isOpenArchive, setIsOpenArchive] = useState<boolean>(false);
@@ -24,14 +25,18 @@ const Chat: FunctionComponent = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userDetails, setUserDetails] = useState<{
-        id: string;
-        profile: { country: string };
-    }>({
-        id: "",
-        profile: {
-            country: "",
-        },
-    });
+			id: string
+			first_name: string
+			last_name: string
+			profile: { country: string }
+		}>({
+			id: "",
+			first_name: "",
+			last_name: "",
+			profile: {
+				country: "",
+			},
+		})
 
     const onCloseDelete = (option: boolean) => {
         setIsOpenDelete(!option);
@@ -64,6 +69,7 @@ const Chat: FunctionComponent = () => {
                     },
                 });
                 setIsLoggedIn(true);
+                setWorkspace(response.data[0].business_name)
                 setUserDetails(response.data[0].root_user);
             } catch (err) {
                 console.error(err);
@@ -72,7 +78,7 @@ const Chat: FunctionComponent = () => {
         };
         fetchWorkspaceDetails();
     }, [navigate]);
-
+    console.log(userDetails)
     const fetchConvos = async () => {
         try {
             const response = await axios.get("http://127.0.0.1:8000/api/channels/convos/", {
@@ -141,6 +147,8 @@ const Chat: FunctionComponent = () => {
     return (
         <div className="h-screen flex overflow-hidden">
             <ChatSideBar
+                workspace={workspace}
+                userDetails={userDetails}
                 SideBar={SideBar}
                 handleHide={handleHide}
                 setInviteOpen={setInviteOpen}
@@ -154,7 +162,7 @@ const Chat: FunctionComponent = () => {
                 handleHide={handleHide}
                 currentConvoId={currentConvoId}
                 onCloseArchive={onCloseArchive}
-                isOpenArchive={isOpenArchive}
+                isOpenArchive={isOpenArchive}                
             />
             <InviteTeam isOpen={inviteOpen} onClose={setInviteOpen} />
 
