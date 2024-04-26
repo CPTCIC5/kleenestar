@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from workspaces.serializers import WorkSpaceSerializer
-from users.models import User
+from users.serializers import UserSerializer
 from . import models
 
 
@@ -53,7 +53,20 @@ class PromptSerializer(serializers.ModelSerializer):
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PromptFeedback
-        fields = ['note']
+        fields = ('category','note')
+
+
+
+class CreateBlockNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.BlockNote
+        fields = ("title","image")
+
+class BlockNoteSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = models.BlockNote
+        fields = ("user","title","image","created_at")
 
 
 """

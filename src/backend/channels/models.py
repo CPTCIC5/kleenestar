@@ -146,17 +146,27 @@ class Prompt(models.Model):
     def __str__(self):
         return str(self.author)
 
-"""
+
 class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    title=  models.CharField(max_length=50,default=user.first_name)
-    image= models.ImageField(upload_to='BlockNote',default='xyz.jpeg')
-    created_at =  models.IPAddressField
-"""
+    title=  models.CharField(max_length=50)
+    image= models.ImageField(upload_to='BlockNote',blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.title
+
+
+CATEGORY  = (
+        ("1","Don't like the style"),
+        ("2","Not factually correct"),
+        ("3", "Being Lazy"),
+        ("4","Other")
+    )
 class PromptFeedback(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     prompt = models.ForeignKey(Prompt,on_delete=models.CASCADE)
+    category = models.CharField(max_length=60,choices=CATEGORY)
     note = models.TextField()
 
     def __str__(self):

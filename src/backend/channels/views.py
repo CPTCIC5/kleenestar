@@ -135,3 +135,40 @@ class PromptFeedbackView(views.APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 """
+
+
+class BlockNoteViewSet(viewsets.ModelViewSet):
+    queryset = models.BlockNote.objects.all()
+    serializer_class = serializers.BlockNoteSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        filter = models.BlockNote.objects.filter(user=self.request.user)
+        return filter
+    
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.CreateBlockNoteSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data,headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance= self.get_object()
+        print(instance)
+        serializer = serializers.CreateBlockNoteSerializer(
+            instance,
+            data=request.data,
+            partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance= self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

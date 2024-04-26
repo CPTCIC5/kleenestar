@@ -18,11 +18,13 @@ urlpatterns = [
 
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
-from .views import ConvoViewSet, PromptViewSet, ChannelViewSet
+from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet
 
 router = DefaultRouter()
-
 # Register viewsets with the router
+
+
+router.register(r'blocknotes', BlockNoteViewSet, basename='blocknote')
 router.register(r'convos', ConvoViewSet, basename='convos')
 router.register(r'promptinputs', PromptViewSet, basename='prompt')
 router.register(r'', ChannelViewSet, basename='channels')
