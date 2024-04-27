@@ -11,12 +11,18 @@ charset-normalizer==3.3.2
 cryptography==42.0.5
 curlify==2.2.1
 dataclasses-json==0.6.4
+datetime-truncate==1.1.1
 defusedxml==0.7.1
 distro==1.9.0
 Django==5.0.2
+django-admin-charts==1.3.1
 django-allauth==0.61.1
+django-bower==5.2.0
 django-cors-headers==4.3.1
 django-countries==7.5.1
+django-memoize==2.3.1
+django-multiselectfield==0.1.12
+django-nvd3==0.10.1
 django-rest-passwordreset==1.4.0
 djangorestframework==3.14.0
 facebook_business==19.0.2
@@ -32,6 +38,7 @@ h11==0.14.0
 httpcore==1.0.4
 httpx==0.27.0
 idna==3.6
+Jinja2==3.1.3
 jsonpatch==1.33
 jsonpointer==2.4
 langchain==0.1.16
@@ -42,6 +49,7 @@ langchain-pinecone==0.1.0
 langchain-text-splitters==0.0.1
 langsmith==0.1.51
 linkedin-api-client==0.3.0
+MarkupSafe==2.1.5
 marshmallow==3.21.1
 multidict==6.0.5
 mypy-extensions==1.0.0
@@ -65,6 +73,8 @@ pydantic_core==2.16.3
 PyJWT==2.8.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+python-nvd3==0.16.0
+python-slugify==8.0.4
 python3-openid==3.2.0
 pytz==2024.1
 PyYAML==6.0.1
@@ -77,6 +87,7 @@ sniffio==1.3.1
 SQLAlchemy==2.0.29
 sqlparse==0.4.4
 tenacity==8.2.3
+text-unidecode==1.3
 tiktoken==0.6.0
 tqdm==4.66.2
 twitter-ads==11.0.0
