@@ -42,7 +42,12 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_admin_logs',
 ]
+
+DJANGO_ADMIN_LOGS_DELETABLE = False
+DJANGO_ADMIN_LOGS_ENABLED = True
+
 
 SITE_ID = 1
 SOCIALACCOUNT_LOGIN_ON_GET=True
