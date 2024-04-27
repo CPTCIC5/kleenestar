@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('admin_tools_stats/', include('admin_tools_stats.urls')),
     path("api/auth/", include("users.urls")),
     path('api/auth/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path("", include("allauth.urls")),
