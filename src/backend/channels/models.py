@@ -44,6 +44,16 @@ class Channel(models.Model):
         return "xyz"
 
 
+class BlockNote(models.Model):
+    user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    title=  models.CharField(max_length=50)
+    image= models.ImageField(upload_to='BlockNote',blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Convo(models.Model):
     assistant_id = models.CharField(max_length=100,blank=True,null=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
@@ -129,6 +139,7 @@ class Prompt(models.Model):
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
+    blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -145,16 +156,6 @@ class Prompt(models.Model):
 
     def __str__(self):
         return str(self.author)
-
-
-class BlockNote(models.Model):
-    user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    title=  models.CharField(max_length=50)
-    image= models.ImageField(upload_to='BlockNote',blank=True)
-    created_at =  models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
 
 
 CATEGORY  = (
