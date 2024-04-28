@@ -1,11 +1,38 @@
-from langchain_community.document_loaders import JSONLoader
-import json
 import requests
-from pathlib import Path
-from pprint import pprint
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_text_splitters import RecursiveJsonSplitter
+
+
+load_dotenv()
+
+API_URL = "http://127.0.0.1:8000/api/workspaces/"
 
 def get_workspace():
-    #file_path=requests.get("",headers={"sessionid":,"X-CSRFToken":"zZAzJ7omDS63g9gRV7ELeIADEoZZZzb2"})
-    file_path = requests.get("http://127.0.0.1:8000/api/workspaces",auth=("aryanjainak@gmail.com","Iamreal@123"))
-    print(file_path.text)
-    #data = json.loads((file_path).read_text())
+    response = requests.get(API_URL, auth=("aryanjainak@gmail.com","Iamreal@123"))
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print("Failed to fetch data:", response.status_code)
+        return None
+
+def main():
+    workspace_data = get_workspace()
+    if workspace_data:
+        # Assuming workspace_data should be an array of documents.
+        embeddings_model = OpenAIEmbeddings()
+        embeddings = embeddings_model.embed_documents(str(workspace_data))
+        #print(embeddings)
+        splitter = RecursiveJsonSplitter(max_chunk_size=300)
+        texts = splitter.split_text(json_data=splitter)
+        #print('dvsywijdh')
+        vectorstore = Chroma.from_documents(documents=texts, embedding=OpenAIEmbeddings())
+        retriever = vectorstore.as_retriever()
+
+        docs = retriever.get_relevant_documents("What is the name of my workspace?")
+    else:
+        pass
+
+if __name__ == "__main__":
+    main()
