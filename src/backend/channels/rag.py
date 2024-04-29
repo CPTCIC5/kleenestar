@@ -2,8 +2,9 @@ import requests
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
+from langchain_community.document_loaders import JSONLoader
 from langchain_text_splitters import RecursiveJsonSplitter
-
+import json
 
 load_dotenv()
 
@@ -19,20 +20,25 @@ def get_workspace():
 
 def main():
     workspace_data = get_workspace()
-    if workspace_data:
-        # Assuming workspace_data should be an array of documents.
-        embeddings_model = OpenAIEmbeddings()
-        embeddings = embeddings_model.embed_documents(str(workspace_data))
-        #print(embeddings)
-        splitter = RecursiveJsonSplitter(max_chunk_size=300)
-        texts = splitter.split_text(json_data=splitter)
-        #print('dvsywijdh')
-        vectorstore = Chroma.from_documents(documents=texts, embedding=OpenAIEmbeddings())
-        retriever = vectorstore.as_retriever()
+    embeddings_model = OpenAIEmbeddings()
+    """
+    splitter = RecursiveJsonSplitter(max_chunk_size=300)
+    json_chunks = splitter.split_json(json_data=workspace_data)
+    print(json_chunks,'efef')
+    
+    loader = JSONLoader(
+    file_path=workspace_data,
+    jq_schema='.messages[].content',
+)
+    data = loader.load()
+    """
+    embeddings = embeddings_model.embed_documents(str(workspace_data))
+    print(embeddings)
+    vectorstore = Chroma.from_documents(embeddings, embedding=OpenAIEmbeddings())
+    retriever = vectorstore.as_retriever()
+    docs = retriever.get_relevant_documents("What is the name of my workspace?")
 
-        docs = retriever.get_relevant_documents("What is the name of my workspace?")
-    else:
-        pass
+
 
 if __name__ == "__main__":
     main()
