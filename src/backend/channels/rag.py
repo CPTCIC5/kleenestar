@@ -29,11 +29,10 @@ def main():
     loader = JSONLoader(
     file_path=workspace_data,
     jq_schema='.messages[].content',
-)
+    )
     data = loader.load()
     """
     embeddings = embeddings_model.embed_documents(str(workspace_data))
-    print(embeddings)
     vectorstore = Chroma.from_documents(embeddings, embedding=OpenAIEmbeddings())
     retriever = vectorstore.as_retriever()
     docs = retriever.get_relevant_documents("What is the name of my workspace?")
