@@ -1,10 +1,8 @@
 import requests
 from dotenv import load_dotenv
+import json
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import JSONLoader
-from langchain_text_splitters import RecursiveJsonSplitter
-import json
 
 load_dotenv()
 
@@ -25,18 +23,15 @@ def main():
     splitter = RecursiveJsonSplitter(max_chunk_size=300)
     json_chunks = splitter.split_json(json_data=workspace_data)
     print(json_chunks,'efef')
-    
-    loader = JSONLoader(
-    file_path=workspace_data,
-    jq_schema='.messages[].content',
-    )
-    data = loader.load()
     """
-    embeddings = embeddings_model.embed_documents(str(workspace_data))
+    loader = json.loads(str(workspace_data))
+    print(loader,'xyz')
+    data = loader.load()
+    print(data)
+    embeddings = embeddings_model.embed_documents(data)
     vectorstore = Chroma.from_documents(embeddings, embedding=OpenAIEmbeddings())
     retriever = vectorstore.as_retriever()
     docs = retriever.get_relevant_documents("What is the name of my workspace?")
-
 
 
 if __name__ == "__main__":
