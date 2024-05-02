@@ -138,7 +138,7 @@ class Prompt(models.Model):
     file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
-    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
+    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
     blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
