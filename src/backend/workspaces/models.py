@@ -38,24 +38,29 @@ class WorkSpace(models.Model):
 
     @property
     def monthly_bill(self):
-        #total users in a workspace
         total_count = self.users.all().count()
 
-        if self.subscription_type == 1:
-            if total_count > 6:
-                extra_users = total_count - 6
-                return (extra_users * 20) + 69
+        if self.subscription_type == 1:  # Pro
+            base_cost = 69
+            user_limit = 6
+            extra_user_rate = 20
+            if total_count > user_limit:
+                extra_users = total_count - user_limit
+                return base_cost + (extra_users * extra_user_rate)
             else:
-                return 69
-            
-        elif self.subscription_type == 2:
-            if total_count > 11:
-                extra_users = total_count - 11
-                return (extra_users * 15) + 169
+                return base_cost
+
+        elif self.subscription_type == 2:  # Scale
+            base_cost = 169
+            user_limit = 11
+            extra_user_rate = 15
+            if total_count > user_limit:
+                extra_users = total_count - user_limit
+                return base_cost + (extra_users * extra_user_rate)
             else:
-                return 169
-            
-        elif self.subscription_type == 3:
+                return base_cost
+
+        elif self.subscription_type == 3:  # Enterprise
             return 800
         
         else:
