@@ -64,6 +64,7 @@ class WorkSpaceInvite(models.Model):
     accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
+    """
     def save(self, *args, **kwargs):
         if self.workspace.subscription_type == 1:
             # Check if inviting more than 5 members
@@ -78,6 +79,7 @@ class WorkSpaceInvite(models.Model):
             
         # Call the superclass save method if no validation error is raised
         super().save(*args, **kwargs)
+    """
 
 
     def __str__(self):
