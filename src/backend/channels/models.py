@@ -4,6 +4,7 @@ from django.conf import settings
 from dotenv import load_dotenv
 from openai import OpenAI
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 load_dotenv()
 
@@ -35,6 +36,22 @@ class Channel(models.Model):
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def save(self, *args, **kwargs):
+
+        # Check the subscription type of the workspace
+        if self.workspace.subscription_type == 1:  # Pro
+            # Check if the workspace already has 3 channels
+            if Channel.objects.filter(workspace=self.workspace).count() >= 3:
+                raise ValidationError("Pro workspace can have only up to 3 channels.")
+
+        elif self.workspace.subscription_type == 2:  # Scale
+            # Check if the workspace already has 5 channels
+            if Channel.objects.filter(workspace=self.workspace).count() >= 5:
+                raise ValidationError("Scale workspace can have only up to 5 channels.")
+        # Call the superclass save method if no validation error is raised
+        super().save(*args, **kwargs)
 
 
     class Meta:

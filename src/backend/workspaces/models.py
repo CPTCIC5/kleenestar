@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 
@@ -62,6 +63,22 @@ class WorkSpaceInvite(models.Model):
     email = models.EmailField(null=True, blank=True)
     accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        if self.workspace.subscription_type == 1:
+            # Check if inviting more than 5 members
+            if self.workspace.users.count() >= 6:
+                raise ValidationError("Pro workspace can only invite up to 5 members.")
+
+        # Check if workspace's subscription type is Scale (2)
+        elif self.workspace.subscription_type == 2:
+            # Check if inviting more than 10 members
+            if self.workspace.users.count() >= 11:
+                raise ValidationError("Scale workspace can only invite up to 10 members.")
+            
+        # Call the superclass save method if no validation error is raised
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return str(self.workspace)
