@@ -36,6 +36,32 @@ class WorkSpace(models.Model):
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def monthly_bill(self):
+        #total users in a workspace
+        total_count = self.users.all().count()
+
+        if self.subscription_type == 1:
+            if total_count > 6:
+                extra_users = total_count - 6
+                return (extra_users * 20) + 69
+            else:
+                return 69
+            
+        elif self.subscription_type == 2:
+            if total_count > 11:
+                extra_users = total_count - 11
+                return (extra_users * 15) + 169
+            else:
+                return 169
+            
+        elif self.subscription_type == 3:
+            return 800
+        
+        else:
+            return 0
+
+
     def __str__(self):
         return self.business_name
 
