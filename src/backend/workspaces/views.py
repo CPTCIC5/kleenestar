@@ -17,12 +17,14 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
         # All the workspaces the request user is a member of
         return self.request.user.workspace_set.all()
     
+    """
     def get_permissions(self):
         # Override permissions based on the action being performed
         if self.action == 'create':  # Bypass permissions for 'create' action
             return []
         else:
             return [permissions.WorkSpaceViewSetPermissions()]  # Apply default permissions for other actions
+    """
 
     def create(self, request, *args, **kwargs):
         serializer = WorkSpaceCreateSerializer(data=request.data)
