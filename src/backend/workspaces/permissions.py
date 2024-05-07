@@ -1,26 +1,14 @@
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-
-class WorkSpaceViewSetPermissions:
+class WorkSpaceViewSetPermissions(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_anonymous:
-            return False
-
         if request.method == "POST":
-            workspaces = request.user.workspace_set.all()
-            return request.user.is_staff or workspaces[0].subscription_type is not None
-
-        return request.user.is_staff or workspaces[0].subscription_type is not None
+            # Allow workspace creation for authenticated users
+            return request.user.is_authenticated
+        return True
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
-            return (
-                obj.users.contains(
-                    request.user
-                )  # check if the user is a member of that workspace
-                or obj.root_user == request.user
-                or request.user.is_staff
-            )
-
-        else:
-            return obj.root_user == request.user or request.user.is_staff
+            # Allow safe methods (GET, HEAD, OPTIONS) for workspace members or staff
+            return obj.users.filter(id=request.user.id).exists() or obj.root_user == request.user or request.user.is_staff
+        return obj.root_user == request.user or request.user.is_staff

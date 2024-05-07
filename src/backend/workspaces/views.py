@@ -10,7 +10,8 @@ from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpac
 
 
 class WorkSpacesViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.WorkSpaceViewSetPermissions,)
+    #permission_classes = (permissions.WorkSpaceViewSetPermissions,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = WorkSpaceSerializer
 
     def get_queryset(self):
@@ -18,12 +19,6 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
         return self.request.user.workspace_set.all()
     
     
-    def get_permissions(self):
-        # Override permissions based on the action being performed
-        if self.action == 'create':  # Bypass permissions for 'create' action
-            return []
-        else:
-            return [permissions.WorkSpaceViewSetPermissions()]  # Apply default permissions for other actions
     
 
     def create(self, request, *args, **kwargs):
