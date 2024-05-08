@@ -34,13 +34,25 @@ class ConvoSerializer(serializers.ModelSerializer):
     workspace = WorkSpaceSerializer()
     class Meta:
         model = models.Convo
-        fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')
+        fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')        
+
+
+class CreateBlockNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.BlockNote
+        fields = ("title","image")
+
+class BlockNoteSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = models.BlockNote
+        fields = ("user","title","image","created_at")
+
 
 class PromptCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
-        fields = ("text_query","file_query")
-
+        fields = ("text_query","file_query","blocknote")
 
 
 class PromptSerializer(serializers.ModelSerializer):
@@ -55,18 +67,6 @@ class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
         model = models.PromptFeedback
         fields = ('category','note')
 
-
-
-class CreateBlockNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.BlockNote
-        fields = ("title","image")
-
-class BlockNoteSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    class Meta:
-        model = models.BlockNote
-        fields = ("user","title","image","created_at")
 
 
 """

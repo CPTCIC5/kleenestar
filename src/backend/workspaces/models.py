@@ -1,5 +1,6 @@
 from django.db import models, transaction
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 
@@ -35,6 +36,37 @@ class WorkSpace(models.Model):
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def monthly_bill(self):
+        total_count = self.users.all().count()
+
+        if self.subscription_type == 1:  # Pro
+            base_cost = 69
+            user_limit = 6
+            extra_user_rate = 20
+            if total_count > user_limit:
+                extra_users = total_count - user_limit
+                return base_cost + (extra_users * extra_user_rate)
+            else:
+                return base_cost
+
+        elif self.subscription_type == 2:  # Scale
+            base_cost = 169
+            user_limit = 11
+            extra_user_rate = 15
+            if total_count > user_limit:
+                extra_users = total_count - user_limit
+                return base_cost + (extra_users * extra_user_rate)
+            else:
+                return base_cost
+
+        elif self.subscription_type == 3:  # Enterprise
+            return 800
+        
+        else:
+            return 0
+
+
     def __str__(self):
         return self.business_name
 
@@ -62,6 +94,24 @@ class WorkSpaceInvite(models.Model):
     email = models.EmailField(null=True, blank=True)
     accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+
+    """
+    def save(self, *args, **kwargs):
+        if self.workspace.subscription_type == 1:
+            # Check if inviting more than 5 members
+            if self.workspace.users.count() >= 6:
+                raise ValidationError("Pro workspace can only invite up to 5 members.")
+
+        # Check if workspace's subscription type is Scale (2)
+        elif self.workspace.subscription_type == 2:
+            # Check if inviting more than 10 members
+            if self.workspace.users.count() >= 11:
+                raise ValidationError("Scale workspace can only invite up to 10 members.")
+            
+        # Call the superclass save method if no validation error is raised
+        super().save(*args, **kwargs)
+    """
+
 
     def __str__(self):
         return str(self.workspace)

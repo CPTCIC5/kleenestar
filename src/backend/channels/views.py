@@ -158,7 +158,6 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance= self.get_object()
-        print(instance)
         serializer = serializers.CreateBlockNoteSerializer(
             instance,
             data=request.data,

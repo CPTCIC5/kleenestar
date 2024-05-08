@@ -11,11 +11,15 @@ from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpac
 
 class WorkSpacesViewSet(viewsets.ModelViewSet):
     #permission_classes = (permissions.WorkSpaceViewSetPermissions,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = WorkSpaceSerializer
 
     def get_queryset(self):
         # All the workspaces the request user is a member of
         return self.request.user.workspace_set.all()
+    
+    
+    
 
     def create(self, request, *args, **kwargs):
         serializer = WorkSpaceCreateSerializer(data=request.data)

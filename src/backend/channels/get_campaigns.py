@@ -19,4 +19,4 @@ def main(client, customer_id):
             print(
                 f"Campaign with ID {row.campaign.id} and name "
                 f'"{row.campaign.name}" was found.'
-            )
+            )   

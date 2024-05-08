@@ -4,6 +4,7 @@ from django.conf import settings
 from dotenv import load_dotenv
 from openai import OpenAI
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 load_dotenv()
 
@@ -37,11 +38,37 @@ class Channel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+    def save(self, *args, **kwargs):
+
+        # Check the subscription type of the workspace
+        if self.workspace.subscription_type == 1:  # Pro
+            # Check if the workspace already has 3 channels
+            if Channel.objects.filter(workspace=self.workspace).count() >= 3:
+                raise ValidationError("Pro workspace can have only up to 3 channels.")
+
+        elif self.workspace.subscription_type == 2:  # Scale
+            # Check if the workspace already has 5 channels
+            if Channel.objects.filter(workspace=self.workspace).count() >= 5:
+                raise ValidationError("Scale workspace can have only up to 5 channels.")
+        # Call the superclass save method if no validation error is raised
+        super().save(*args, **kwargs)
+
+
     class Meta:
         unique_together = ["workspace", "channel_type"]
 
     def __str__(self):
         return "xyz"
+
+
+class BlockNote(models.Model):
+    user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    title=  models.CharField(max_length=50)
+    image= models.ImageField(upload_to='BlockNote',blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Convo(models.Model):
@@ -128,7 +155,8 @@ class Prompt(models.Model):
     file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
-    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True)
+    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
+    blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -145,16 +173,6 @@ class Prompt(models.Model):
 
     def __str__(self):
         return str(self.author)
-
-
-class BlockNote(models.Model):
-    user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    title=  models.CharField(max_length=50)
-    image= models.ImageField(upload_to='BlockNote',blank=True)
-    created_at =  models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
 
 
 CATEGORY  = (
