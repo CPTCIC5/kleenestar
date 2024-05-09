@@ -5,13 +5,14 @@ from .models import create_workspace_invite
 from django.core.mail import send_mail
 import os
 
-from . import permissions
+#from . import permissions
+from rest_framework import permissions
 from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpaceInviteCreateSerializer
 
 
 class WorkSpacesViewSet(viewsets.ModelViewSet):
     #permission_classes = (permissions.WorkSpaceViewSetPermissions,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated)
     serializer_class = WorkSpaceSerializer
 
     def get_queryset(self):
