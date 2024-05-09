@@ -68,6 +68,18 @@ class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
         fields = ('category','note')
 
 
+class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.KnowledgeBase
+        fields= ("file", "title")
+
+
+class KnowlodgeBaseSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    workspace= WorkSpaceSerializer()
+    class Meta:
+        model = models.KnowledgeBase
+        filds= ("user","workspace","file","title")
 
 """
 class PromptInputSerializer(serializers.Serializer):

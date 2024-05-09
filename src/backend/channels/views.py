@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import views,viewsets, permissions, status,pagination
+from rest_framework import viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
 from rest_framework.decorators import action
@@ -171,3 +171,39 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
         instance= self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class KnowledgeBaseView(viewsets.ModelViewSet):
+    queryset = models.KnowledgeBase.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = serializers.KnowlodgeBaseSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return models.KnowledgeBase.objects.filter(workspace=user.workspace_set.all()[0])
+    
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.CreateKnowledgeBaseSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(
+            user=request.user,
+            workspace=request.user.workspace_set.all()[0])
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = serializers.CreateKnowledgeBaseSerializer(
+            instance,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_200_OK)
