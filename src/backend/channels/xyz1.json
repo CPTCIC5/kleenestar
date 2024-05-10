@@ -1,0 +1,59 @@
+{
+    "campaigns": [
+      {
+        "campaign_id": "001",
+        "name": "Spring Sale 2024",
+        "start_date": "2024-03-15",
+        "end_date": "2024-04-15",
+        "budget": 10000,
+        "status": "completed",
+        "channels": ["email", "social_media", "paid_search"],
+        "metrics": {
+          "clicks": 2500,
+          "conversions": 180,
+          "revenue": 25000
+        }
+      },
+      {
+        "campaign_id": "002",
+        "name": "Summer Promo 2024",
+        "start_date": "2024-05-01",
+        "end_date": "2024-06-30",
+        "budget": 15000,
+        "status": "active",
+        "channels": ["social_media", "display_ads"],
+        "metrics": {
+          "clicks": 3000,
+          "conversions": 220,
+          "revenue": 35000
+        }
+      }
+    ],
+    "channels": {
+      "email": {
+        "campaigns_sent": 5,
+        "click_rate": 10,
+        "conversion_rate": 8
+      },
+      "social_media": {
+        "campaigns_run": 8,
+        "engagement_rate": 15,
+        "conversion_rate": 7
+      },
+      "paid_search": {
+        "campaigns_run": 3,
+        "impressions": 50000,
+        "click_through_rate": 3
+      },
+      "display_ads": {
+        "campaigns_run": 4,
+        "impressions": 80000,
+        "click_through_rate": 2
+      }
+    },
+    "overall_performance": {
+      "total_revenue": 60000,
+      "total_clicks": 5500,
+      "total_conversions": 400
+    }
+  }

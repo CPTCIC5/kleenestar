@@ -1,0 +1,21 @@
+{
+    "keyword": "marketing analytics",
+    "search_volume": {
+      "2024-01": 10000,
+      "2024-02": 11000,
+      "2024-03": 12000,
+      "2024-04": 13000
+    },
+    "related_keywords": ["digital marketing analytics", "social media analytics", "web analytics"],
+    "top_countries": {
+      "United States": 40,
+      "India": 20,
+      "United Kingdom": 15
+    },
+    "interest_over_time": {
+      "2024-01": 60,
+      "2024-02": 65,
+      "2024-03": 70,
+      "2024-04": 75
+    }
+  }

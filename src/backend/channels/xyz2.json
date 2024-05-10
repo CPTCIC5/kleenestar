@@ -1,0 +1,42 @@
+{
+    "account": {
+      "username": "@example_brand",
+      "followers": 10000,
+      "posts": [
+        {
+          "post_id": "post001",
+          "content": "Excited about our new product launch! #innovation",
+          "likes": 300,
+          "comments": 50,
+          "shares": 20,
+          "engagement_rate": 5.5,
+          "created_at": "2024-04-15T12:30:00"
+        },
+        {
+          "post_id": "post002",
+          "content": "Join us at the upcoming webinar! #tech",
+          "likes": 150,
+          "comments": 30,
+          "shares": 10,
+          "engagement_rate": 3.2,
+          "created_at": "2024-04-20T10:15:00"
+        }
+      ]
+    },
+    "hashtags": {
+      "innovation": {
+        "usage": 100,
+        "engagement_rate": 8
+      },
+      "tech": {
+        "usage": 80,
+        "engagement_rate": 6
+      }
+    },
+    "overall_metrics": {
+      "total_posts": 50,
+      "total_likes": 2500,
+      "total_comments": 400,
+      "total_shares": 200
+    }
+  }

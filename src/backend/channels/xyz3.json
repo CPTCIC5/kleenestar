@@ -1,0 +1,34 @@
+{
+    "company": {
+      "name": "Example Corp",
+      "industry": "Technology",
+      "employees_count": 5000
+    },
+    "job_openings": [
+      {
+        "title": "Data Scientist",
+        "location": "San Francisco, CA",
+        "seniority_level": "Senior",
+        "employment_type": "Full-time",
+        "skills_required": ["Python", "Machine Learning", "Statistics"],
+        "applicants": 200
+      },
+      {
+        "title": "Digital Marketing Manager",
+        "location": "New York, NY",
+        "seniority_level": "Director",
+        "employment_type": "Remote",
+        "skills_required": ["SEO", "Content Marketing", "Social Media"],
+        "applicants": 150
+      }
+    ],
+    "applicant_demographics": {
+      "total_applicants": 350,
+      "average_experience_years": 6,
+      "education_levels": {
+        "Bachelor's Degree": 60,
+        "Master's Degree": 30,
+        "PhD": 10
+      }
+    }
+  }
