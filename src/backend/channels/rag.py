@@ -45,8 +45,10 @@ def RagData(question, username, passwd):
     db = Chroma(embedding_function=embeddings_model)
     db.add_documents(data)
     result = db.similarity_search_with_score(question, k=5)
+
     def format_docs(result):
         return "\n\n---\n\n".join([doc.page_content for doc,_score in result])
+    
 
     RaggedData = format_docs(result)
     return str(RaggedData).replace("\n", "")

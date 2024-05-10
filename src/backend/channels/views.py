@@ -151,7 +151,10 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
+        serializer.save(
+            user=request.user,
+            workspace= request.user.workspace_set.all()[0]  
+                        )
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data,headers=headers)
     
