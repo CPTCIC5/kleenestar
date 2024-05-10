@@ -19,6 +19,7 @@ urlpatterns = [
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet, KnowledgeBaseView
+from channels.export import merge_json_files
 
 router = DefaultRouter()
 # Register viewsets with the router
@@ -32,11 +33,13 @@ router.register(r'', ChannelViewSet, basename='channels')
 
 # Define urlpatterns including the router's URLs
 urlpatterns = [
+    path('xyz/', merge_json_files),
     path('', include(router.urls)),
     path('convos/<int:pk>/prompts/',PromptViewSet.as_view({'get': 'list'}), name='convo-prompts-list'),
     path('convos/<int:pk>/prompts/create/', PromptViewSet.as_view({'post': 'create'}), name='create-prompt'),
     path('prompts/<int:pk>/update/', PromptViewSet.as_view({'patch': 'update'}), name='update-prompt'),
     path('prompts/<int:pk>/delete/', PromptViewSet.as_view({'delete': 'destroy'}), name='delete-prompt'),
+    
 
 
 ]
