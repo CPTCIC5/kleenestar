@@ -20,7 +20,7 @@ from langchain.schema.document import Document
 
 
 
-API_URL = "http://127.0.0.1:8000/api/workspaces/"
+API_URL ="http://127.0.0.1:8000/api/channels/xyz/"
 
 def get_workspace(username,passwd):
     
