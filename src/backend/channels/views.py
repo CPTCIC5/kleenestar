@@ -174,7 +174,7 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
         instance= self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 class KnowledgeBaseView(viewsets.ModelViewSet):
     queryset = models.KnowledgeBase.objects.all()
     permission_classes = (permissions.IsAuthenticated,)

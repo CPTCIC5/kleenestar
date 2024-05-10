@@ -80,7 +80,7 @@ class KnowlodgeBaseSerializer(serializers.ModelSerializer):
     workspace= WorkSpaceSerializer()
     class Meta:
         model = models.KnowledgeBase
-        filds= ("user","workspace","file","title")
+        fields= ("user","workspace","file","title")
 
 """
 class PromptInputSerializer(serializers.Serializer):
