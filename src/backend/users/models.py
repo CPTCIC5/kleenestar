@@ -62,6 +62,7 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user)
 
+"""
 
 FEEDBACK_CATEGORIES = (
     ("General", "General"),
@@ -70,6 +71,7 @@ FEEDBACK_CATEGORIES = (
     ("Feedback", "Feedback"),
     ("Others", "Others"),
 )
+"""
 
 URGENCYY = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9))
 
@@ -77,9 +79,9 @@ URGENCYY = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     urgency = models.IntegerField(choices=URGENCYY)
-    category = models.CharField(max_length=30, choices=FEEDBACK_CATEGORIES)
+    subject = models.CharField(max_length=30)
     message = models.TextField()
-    emoji = models.IntegerField(blank=True, null=True)
+    emoji = models.CharField(max_length=50,blank=True, null=True)
     attachment = models.ImageField(upload_to='Platform-Feedbacks/',validators=[validate_image_file_extension],blank=True,null=True)
 
     def __str__(self):
