@@ -65,7 +65,7 @@ class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE, null=True, blank=True)
     title=  models.CharField(max_length=50)
-    image= models.ImageField(upload_to='BlockNote',blank=True)
+    image= models.CharField(max_length=50,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
