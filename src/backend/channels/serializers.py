@@ -47,7 +47,7 @@ class BlockNoteSerializer(serializers.ModelSerializer):
     workspace = WorkSpaceSerializer()
     class Meta:
         model = models.BlockNote
-        fields = ("user", "workspace", "title","image","created_at")
+        fields = ("user", "workspace", "title","image","id","created_at")
 
 
 class PromptCreateSerializer(serializers.ModelSerializer):
