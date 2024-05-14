@@ -5,6 +5,6 @@ from . import views
 
 router = DefaultRouter()
 
-router.register("", views.WorkSpacesViewSet, basename="workspaces")
+router.register(r'', views.WorkSpacesViewSet, basename="workspaces")
 
 urlpatterns = router.urls

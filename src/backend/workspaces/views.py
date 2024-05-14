@@ -64,19 +64,24 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
             })
         """
 
-        serializer = WorkSpaceCreateSerializer(data=request.data)
+        serializer = WorkSpaceInviteCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(
             workspace=workspace,
             invite_code=invite_code
             )
         print(os.environ['EMAIL_HOST_USER'])
-        
-        # Send an email with the  invitation link
+
+
+        # Extract the email address from the validated data and send the email
+        recipient_email = serializer.validated_data.get("email")
+
+        #sending mail
         send_mail(
-        'Subject here',
-        f'Here is the message.,  Your code is {invite_code} ',
-        [os.environ['EMAIL_HOST_USER']],
-        [serializer.validated_data.get("email")]
-    )
+            'Subject here',
+            f'Here is the message. Your code is {invite_code}',
+            os.environ['EMAIL_HOST_USER'],  # Sender's email address
+            [recipient_email],  # List of recipient email addresses as strings
+        )
+        
         return Response(serializer.data,status=status.HTTP_201_CREATED)
