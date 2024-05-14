@@ -88,13 +88,14 @@ CORS_ALLOW_HEADERS = [
     'Content-Type',  # Include Content-Type header
 ]
 CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
 
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 
 CORS_ALLOWED_ORIGINS = [
-    'https://:3000',
-    'http://localhost:5173'
+    'http://localhost:3000',
+    'http://localhost:5173',
+    #'https://example.com',  # Your production domain(s)
     #'https://1.0.0.127.in-addr.arpa'
 ]
 CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
