@@ -93,7 +93,7 @@ class WorkSpaceInvite(models.Model):
     invite_code = models.CharField(max_length=20, default=create_workspace_invite)
     email = models.EmailField(null=True, blank=True)
     accepted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     """
     def save(self, *args, **kwargs):
