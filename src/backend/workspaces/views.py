@@ -53,7 +53,7 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
         #workspace = self.get_object().id
         workspace = self.get_object()
 
-        #invite_code = create_workspace_invite()
+        invite_code = create_workspace_invite()
         #email = request.data["email"]  # Assuming email is provided in request data
         
         """
@@ -66,13 +66,16 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
 
         serializer = WorkSpaceCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(workspace=workspace)
+        serializer.save(
+            workspace=workspace,
+            invite_code=invite_code
+            )
         print(os.environ['EMAIL_HOST_USER'])
         
         # Send an email with the  invitation link
         send_mail(
         'Subject here',
-        'Here is the message.',
+        f'Here is the message.,  Your code is {invite_code} ',
         [os.environ['EMAIL_HOST_USER']],
         [serializer.validated_data.get("email")]
     )
