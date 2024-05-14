@@ -21,7 +21,7 @@ class LoginView(views.APIView):
 
         if user is None:
             return Response(
-                {"detail": "Account does not exist"},
+                {"detail": "Invalid Credentials"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
