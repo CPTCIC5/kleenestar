@@ -75,6 +75,7 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
 
         # Extract the email address from the validated data and send the email
         recipient_email = serializer.validated_data.get("email")
+        print(recipient_email)
 
         #sending mail
         send_mail(
