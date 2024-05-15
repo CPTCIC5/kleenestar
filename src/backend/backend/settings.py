@@ -97,15 +97,15 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app"
-    #'https://example.com',  # Your production domain(s)
+    'https://localhost:3000',
+    'http://localhost:5173'
     #'https://1.0.0.127.in-addr.arpa'
 ]
 CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+T_URLCONF = "backend.urls"
 
 CSRF_COOKIE_SECURE= True
 CSRF_COOKIE_SAMESITE = 'None'
