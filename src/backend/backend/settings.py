@@ -16,7 +16,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://b362-2405-201-3023-68e8-54f7-66f9-eb6d-4911.ngrok-free.app','*']
+ALLOWED_HOSTS = ['https://1918-2405-201-3023-68e8-512a-27ac-ad90-6391.ngrok-free.app','*']
 
 
 # Application definition
@@ -83,6 +83,8 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend'
     ]
 
+CSRF_COOKIE_SECURE= False
+
 CORS_ALLOW_HEADERS = [
     'X-CSRFToken',  # Add any other headers you need to allow
     'Content-Type',  # Include Content-Type header
@@ -91,14 +93,19 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
+    "https://1918-2405-201-3023-68e8-512a-27ac-ad90-6391.ngrok-free.app",
+    "https://kleenestar.vercel.app",
+    "https://kleenestar.vercel.app/",
     'http://localhost:3000/',
     "http://localhost:8000/"
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
-    'http://localhost:5173'
+    "https://kleenestar.vercel.app",
+    'http://localhost:5173',
+    "https://1918-2405-201-3023-68e8-512a-27ac-ad90-6391.ngrok-free.app"
+    
     #'https://1.0.0.127.in-addr.arpa'
 ]
 CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
@@ -107,8 +114,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 T_URLCONF = "backend.urls"
 
-CSRF_COOKIE_SECURE= True
-CSRF_COOKIE_SAMESITE = 'None'
 
 ROOT_URLCONF = "backend.urls"
 
