@@ -229,3 +229,28 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.TokenAuthentication',
         )
     }
+
+
+CORS_ALLOW_HEADERS = [
+    'X-CSRFToken',  # Add any other headers you need to allow
+    'Content-Type',  # Include Content-Type header
+]
+CORS_ALLOW_CREDENTIALS = True
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
+    'http://localhost:3000/',
+    "http://localhost:8000/"
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app"
+    #'https://example.com',  # Your production domain(s)
+    #'https://1.0.0.127.in-addr.arpa'
+]
+CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
