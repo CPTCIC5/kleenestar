@@ -170,6 +170,7 @@ class Prompt(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    chart_data = models.JSONField(blank=True, null=True)
     
     def save(self,*args,**kwargs):
         self.response_text= generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).text.value
