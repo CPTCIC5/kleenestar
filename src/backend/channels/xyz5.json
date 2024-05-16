@@ -1,0 +1,31 @@
+{
+    "channel": "TikTok",
+    "campaigns": [
+      {
+        "campaign_id": "TT001",
+        "name": "Influencer Partnership",
+        "impressions": 60000,
+        "clicks": 2500,
+        "conversions": 200,
+        "cost": 10000,
+        "ctr": 4.17,
+        "conversion_rate": 8.0
+      },
+      {
+        "campaign_id": "TT002",
+        "name": "Hashtag Challenge",
+        "impressions": 45000,
+        "clicks": 1800,
+        "conversions": 150,
+        "cost": 8000,
+        "ctr": 4.0,
+        "conversion_rate": 8.33
+      }
+    ],
+    "user_age_distribution": {
+      "Under 18": 2000,
+      "18-24": 3500,
+      "25-34": 3000
+    }
+  }
+  
