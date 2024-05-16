@@ -22,9 +22,9 @@ from langchain.schema.document import Document
 
 API_URL ="http://127.0.0.1:8000/api/channels/xyz/"
 
-def get_workspace(username,passwd):
+def get_workspace():
     
-    response = requests.get(API_URL, auth=(username,passwd))
+    response = requests.get(API_URL)
     if response.status_code == 200:
         ResponseData = response.json()
     else:
@@ -39,9 +39,9 @@ def get_workspace(username,passwd):
 
 
 
-def RagData(question, username, passwd): 
+def RagData(question): 
     embeddings_model = OpenAIEmbeddings()
-    data = get_workspace(username,passwd)
+    data = get_workspace()
     db = Chroma(embedding_function=embeddings_model)
     db.add_documents(data)
     result = db.similarity_search_with_score(question, k=5)
