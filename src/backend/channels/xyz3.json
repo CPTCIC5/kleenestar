@@ -1,34 +1,30 @@
 {
-    "company": {
-      "name": "Example Corp",
-      "industry": "Technology",
-      "employees_count": 5000
+  "channel": "Meta (Facebook)",
+  "campaigns": [
+    {
+      "campaign_id": "FB001",
+      "name": "Holiday Sale",
+      "impressions": 40000,
+      "clicks": 2000,
+      "conversions": 120,
+      "cost": 7000,
+      "ctr": 5.0,
+      "conversion_rate": 6.0
     },
-    "job_openings": [
-      {
-        "title": "Data Scientist",
-        "location": "San Francisco, CA",
-        "seniority_level": "Senior",
-        "employment_type": "Full-time",
-        "skills_required": ["Python", "Machine Learning", "Statistics"],
-        "applicants": 200
-      },
-      {
-        "title": "Digital Marketing Manager",
-        "location": "New York, NY",
-        "seniority_level": "Director",
-        "employment_type": "Remote",
-        "skills_required": ["SEO", "Content Marketing", "Social Media"],
-        "applicants": 150
-      }
-    ],
-    "applicant_demographics": {
-      "total_applicants": 350,
-      "average_experience_years": 6,
-      "education_levels": {
-        "Bachelor's Degree": 60,
-        "Master's Degree": 30,
-        "PhD": 10
-      }
+    {
+      "campaign_id": "FB002",
+      "name": "Product Launch",
+      "impressions": 32000,
+      "clicks": 1500,
+      "conversions": 100,
+      "cost": 6000,
+      "ctr": 4.69,
+      "conversion_rate": 6.67
     }
+  ],
+  "age_group_engagement": {
+    "18-24": 800,
+    "25-34": 1500,
+    "35-44": 1200
   }
+}

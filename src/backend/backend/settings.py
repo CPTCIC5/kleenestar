@@ -16,7 +16,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://b362-2405-201-3023-68e8-54f7-66f9-eb6d-4911.ngrok-free.app','*']
+ALLOWED_HOSTS = ['https://polite-awake-bobcat.ngrok-free.app','*']
 
 
 # Application definition
@@ -83,6 +83,8 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend'
     ]
 
+CSRF_COOKIE_SECURE= False
+
 CORS_ALLOW_HEADERS = [
     'X-CSRFToken',  # Add any other headers you need to allow
     'Content-Type',  # Include Content-Type header
@@ -91,24 +93,27 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
-    'http://localhost:3000',
+    "https://polite-awake-bobcat.ngrok-free.app",
+    "https://kleenestar.vercel.app",
+    "https://kleenestar.vercel.app/",
+    'http://localhost:3000/',
     "http://localhost:8000/"
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
+    'https://localhost:3000',
+    "https://kleenestar.vercel.app",
     'http://localhost:5173',
-    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app"
-    #'https://example.com',  # Your production domain(s)
+    "https://polite-awake-bobcat.ngrok-free.app"
+    
     #'https://1.0.0.127.in-addr.arpa'
 ]
 CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SECURE= True
-CSRF_COOKIE_SAMESITE = 'None'
+T_URLCONF = "backend.urls"
+
 
 ROOT_URLCONF = "backend.urls"
 
@@ -219,8 +224,33 @@ REST_FRAMEWORK = {
             'rest_framework.permissions.IsAuthenticated',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.BasicAuthentication',  # enables simple command line authentication
+            #'rest_framework.authentication.BasicAuthentication',  # enables simple command line authentication
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
         )
     }
+
+
+CORS_ALLOW_HEADERS = [
+    'X-CSRFToken',  # Add any other headers you need to allow
+    'Content-Type',  # Include Content-Type header
+]
+CORS_ALLOW_CREDENTIALS = True
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
+    'http://localhost:3000/',
+    "http://localhost:8000/"
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app"
+    #'https://example.com',  # Your production domain(s)
+    #'https://1.0.0.127.in-addr.arpa'
+]
+CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True

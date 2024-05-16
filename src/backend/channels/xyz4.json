@@ -1,21 +1,30 @@
 {
-    "keyword": "marketing analytics",
-    "search_volume": {
-      "2024-01": 10000,
-      "2024-02": 11000,
-      "2024-03": 12000,
-      "2024-04": 13000
+  "channel": "Twitter",
+  "campaigns": [
+    {
+      "campaign_id": "TW001",
+      "name": "Promoted Tweets",
+      "impressions": 35000,
+      "clicks": 1500,
+      "conversions": 100,
+      "cost": 6000,
+      "ctr": 4.29,
+      "conversion_rate": 6.67
     },
-    "related_keywords": ["digital marketing analytics", "social media analytics", "web analytics"],
-    "top_countries": {
-      "United States": 40,
-      "India": 20,
-      "United Kingdom": 15
-    },
-    "interest_over_time": {
-      "2024-01": 60,
-      "2024-02": 65,
-      "2024-03": 70,
-      "2024-04": 75
+    {
+      "campaign_id": "TW002",
+      "name": "Trend Campaign",
+      "impressions": 28000,
+      "clicks": 1200,
+      "conversions": 80,
+      "cost": 5000,
+      "ctr": 4.29,
+      "conversion_rate": 6.67
     }
+  ],
+  "hashtags_performance": {
+    "#marketing": 1200,
+    "#socialmedia": 1000,
+    "#digitalmarketing": 800
   }
+}
