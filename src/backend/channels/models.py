@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+from .rag import RagData
 
 load_dotenv()
 
@@ -96,10 +97,13 @@ class Convo(models.Model):
     
 
 
-def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
-    get_convo = get_object_or_404(Convo,id=convo)
+def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
+    get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
+
+    # Call RagData function with the user query to get RAG context
+    rag_context = RagData(user_query)
 
     # Creating a new conversation thread
     if all_prompts >= 1:
@@ -113,14 +117,13 @@ def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
         get_convo.save()
         #convo.assistant_id = thread
 
-
     if file != None:
-    # Posting user's query as a message in the thread
+        # Posting user's query as a message in the thread
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
             content=user_query,
-            file_ids= [file]
+            file_ids=[file]
         )
     else:
         message = client.beta.threads.messages.create(
@@ -129,13 +132,18 @@ def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
             content=user_query
         )
 
+    # Posting RAG context as a message in the thread for the Assistant
+    rag_message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="assistant",
+        content=rag_context
+    )
 
     # Initiating a run
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
         assistant_id="asst_wljmLStVyrLtU7AyxcyXlU7d"
     )
-
 
     while run.status != "completed":
         keep_retrieving_run = client.beta.threads.runs.retrieve(
@@ -151,9 +159,9 @@ def generate_insights_with_gpt4(user_query:str,convo:int,file=None):
     all_messages = client.beta.threads.messages.list(
         thread_id=thread.id
     )
-        
-    # Print the messages from the user and the assistant
-    return (all_messages.data[0].content[0])
+
+    # Return the content of the first message added by the Assistant
+    return all_messages.data[0].content[0]
 
 
     
