@@ -240,8 +240,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
-    'http://localhost:3000/',
-    "http://localhost:8000/",
+    'http://localhost:3000',
+    "http://localhost:8000",
     'http://localhost:5173',
     'https://polite-awake-bobcat.ngrok-free.app'
 ]

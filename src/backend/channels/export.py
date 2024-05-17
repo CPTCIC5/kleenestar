@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Allow access to anyone
 def merge_json_files(request):
-    merged_data = {}
+    merged_data = []
 
     # List all JSON files in the specified folder
     json_files = [f for f in os.listdir("channels/") if f.endswith(".json")]
@@ -31,6 +31,6 @@ def merge_json_files(request):
         key = os.path.splitext(filename)[0]  # Remove the file extension (.json)
 
         # Merge the file data into the merged_data dictionary
-        merged_data[key] = file_data
+        merged_data.append(file_data)
 
     return Response(merged_data)
