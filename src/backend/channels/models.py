@@ -142,7 +142,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     # Initiating a run
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
-        assistant_id="asst_wljmLStVyrLtU7AyxcyXlU7d"
+        assistant_id=get_convo.workspace.assistant_id
     )
 
     while run.status != "completed":
