@@ -83,7 +83,7 @@ class Folder(models.Model):
 
 class Convo(models.Model):
     #folder= models.ForeignKey(Folder, on_delete=models.PROTECT, blank=True, null=True)
-    assistant_id = models.CharField(max_length=100,blank=True,null=True)
+    thread_id = models.CharField(max_length=100,blank=True,null=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     title = models.CharField(max_length=100,default= 'New Chat')
     archived =  models.BooleanField(default=False)
@@ -108,12 +108,12 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     # Creating a new conversation thread
     if all_prompts >= 1:
         thread = client.beta.threads.retrieve(
-            thread_id=get_convo.assistant_id
+            thread_id=get_convo.thread_id
         )
 
     else:
         thread = client.beta.threads.create()
-        get_convo.assistant_id = thread.id
+        get_convo.thread_id = thread.id
         get_convo.save()
         #convo.assistant_id = thread
 
