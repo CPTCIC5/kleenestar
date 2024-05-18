@@ -99,7 +99,7 @@ class WorkSpace(models.Model):
             assistant = client.beta.assistants.create(
                 name=self.business_name,
                 instructions=INSTRUCTIONS,
-                tools=[{"type": "code_interpreter"}],
+                tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
                 model="gpt-4-turbo",
             )
             self.assistant_id = assistant.id
