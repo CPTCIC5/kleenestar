@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "channels.apps.ChannelsConfig",
     "workspaces.apps.WorkspacesConfig",
     "dummy.apps.DummyConfig",
+    "oauth.apps.OauthConfig",
     "rest_framework",
     "django_rest_passwordreset",
     "corsheaders",
