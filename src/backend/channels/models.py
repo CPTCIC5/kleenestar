@@ -24,6 +24,8 @@ class APICredentials(models.Model):
 
 
 class Channel(models.Model):
+    # refresh token
+    # client id
     CHANNEL_TYPES = (
         (1, "Google ads"),
         (2, "Meta"),
