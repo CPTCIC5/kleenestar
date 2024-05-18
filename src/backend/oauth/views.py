@@ -19,7 +19,7 @@ def google_oauth_callback(request):
     customer_id = ...
     email = ...
 
-    if type(customer_id) == list:
+    if isinstance(customer_id, list):
         return Response(
             {"detail": "manager accounts not allowed"},
             status=status.HTTP_403_FORBIDDEN,
