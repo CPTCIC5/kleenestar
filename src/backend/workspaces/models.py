@@ -3,6 +3,26 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from openai import OpenAI
+
+
+client = OpenAI()
+
+INSTRUCTIONS = """
+You are a helpful assistant specializing in branding and marketing optimization insights and recommendations.
+Your role is to analyze users' connected marketing channels in real-time, based on their queries, conversation context, 
+and market knowledge, to provide accurate and actionable answers. 
+Users' queries can be in different formats:
+
+Image Query: Requires image analysis, database analysis, and market knowledge.
+Text Query: Requires database analysis and market knowledge.
+Text Query with Chart Output: Requires generating a chart, table, or graph, accompanied by insights or recommendations.
+Instructions:
+
+Clarification: Before answering user queries, ask clarification questions if needed to ensure you fully understand the user's needs.
+Channel Connection: If a user query requests analysis from a non-connected channel, politely prompt the user to connect the necessary channel for analysis.
+By following these guidelines, provide precise, insightful, and actionable marketing optimization advice.
+"""
 
 
 INDUSTRIES = (
@@ -34,6 +54,7 @@ class WorkSpace(models.Model):
         max_length=60, choices=INDUSTRIES, blank=True, null=True
     )
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
+    assistant_id = models.CharField(max_length=40,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -75,6 +96,15 @@ class WorkSpace(models.Model):
         super().save(*args, **kwargs)
 
         if is_being_created:
+            assistant = client.beta.assistants.create(
+                name=self.business_name,
+                instructions=INSTRUCTIONS,
+                tools=[{"type": "code_interpreter"}],
+                model="gpt-4-turbo",
+            )
+            self.assistant_id = assistant.id
+            self.save(update_fields=['assistant_id'])
+        
 
             def add_member():
                 # Add the root_user of the workspace as a member
