@@ -119,7 +119,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         get_convo.save()
         #convo.assistant_id = thread
 
-    if file != None:
+    if file is not None:
         # Posting user's query as a message in the thread
         # file.open()
         # x = file.read()
