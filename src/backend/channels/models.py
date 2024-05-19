@@ -121,13 +121,20 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     if file != None:
         # Posting user's query as a message in the thread
+        # file.open()
+        # x = file.read()
+        # print("AAAA", type(x))
+        message_file = client.files.create(
+          file=file.open("rb"), purpose="assistants"
+        )
+        # file.close()
         message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
         content=user_query,
         attachments=[
             {
-                "file_id": file,
+                "file_id": message_file.id,
                 "tools": [{"type": "file_search"}]
             }
         ]
@@ -193,10 +200,11 @@ class Prompt(models.Model):
     chart_data = models.JSONField(blank=True, null=True)
     
     def save(self,*args,**kwargs):
+        # error is coming from here
         response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
 
         self.response_text = response_data.get('text', '')
-        self.response_image = response_data.get('image', None)
+        self.response_image = response_data.gFet('image', None)
 
         super().save(*args, **kwargs)
 
