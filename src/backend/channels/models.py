@@ -122,11 +122,16 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     if file != None:
         # Posting user's query as a message in the thread
         message = client.beta.threads.messages.create(
-            thread_id=thread.id,
-            role="user",
-            content=user_query,
-            file_ids=[file]
-        )
+        thread_id=thread.id,
+        role="user",
+        content=user_query,
+        attachments=[
+            {
+                "file_id": file,
+                "tools": [{"type": "file_search"}]
+            }
+        ]
+    )
     else:
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
@@ -163,7 +168,12 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     )
 
     # Return the content of the first message added by the Assistant
-    return all_messages.data[0].content[0]
+    assistant_response= all_messages.data[0].content[0]
+
+    if assistant_response.type == 'text':
+        return {'text': assistant_response.text.value, 'image': None}
+    elif assistant_response.type == 'image':
+        return {'text': assistant_response.text.value, 'image': assistant_response.image_file}
 
 
     
@@ -183,10 +193,19 @@ class Prompt(models.Model):
     chart_data = models.JSONField(blank=True, null=True)
     
     def save(self,*args,**kwargs):
+        response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
+
+        self.response_text = response_data.get('text', '')
+        self.response_image = response_data.get('image', None)
+
+        super().save(*args, **kwargs)
+
+        """
         self.response_text= generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).text.value
         if self.response_image:
             self.response_image = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query).image_file
         super().save(*args,**kwargs)
+        """
     
     
     class Meta:
