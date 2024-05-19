@@ -1,6 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
+from channels.models import Channel
+from backend.settings import AUTH_USER_MODEL
 
 
 @api_view(("GET", "POST"))
@@ -26,9 +29,9 @@ def google_oauth_callback(request):
         )
 
     # arayn
-    user = ...  # get the user from the email
-    workspace = ...
-    google_channel = ...
+    user = get_object_or_404(AUTH_USER_MODEL,email=email)  # get the user from the email
+    workspace = user.workspace_set.all()[0]
+    google_channel = get_object_or_404(Channel, channel_type=1)
 
     google_channel.credentials.key_1 = code
     google_channel.credentials.key_2 = refresh_token
