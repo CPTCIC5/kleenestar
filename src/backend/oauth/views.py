@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
+from backend.settings import AUTH_USER_MODEL
+from channels.models import Channel
 import argparse
 import hashlib
 import os
@@ -80,12 +82,10 @@ def google_oauth_callback(request):
                 status=status.HTTP_403_FORBIDDEN,
             )
         customer_id = resource_names[0]
-        return Response(status=status.HTTP_200_OK)
-    
-        # arayn
-        user = ...  # get the user from the email
-        workspace = ...
-        google_channel = ...
+
+        user = get_object_or_404(AUTH_USER_MODEL,email=email)  # get the user from the email
+        workspace = user.workspace_set.all()[0]
+        google_channel = get_object_or_404(Channel, channel_type=1)
 
         google_channel.credentials.key_1 = code
         google_channel.credentials.key_2 = refresh_token
@@ -93,6 +93,8 @@ def google_oauth_callback(request):
         google_channel.credentials.key_4 = customer_id
         google_channel.save()
 
+        return Response(status=status.HTTP_200_OK)
+    
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
