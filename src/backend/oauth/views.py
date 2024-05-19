@@ -18,8 +18,8 @@ _REDIRECT_URI = 'http://127.0.0.1:8000/api/oauth/google-callback/'
 _SCOPE = "https://www.googleapis.com/auth/adwords"
 configured_scopes = [_SCOPE]
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Adjusted to navigate to the project root
-CLIENT_SECRET_FILE = os.path.join(BASE_DIR, 'base', 'oauth', 'utils', 'XYZ.json')
-ADS_CONFIG_FILE = os.path.join(BASE_DIR, 'base', 'oauth', 'utils', 'google-ads.yaml')
+CLIENT_SECRET_FILE = os.path.join(BASE_DIR, 'oauth', 'utils', 'XYZ.json')
+ADS_CONFIG_FILE = os.path.join(BASE_DIR, 'oauth', 'utils', 'google-ads.yaml')
 flow = Flow.from_client_secrets_file(CLIENT_SECRET_FILE, scopes=configured_scopes)
 flow.redirect_uri = _REDIRECT_URI
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
