@@ -100,7 +100,7 @@ class WorkSpace(models.Model):
                 name=self.business_name,
                 instructions=INSTRUCTIONS,
                 tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
-                model="gpt-4-turbo",
+                model="gpt-4o",
             )
             self.assistant_id = assistant.id
             self.save(update_fields=['assistant_id'])
