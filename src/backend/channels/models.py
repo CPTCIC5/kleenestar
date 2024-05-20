@@ -18,6 +18,7 @@ class APICredentials(models.Model):
     key_2 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_3 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_4 = models.CharField(max_length=255, null=True, blank=True,unique=True)
+    key_5 = models.CharField(max_length=255,blank=True,null = True)
 
     def __str__(self):
         return self.key_1

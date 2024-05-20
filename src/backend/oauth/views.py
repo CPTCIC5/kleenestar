@@ -23,6 +23,13 @@ from google.oauth2.credentials import Credentials
 from requests_oauthlib import OAuth1Session
 load_dotenv()
 
+
+def get_channel(email,channel_type_num):
+    user = get_object_or_404(AUTH_USER_MODEL,email=email)
+    workspace = user.workspace_set.all()[0]
+    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
+
+
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
@@ -153,9 +160,10 @@ def google_oauth_callback(request):
         
         customer_id = resource_names[0].split('/')[1]
 
-        user = get_object_or_404(AUTH_USER_MODEL,email=email)  # get the user from the email
-        workspace = user.workspace_set.all()[0]
-        google_channel = get_object_or_404(Channel, channel_type=1)
+        google_channel = get_channel(
+            email=email,
+            channel_type_num=1
+        )
 
         google_channel.credentials.key_1 = code
         google_channel.credentials.key_2 = refresh_token
@@ -230,11 +238,14 @@ def facebook_oauth_callback(request):
         user_info_response = facebook.get(user_info_url)
         email = user_info_response.json()['email']
 
-        # aryan # creds to store in the db
+        facebook_channel = get_channel(
+            email=email,
+            channel_type_num=2
+        )
 
-        # filed name : value
-        # access_token: token
-        # email: email
+        facebook_channel.credentials.key_1 = token
+        facebook_channel.credentials.key_2= email
+        facebook_channel.save()
 
         return Response({"detail": "OAuth process completed successfully."}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -321,10 +332,23 @@ def twitter_oauth_callback(request):
         
         user_json = user_data.json()
         email = user_json.get('email', None)
-    
-        # aryan # creds to store in the db
 
-        # filed name : value
+        twitter_channel = get_channel(
+            email=email,
+            channel_type_num=3
+        )
+
+
+        twitter_channel.credentials.key_1= resource_owner_key
+        twitter_channel.credentials.key_2= resource_owner_secret
+        twitter_channel.credentials.key_3 = key
+        twitter_channel.credentials.key_4 = secret
+        twitter_channel.credentials.key_5 = email
+        twitter_channel.save()
+
+
+    
+
         # consumer_key :  resource_owner_key
         # consumer_secret: resource_owner_secret
         # access_token: key
@@ -375,9 +399,14 @@ def linkedin_oauth_callback(request):
         
         # aryan # creds to store in the db
 
-        # filed name : value
-        # access_token: token
-        # email: email
+        linkedin_channel = get_channel(
+            email=email,
+            channel_type_num=4
+        )
+
+        linkedin_channel.credentials.key_1= token
+        linkedin_channel.credentials.key_2= email
+        linkedin_channel.save()
 
         return Response(
             status=status.HTTP_200_OK
