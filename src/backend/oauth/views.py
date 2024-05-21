@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from requests_oauthlib import OAuth1Session
+from django.shortcuts import redirect
 load_dotenv()
 
 
@@ -64,15 +65,24 @@ resource_owner_key = ''
 resource_owner_secret = ''
 
 #linkedin
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1' 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 linkedin_client_id = os.getenv('LINKEDIN_CLIENT_ID')
 linkedin_client_secret = os.getenv('LINKEDIN_CLIENT_SECRET')
-linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "r_emailaddress"]
+linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "email","openid","profile"]
 linkedin_authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
 linkedin_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
 linkedin_redirect_uri = 'http://127.0.0.1:8000/api/oauth/linkedin-callback/'
 linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri, scope=linkedin_scope)
 
+#tiktok
+tiktok_client_id = os.getenv('TIKTOK_CLIENT_ID')
+tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
+tiktok_redirect_uri = 'http://127.0.0.1:8000/api/oauth/tiktok-callback/'
+tiktok_authorization_base_url = 'https://business-api.tiktok.com/open_api/v1.2/oauth/authorize/'
+tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.2/oauth/token/'
+tiktok_scopes = ['ads.read', 'ads.management','user.info']
+tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_uri, scope=tiktok_scopes)
 
 
 
@@ -160,18 +170,18 @@ def google_oauth_callback(request):
         
         customer_id = resource_names[0].split('/')[1]
 
-        google_channel = get_channel(
-            email=email,
-            channel_type_num=1
-        )
+        # google_channel = get_channel(
+        #     email=email,
+        #     channel_type_num=1
+        # )
 
-        google_channel.credentials.key_1 = code
-        google_channel.credentials.key_2 = refresh_token
-        google_channel.credentials.key_3 = access_token
-        google_channel.credentials.key_4 = customer_id
-        google_channel.save()
+        # google_channel.credentials.key_1 = code
+        # google_channel.credentials.key_2 = refresh_token
+        # google_channel.credentials.key_3 = access_token
+        # google_channel.credentials.key_4 = customer_id
+        # google_channel.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return redirect("http://localhost:3000/channels/")
     
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
@@ -238,16 +248,16 @@ def facebook_oauth_callback(request):
         user_info_response = facebook.get(user_info_url)
         email = user_info_response.json()['email']
 
-        facebook_channel = get_channel(
-            email=email,
-            channel_type_num=2
-        )
+        # facebook_channel = get_channel(
+        #     email=email,
+        #     channel_type_num=2
+        # )
 
-        facebook_channel.credentials.key_1 = token
-        facebook_channel.credentials.key_2= email
-        facebook_channel.save()
+        # facebook_channel.credentials.key_1 = token
+        # facebook_channel.credentials.key_2= email
+        # facebook_channel.save()
 
-        return Response({"detail": "OAuth process completed successfully."}, status=status.HTTP_200_OK)
+        return redirect("http://localhost:3000/channels/")
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -259,8 +269,7 @@ def twitter_get_oauth_token(verifier, ro_key, ro_secret):
     oauth_token = OAuth1Session(client_key=twitter_client_id,
                                 client_secret=twitter_client_secret,
                                 resource_owner_key=ro_key,
-                                resource_owner_secret=ro_secret,
-                                scope=twitter_scopes)
+                                resource_owner_secret=ro_secret)
     url = 'https://api.twitter.com/oauth/access_token'
     data = {"oauth_verifier": verifier}
     access_token_data = oauth_token.post(url, data=data)
@@ -284,11 +293,14 @@ def twitter_get_oauth_request_token():
             {"detail": "Unauthorized request error!!!"},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
-
+@api_view(("GET",))
 def twitter_oauth(request):
     try:
         twitter_get_oauth_request_token()
         url = "https://api.twitter.com/oauth/authenticate?oauth_token=" + resource_owner_key
+
+        print(url)
+     
         return Response({
             "url": url},
             status=status.HTTP_200_OK
@@ -312,7 +324,9 @@ def twitter_oauth_callback(request):
                 )
         oauth_verifier  = request.query_params.get("oauth_verifier")
         oauth_list = twitter_get_oauth_token(oauth_verifier,resource_owner_key,resource_owner_secret)
+        
         access_token = {}
+        print(oauth_list)
         for token in oauth_list:
             key, value = token.split('=')
             access_token[key] = value
@@ -321,52 +335,47 @@ def twitter_oauth_callback(request):
         secret = access_token['oauth_token_secret']
         
         # Create OAuth1Session with the obtained access token
-        oauth_user = OAuth1Session(client_key=resource_owner_key,
-                                client_secret=resource_owner_secret,
+        oauth_user = OAuth1Session(client_key=twitter_client_id,
+                                client_secret=twitter_client_secret,
                                 resource_owner_key=key,
                                 resource_owner_secret=secret)
         
         url_user = 'https://api.twitter.com/1.1/account/verify_credentials.json'
-        params = {"include_email": 'true'}
+        params = {"include_email": True}
         user_data = oauth_user.get(url_user, params=params)
-        
         user_json = user_data.json()
-        email = user_json.get('email', None)
+        email = user_json.get('email', None)   # gets email only if twitter account connected with email else None
 
-        twitter_channel = get_channel(
-            email=email,
-            channel_type_num=3
-        )
+        print(email)
+        print(resource_owner_key, resource_owner_secret, key, secret)
 
-
-        twitter_channel.credentials.key_1= resource_owner_key
-        twitter_channel.credentials.key_2= resource_owner_secret
-        twitter_channel.credentials.key_3 = key
-        twitter_channel.credentials.key_4 = secret
-        twitter_channel.credentials.key_5 = email
-        twitter_channel.save()
+        # twitter_channel = get_channel(
+        #     email=email,
+        #     channel_type_num=3
+        # )
 
 
-    
+        # twitter_channel.credentials.key_1= resource_owner_key
+        # twitter_channel.credentials.key_2= resource_owner_secret
+        # twitter_channel.credentials.key_3 = key
+        # twitter_channel.credentials.key_4 = secret
+        # twitter_channel.credentials.key_5 = email
+        # twitter_channel.save()
 
-        # consumer_key :  resource_owner_key
-        # consumer_secret: resource_owner_secret
-        # access_token: key
-        # access_token_secret: secret
-        # email: email
-
-        return Response(status=status.HTTP_200_OK)
+        return redirect("http://localhost:3000/channels/")
 
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        print(f"Exception occurred: {e}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    
+
+@api_view(("GET",))
 def linkedin_oauth(request):
     try:
         authorization_url, state = linkedin.authorization_url(url=linkedin_authorization_base_url, state=passthrough_val)
+        print(authorization_url)
         return Response({
             "url": authorization_url},
             status=status.HTTP_200_OK
@@ -378,7 +387,10 @@ def linkedin_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
 def linkedin_oauth_callback(request):
     try:
         if request.query_params.get("state") != passthrough_val:
@@ -392,25 +404,32 @@ def linkedin_oauth_callback(request):
                              include_client_id=True,
                              authorization_response=redirect_response)
 
-        # Get the user's email address
-        email_address_url = 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))'
-        email_response = linkedin.get(email_address_url)
-        email = email_response.json()['elements'][0]['handle~']['emailAddress']
+        access_token = token.get("access_token") # 60 days
+        refresh_token = token.get("refresh_token") # 365 days
         
-        # aryan # creds to store in the db
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            }
 
-        linkedin_channel = get_channel(
-            email=email,
-            channel_type_num=4
-        )
+        response = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers)
 
-        linkedin_channel.credentials.key_1= token
-        linkedin_channel.credentials.key_2= email
-        linkedin_channel.save()
+        user_details = response.json()
 
-        return Response(
-            status=status.HTTP_200_OK
-        )
+        email = user_details.get("email")
+
+        print(access_token, refresh_token, email)
+
+        # linkedin_channel = get_channel(
+        #     email=email,
+        #     channel_type_num=4
+        # )
+
+        # linkedin_channel.credentials.key_1= access_token
+        # linkedin_channel.credentials.key_2= refresh_token
+        # linkedin_channel.credentials.key_3 = email
+        # linkedin_channel.save()
+
+        return redirect("http://localhost:3000/channels/")
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -418,3 +437,183 @@ def linkedin_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     
+
+
+# @csrf_exempt
+@api_view(("GET",))
+# @permission_classes([AllowAny]) 
+def get_linkedin_marketing_data(request):
+    # aryan
+    # get the access_token from the model 
+    # access_token = ??
+    access_token = ""
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    
+    base_url = "https://api.linkedin.com/v2"
+
+    # Get Campaign Information
+    try:
+        campaigns_url = f"{base_url}/adCampaignsV2"
+        response = requests.get(campaigns_url, headers=headers)
+        campaigns = response.json().get('elements', [])
+        print(response.json())
+        campaign_data = []
+        for campaign in campaigns:
+            campaign_info = {
+                'id': campaign.get('id'),
+                'name': campaign.get('name'),
+                'status': campaign.get('status'),
+                'created': campaign.get('created'),
+                'lastModified': campaign.get('lastModified'),
+                'dailyBudget': campaign.get('dailyBudget'),
+                'totalBudget': campaign.get('totalBudget'),
+                'objective': campaign.get('objective'),
+                'type': campaign.get('type'),
+            }
+            
+            # Get Ad Set
+            ad_creatives_url = f"{base_url}/adCreativesV2?q=campaign&campaign={campaign['id']}"
+            ad_response = requests.get(ad_creatives_url, headers=headers)
+            ad_creatives = ad_response.json().get('elements', [])
+
+            ad_creative_data = []
+            for ad in ad_creatives:
+                ad_info = {
+                    'id': ad.get('id'),
+                    'campaignId': ad.get('campaign'),
+                    'format': ad.get('format'),
+                    'status': ad.get('status'),
+                    'created': ad.get('created'),
+                    'lastModified': ad.get('lastModified'),
+                    'textAdTitle': ad.get('textAdTitle'),
+                    'textAdDescription': ad.get('textAdDescription'),
+                    'landingPageUrl': ad.get('landingPageUrl'),
+                }
+                ad_creative_data.append(ad_info)
+            
+            campaign_info['ad_creatives'] = ad_creative_data
+
+            # Get Audience Metrics, Conversion Metrics, Revenue Metrics, and Time-based Metrics
+            metrics_url = f"{base_url}/adAnalyticsV2?q=analytics&pivot=AD&timeGranularity=ALL&campaigns={campaign['id']}"
+            metrics_response = requests.get(metrics_url, headers=headers)
+            metrics = metrics_response.json().get('elements', [])
+
+            audience_metrics = {
+                'impressions': 0,
+                'clicks': 0,
+                'uniqueImpressions': 0,
+                'uniqueClicks': 0,
+                'totalEngagements': 0,
+            }
+
+            conversion_metrics = {
+                'likes': 0,
+                'shares': 0,
+                'comments': 0,
+                'socialActions': 0,
+                'engagementRate': 0.0,
+            }
+
+            revenue_metrics = {
+                'costInUsd': 0.0,
+                'cpm': 0.0,
+                'cpc': 0.0,
+                'totalSpent': 0.0,
+            }
+
+            time_based_metrics = {
+                'startDate': None,
+                'endDate': None,
+            }
+
+            for metric in metrics:
+                audience_metrics.update({
+                    'impressions': metric.get('impressions', 0),
+                    'clicks': metric.get('clicks', 0),
+                    'uniqueImpressions': metric.get('uniqueImpressions', 0),
+                    'uniqueClicks': metric.get('uniqueClicks', 0),
+                    'totalEngagements': metric.get('totalEngagements', 0),
+                })
+                conversion_metrics.update({
+                    'likes': metric.get('likes', 0),
+                    'shares': metric.get('shares', 0),
+                    'comments': metric.get('comments', 0),
+                    'socialActions': metric.get('socialActions', 0),
+                    'engagementRate': metric.get('engagementRate', 0.0),
+                })
+                revenue_metrics.update({
+                    'costInUsd': metric.get('costInUsd', 0.0),
+                    'cpm': metric.get('cpm', 0.0),
+                    'cpc': metric.get('cpc', 0.0),
+                    'totalSpent': metric.get('totalSpent', 0.0),
+                })
+                time_based_metrics.update({
+                    'startDate': metric.get('startDate'),
+                    'endDate': metric.get('endDate'),
+                })
+            
+            campaign_info['audience_metrics'] = audience_metrics
+            campaign_info['conversion_metrics'] = conversion_metrics
+            campaign_info['revenue_metrics'] = revenue_metrics
+            campaign_info['time_based_metrics'] = time_based_metrics
+
+            campaign_data.append(campaign_info)
+        print(campaign_data)
+
+    except Exception as e:
+        print(f"Exception found: {e}")
+        return Response(
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def tiktok_oauth_callback(request):
+    try:
+        if request.query_params.get("state") != passthrough_val:
+            return Response(
+            {"detail": "State token does not match the expected state."},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        redirect_response = request.build_absolute_uri()
+
+        token = tiktok.fetch_token(token_url=tiktok_token_url, authorization_response=redirect_response, client_secret=tiktok_client_secret)
+
+        print(token)
+
+        # aryan
+        # add token to model
+        # no email here!
+
+        return redirect("http://localhost:3000/channels/")
+    
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+
+@api_view(("GET",))
+def tiktok_oauth(request):
+    try:
+        authorization_url, state = tiktok.authorization_url(url=tiktok_authorization_base_url, state=passthrough_val)
+        print(authorization_url)
+        return Response({
+            "url": authorization_url},
+            status=status.HTTP_200_OK
+        )
+    
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
