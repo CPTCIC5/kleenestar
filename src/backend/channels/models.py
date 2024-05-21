@@ -121,14 +121,11 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         #convo.assistant_id = thread
 
     if file is not None:
-        # Posting user's query as a message in the thread
-        # file.open()
-        # x = file.read()
-        # print("AAAA", type(x))
+
         message_file = client.files.create(
-          file=file.open("rb"), purpose="assistants"
+          file= open(file.path,"rb"), purpose="assistants"
         )
-        # file.close()
+
         message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
@@ -136,7 +133,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         attachments=[
             {
                 "file_id": message_file.id,
-                "tools": [{"type": "file_search"}]
+                "tools": [{"type": "file_search"}, {"type":"retrieval"} ]
             }
         ]
     )
@@ -205,7 +202,7 @@ class Prompt(models.Model):
         response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
 
         self.response_text = response_data.get('text', '')
-        self.response_image = response_data.gFet('image', None)
+        self.response_image = response_data.get('image', None)
 
         super().save(*args, **kwargs)
 
