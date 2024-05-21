@@ -7,7 +7,7 @@ from . import models
 class APICredentialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.APICredentials
-        fields  = ['key_1','key_2','key_3','key_4']
+        fields  = ['key_1','key_2','key_3','key_4','key_5']
 
 
 class ChannelSerializer(serializers.ModelSerializer):
@@ -37,17 +37,30 @@ class ConvoSerializer(serializers.ModelSerializer):
         fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')        
 
 
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Note
+        fields = ['note','created_at','color']
+
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BlockNote
         fields = ("title","image")
 
+class UpdateBlockNoteSerializer(serializers.ModelSerializer):
+    note = NoteSerializer()
+    class Meta:
+        model = models.BlockNote
+        fields = ("title","image","note")
+
+
 class BlockNoteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     workspace = WorkSpaceSerializer()
+    note = NoteSerializer()
     class Meta:
         model = models.BlockNote
-        fields = ("user", "workspace", "title","image","id","created_at")
+        fields = ("user", "workspace", "note", "title","image","id","created_at")
 
 
 class PromptCreateSerializer(serializers.ModelSerializer):

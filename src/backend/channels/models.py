@@ -64,10 +64,25 @@ class Channel(models.Model):
     def __str__(self):
         return "xyz"
 
+COLOR_CHOICES = (
+    (1,"Red"),
+    (2,"Green")
+)
+
+
+class Note(models.Model):
+    note= models.CharField(max_length=100)
+    created_at= models.DateTimeField(auto_now_add=True)
+    color = models.IntegerField(choices=COLOR_CHOICES)
+
+    def __str__(self):
+        return self.note
+
 
 class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE, null=True, blank=True)
+    note = models.ManyToManyField(Note)
     title=  models.CharField(max_length=50)
     image= models.CharField(max_length=50,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
@@ -191,7 +206,8 @@ class Prompt(models.Model):
     
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
-    blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
+    #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
+    blocknote = models.ManyToManyField(BlockNote)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
