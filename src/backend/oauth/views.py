@@ -16,12 +16,16 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from requests_oauthlib import OAuth2Session
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
-import os
 from dotenv import load_dotenv
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from requests_oauthlib import OAuth1Session
 from django.shortcuts import redirect
+from facebook_business.api import FacebookAdsApi
+from facebook_business.adobjects.user import User
+from facebook_business.adobjects.adsinsights import AdsInsights
+from facebook_business.adobjects.adaccount import AdAccount
+from twitter_ads.client import Client
+from twitter_ads.campaign import Campaign, LineItem
+from twitter_ads.analytics import Analytics
 load_dotenv()
 
 
@@ -35,6 +39,12 @@ def get_channel(email,channel_type_num):
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
 #google
+credentials = {
+"developer_token": os.getenv("GOOGLE_DEVELOPER_TOKEN"),
+"client_id": os.getenv("GOOGLE_CLIENT_ID"),
+"client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+"use_proto_plus": "false"
+}
 google_redirect_uri = 'http://127.0.0.1:8000/api/oauth/google-callback/'
 google_scopes = ["openid","https://www.googleapis.com/auth/adwords" ,"https://www.googleapis.com/auth/userinfo.email" ,"https://www.googleapis.com/auth/userinfo.profile"]
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Adjusted to navigate to the project root
@@ -86,16 +96,34 @@ tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_
 
 
 
+
+#-----------------------------------------------------GOOGLE--------------------------------------------------#
+
+@api_view(("GET",))
+def google_oauth(request):
+    try:
+        authorization_url, state = flow.authorization_url(
+            access_type="offline",
+            state=passthrough_val,
+            prompt="consent",
+            include_granted_scopes="true",
+        )
+        return Response({
+            "url": authorization_url},
+            status=status.HTTP_200_OK
+        )
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def google_oauth_callback(request):
-    credentials = {
-    "developer_token": "IxYU10YtrXbo7exsbvETNw",
-    "client_id": "127357063070-13vjj74l6rmd6qi773k8fgraukp0e8vi.apps.googleusercontent.com",
-    "client_secret": "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",
-    "use_proto_plus": "false"
-    }
+
     # code to get access token from refresh token
 
     # refresh_token = 'your_refresh_token'
@@ -149,8 +177,8 @@ def google_oauth_callback(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        client = GoogleAdsClient.load_from_dict(credentials , version='v16')
-        customer_service = client.get_service("CustomerService")
+        google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+        customer_service = google_client.get_service("CustomerService")
 
         accessible_customers = customer_service.list_accessible_customers()
         
@@ -191,26 +219,141 @@ def google_oauth_callback(request):
         )
 
 
-@api_view(("GET",))
-def google_oauth(request):
+def get_google_marketing_data(customer_id):
+    # aryan
+    # get refresh token from db
+    credentials["refresh_token"] = "get refresh token from db"
+    google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+    query = """
+        SELECT
+            campaign.id,
+            campaign.name,
+            campaign.status,
+            campaign.serving_status,
+            campaign.advertising_channel_type,
+            campaign.start_date,
+            campaign.end_date,
+            campaign_budget.amount_micros,
+            campaign.target.cpa_micros,
+            ad_group.id,
+            ad_group.name,
+            ad_group.status,
+            ad_group_ad.ad.id,
+            ad_group_ad.ad.name,
+            ad_group_ad.status,
+            ad_group_ad.ad.final_urls,
+            ad_group_ad.ad.type,
+            ad_group_ad.ad.text_ad.description,
+            keyword_view.resource_name,
+            keyword_plan_campaign_keyword.text,
+            keyword_plan_campaign_keyword.match_type,
+            metrics.impressions,
+            metrics.clicks,
+            metrics.cost_micros,
+            metrics.average_cpc,
+            metrics.ctr,
+            metrics.conversions,
+            metrics.conversion_rate,
+            metrics.cost_per_conversion,
+            metrics.all_conversions,
+            metrics.click_conversion_rate,
+            metrics.value_per_conversion,
+            metrics.all_conversion_value,
+            segments.age_range,
+            segments.gender,
+            segments.device,
+            segments.location,
+            segments.date,
+            metrics.conversions_value,
+            metrics.all_conversions_value,
+            metrics.view_through_conversions,
+            metrics.interaction_rate,
+            metrics.average_position,
+            segments.week,
+            segments.month,
+            segments.quarter,
+            segments.year
+        FROM
+            campaign
+        WHERE
+            campaign.status = 'ENABLED'
+    """
+
+    ga_service = google_client.get_service("GoogleAdsService")
+    
     try:
-        authorization_url, state = flow.authorization_url(
-            access_type="offline",
-            state=passthrough_val,
-            prompt="consent",
-            include_granted_scopes="true",
-        )
-        return Response({
-            "url": authorization_url},
-            status=status.HTTP_200_OK
-        )
-    except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        response = ga_service.search(customer_id=customer_id, query=query)
+
+        results = []
+        for row in response:
+            result = {
+                "campaign_id": row.campaign.id,
+                "campaign_name": row.campaign.name,
+                "campaign_status": row.campaign.status,
+                "campaign_serving_status": row.campaign.serving_status,
+                "campaign_advertising_channel_type": row.campaign.advertising_channel_type,
+                "campaign_start_date": row.campaign.start_date,
+                "campaign_end_date": row.campaign.end_date,
+                "campaign_budget": row.campaign_budget.amount_micros,
+                "campaign_target_cpa": row.campaign.target.cpa_micros,
+                "ad_group_id": row.ad_group.id,
+                "ad_group_name": row.ad_group.name,
+                "ad_group_status": row.ad_group.status,
+                "ad_id": row.ad_group_ad.ad.id,
+                "ad_name": row.ad_group_ad.ad.name,
+                "ad_status": row.ad_group_ad.status,
+                "ad_final_urls": row.ad_group_ad.ad.final_urls,
+                "ad_type": row.ad_group_ad.ad.type,
+                "ad_description": row.ad_group_ad.ad.text_ad.description,
+                "keyword_resource_name": row.keyword_view.resource_name,
+                "keyword_text": row.keyword_plan_campaign_keyword.text,
+                "keyword_match_type": row.keyword_plan_campaign_keyword.match_type,
+                "metrics_impressions": row.metrics.impressions,
+                "metrics_clicks": row.metrics.clicks,
+                "metrics_cost_micros": row.metrics.cost_micros,
+                "metrics_average_cpc": row.metrics.average_cpc,
+                "metrics_ctr": row.metrics.ctr,
+                "metrics_conversions": row.metrics.conversions,
+                "metrics_conversion_rate": row.metrics.conversion_rate,
+                "metrics_cost_per_conversion": row.metrics.cost_per_conversion,
+                "metrics_all_conversions": row.metrics.all_conversions,
+                "metrics_click_conversion_rate": row.metrics.click_conversion_rate,
+                "metrics_value_per_conversion": row.metrics.value_per_conversion,
+                "metrics_all_conversion_value": row.metrics.all_conversion_value,
+                "segments_age_range": row.segments.age_range,
+                "segments_gender": row.segments.gender,
+                "segments_device": row.segments.device,
+                "segments_location": row.segments.location,
+                "segments_date": row.segments.date,
+                "metrics_conversions_value": row.metrics.conversions_value,
+                "metrics_all_conversions_value": row.metrics.all_conversions_value,
+                "metrics_view_through_conversions": row.metrics.view_through_conversions,
+                "metrics_interaction_rate": row.metrics.interaction_rate,
+                "metrics_average_position": row.metrics.average_position,
+                "segments_week": row.segments.week,
+                "segments_month": row.segments.month,
+                "segments_quarter": row.segments.quarter,
+                "segments_year": row.segments.year
+            }
+            results.append(result)
+
+        print(results)
+
+    except GoogleAdsException as ex:
+        print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
+        for error in ex.failure.errors:
+            print(f"\tError with message {error.message}.")
+            if error.location:
+                for field_path_element in error.location.field_path_elements:
+                    print(f"\t\tOn field: {field_path_element.field_name}")
+
         return Response(
-            {"detail": "An error occurred during the OAuth process"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+
+#-----------------------------------------------------FACEBOOK--------------------------------------------------#
 
 @api_view(("GET",))
 def facebook_oauth(request):
@@ -242,11 +385,21 @@ def facebook_oauth_callback(request):
 
     try:
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
-                                     authorization_response=redirect_response)
+                                     authorization_response=redirect_response) # access_token
 
         user_info_url = 'https://graph.facebook.com/v10.0/me?fields=id,name,email'
         user_info_response = facebook.get(user_info_url)
-        email = user_info_response.json()['email']
+        email = user_info_response.json()['email']  # email
+
+        FacebookAdsApi.init(access_token=token)
+        user = User('me')
+        ad_accounts = user.get_ad_accounts()
+        ad_accounts_list = []
+        for account in ad_accounts:
+            ad_accounts_list.append(account.get("id")) # account id list
+        
+        #aryan
+        #add ad accounts list as credentials (list of ads account ids associated with the facebook account)
 
         # facebook_channel = get_channel(
         #     email=email,
@@ -265,6 +418,98 @@ def facebook_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     
+
+def get_facebook_marketing_data(access_token,ad_account_id):
+    #aryan 
+    # pass access_token and iterate by passing all the account id from db.
+    
+    FacebookAdsApi.init(access_token=access_token)
+    ad_account = AdAccount(ad_account_id)
+
+    fields = [
+        'campaign_id', 'campaign_name', 'objective', 'campaign_status', 'campaign_effective_status',
+        'campaign_start_time', 'campaign_stop_time', 'campaign_daily_budget', 'campaign_lifetime_budget',
+        'adset_id', 'adset_name', 'adset_status', 'adset_effective_status', 'billing_event', 'optimization_goal',
+        'targeting', 'ad_id', 'ad_name', 'ad_status', 'ad_effective_status', 'creative_body', 'creative_title',
+        'creative_image_url', 'impressions', 'reach', 'frequency', 'unique_clicks', 'cpm', 'cpp', 'conversions',
+        'cost_per_conversion', 'conversion_rate', 'website_ctr', 'clicks', 'cost_per_click', 'social_clicks',
+        'social_impressions', 'spend', 'roi', 'purchase_roas', 'value_per_conversion', 'date_start', 'date_stop'
+    ]
+
+    params = {
+        'level': 'ad',
+        'time_range': {'since': '2023-01-01', 'until': '2023-12-31'},
+        'filtering': [],
+        'breakdowns': [],
+    }
+
+    insights = ad_account.get_insights(fields=fields, params=params)
+
+    results = []
+    for insight in insights:
+        result = {
+            "campaign_id": insight.get('campaign_id'),
+            "name": insight.get('campaign_name'),
+            "objective": insight.get('objective'),
+            "status": insight.get('campaign_status'),
+            "effective_status": insight.get('campaign_effective_status'),
+            "start_time": insight.get('campaign_start_time'),
+            "stop_time": insight.get('campaign_stop_time'),
+            "daily_budget": insight.get('campaign_daily_budget'),
+            "lifetime_budget": insight.get('campaign_lifetime_budget'),
+            "adset_id": insight.get('adset_id'),
+            "adset_name": insight.get('adset_name'),
+            "adset_status": insight.get('adset_status'),
+            "adset_effective_status": insight.get('adset_effective_status'),
+            "billing_event": insight.get('billing_event'),
+            "optimization_goal": insight.get('optimization_goal'),
+            "targeting": {
+                "age_min": insight.get('targeting', {}).get('age_min'),
+                "age_max": insight.get('targeting', {}).get('age_max'),
+                "genders": insight.get('targeting', {}).get('genders'),
+                "geo_locations": insight.get('targeting', {}).get('geo_locations'),
+                "interests": insight.get('targeting', {}).get('interests')
+            },
+            "ad_id": insight.get('ad_id'),
+            "ad_name": insight.get('ad_name'),
+            "ad_status": insight.get('ad_status'),
+            "ad_effective_status": insight.get('ad_effective_status'),
+            "creative": {
+                "body": insight.get('creative_body'),
+                "title": insight.get('creative_title'),
+                "image_url": insight.get('creative_image_url')
+            },
+            "impressions": insight.get('impressions'),
+            "reach": insight.get('reach'),
+            "frequency": insight.get('frequency'),
+            "unique_clicks": insight.get('unique_clicks'),
+            "cpm": insight.get('cpm'),
+            "cpp": insight.get('cpp'),
+            "conversions": insight.get('conversions'),
+            "cost_per_conversion": insight.get('cost_per_conversion'),
+            "conversion_rate": insight.get('conversion_rate'),
+            "website_ctr": insight.get('website_ctr'),
+            "clicks": insight.get('clicks'),
+            "cost_per_click": insight.get('cost_per_click'),
+            "social_clicks": insight.get('social_clicks'),
+            "social_impressions": insight.get('social_impressions'),
+            "spend": insight.get('spend'),
+            "roi": insight.get('roi'),
+            "purchase_roas": insight.get('purchase_roas'),
+            "value_per_conversion": insight.get('value_per_conversion'),
+            "date_start": insight.get('date_start'),
+            "date_stop": insight.get('date_stop')
+        }
+        results.append(result)
+
+    print(results)
+
+
+#-----------------------------------------------------TWITTER--------------------------------------------------#
+
+
+# twitter - util functions
+
 def twitter_get_oauth_token(verifier, ro_key, ro_secret):
     oauth_token = OAuth1Session(client_key=twitter_client_id,
                                 client_secret=twitter_client_secret,
@@ -293,6 +538,8 @@ def twitter_get_oauth_request_token():
             {"detail": "Unauthorized request error!!!"},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+    
+
 @api_view(("GET",))
 def twitter_oauth(request):
     try:
@@ -371,6 +618,94 @@ def twitter_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
+def get_twitter_marketing_data(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET):
+    # aryan
+    # get these credentials from twitter db and pass it to the function
+
+    twitter_client = Client(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    accounts = twitter_client.accounts()
+    for account in accounts:
+        data = {
+            "campaigns": [],
+            "line_items": [],
+            "ads": [],
+            "audience_metrics": [],
+            "conversion_metrics": [],
+            "engagement_metrics": [],
+            "revenue_metrics": [],
+            "time_metrics": []
+        }
+
+        # Fetch campaigns
+        for campaign in Campaign.all(account):
+            data["campaigns"].append({
+                "id": campaign.id,
+                "name": campaign.name,
+                "entity_status": campaign.entity_status,
+                "start_time": campaign.start_time,
+                "end_time": campaign.end_time,
+                "daily_budget_amount_local_micro": campaign.daily_budget_amount_local_micro,
+                "total_budget_amount_local_micro": campaign.total_budget_amount_local_micro
+            })
+
+        # Fetch line items
+        for line_item in LineItem.all(account):
+            data["line_items"].append({
+                "id": line_item.id,
+                "name": line_item.name,
+                "campaign_id": line_item.campaign_id,
+                "objective": line_item.objective,
+                "placements": line_item.placements
+            })
+
+        # Fetch ads
+        for ad in PromotedTweet.all(account):
+            data["ads"].append({
+                "id": ad.id,
+                "name": ad.name,
+                "creative_id": ad.creative_id,
+                "entity_status": ad.entity_status
+            })
+
+        # Fetch analytics (audience, conversion, engagement, revenue, and time-based metrics)
+        analytics_data = Analytics.all(account,
+                                    entity='CAMPAIGN',
+                                    metric_groups=[
+                                        'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
+                                        'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
+                                    ],
+                                    granularity='TOTAL')
+
+        for stat in analytics_data:
+            data["audience_metrics"].append({
+                "impressions": stat['impressions'],
+                "reach": stat.get('reach'),  # Reach might not be directly available
+                "engagements": stat['engagements'],
+                "engagement_rate": stat['engagement_rate']
+            })
+            data["conversion_metrics"].append(stat['activity_metrics'])
+            data["engagement_metrics"].append({
+                "follows": stat['follows'],
+                "likes": stat['likes'],
+                "replies": stat['replies'],
+                "retweets": stat['retweets']
+            })
+            data["revenue_metrics"].append({
+                "billed_charge_local_micro": stat['billed_charge_local_micro'],
+                "cpm": stat['cpm'],
+                "cpc": stat['cpc']
+            })
+            data["time_metrics"].append({
+                "start_time": stat['start_time'],
+                "end_time": stat['end_time']
+            })
+
+        print(data)
+
+
+#-----------------------------------------------------LINKEDIN--------------------------------------------------#
+
 @api_view(("GET",))
 def linkedin_oauth(request):
     try:
@@ -438,15 +773,13 @@ def linkedin_oauth_callback(request):
         )
     
 
-
 # @csrf_exempt
 @api_view(("GET",))
 # @permission_classes([AllowAny]) 
-def get_linkedin_marketing_data(request):
+def get_linkedin_marketing_data(access_token):
     # aryan
     # get the access_token from the model 
     # access_token = ??
-    access_token = ""
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
@@ -570,36 +903,7 @@ def get_linkedin_marketing_data(request):
         )
     
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
-def tiktok_oauth_callback(request):
-    try:
-        if request.query_params.get("state") != passthrough_val:
-            return Response(
-            {"detail": "State token does not match the expected state."},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            )
-        redirect_response = request.build_absolute_uri()
-
-        token = tiktok.fetch_token(token_url=tiktok_token_url, authorization_response=redirect_response, client_secret=tiktok_client_secret)
-
-        print(token)
-
-        # aryan
-        # add token to model
-        # no email here!
-
-        return redirect("http://localhost:3000/channels/")
-    
-    except Exception as e:
-        print(f"Exception occurred: {str(e)}")
-        return Response(
-            {"detail": "An error occurred during the OAuth process"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
+#-----------------------------------------------------TIKTOK--------------------------------------------------#
 
 @api_view(("GET",))
 def tiktok_oauth(request):
@@ -617,3 +921,97 @@ def tiktok_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def tiktok_oauth_callback(request):
+    try:
+        if request.query_params.get("state") != passthrough_val:
+            return Response(
+            {"detail": "State token does not match the expected state."},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        redirect_response = request.build_absolute_uri()
+
+        token = tiktok.fetch_token(token_url=tiktok_token_url, authorization_response=redirect_response, client_secret=tiktok_client_secret)
+
+        print(token)
+
+        # aryan
+        # add token to tiktok model
+        # no email here!
+
+        return redirect("http://localhost:3000/channels/")
+    
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+def get_tiktok_marketing_data(access_token):
+    #aryan
+    # pass access token from tiktok model
+    base_url = "https://ads.tiktok.com/open_api/2/"
+    headers = {
+        "access_token": access_token,
+        "Content-Type": "application/json"
+    }
+
+    accounts_url = base_url + "advertiser/get/"
+    accounts_response = requests.get(accounts_url, headers=headers)
+    accounts_data = accounts_response.json()
+    advertiser_ids = [account['advertiser_id'] for account in accounts_data['data']['list']]
+
+    all_data = {}
+
+    for advertiser_id in advertiser_ids:
+        # Fetch campaign information
+        campaign_url = base_url + "campaign/get/"
+        campaign_params = {
+            "advertiser_id": advertiser_id
+        }
+        campaign_response = requests.get(campaign_url, headers=headers, params=campaign_params)
+        campaign_data = campaign_response.json()
+
+        # Fetch ad group information
+        adgroup_url = base_url + "adgroup/get/"
+        adgroup_params = {
+            "advertiser_id": advertiser_id
+        }
+        adgroup_response = requests.get(adgroup_url, headers=headers, params=adgroup_params)
+        adgroup_data = adgroup_response.json()
+
+        # Fetch ad information
+        ad_url = base_url + "ad/get/"
+        ad_params = {
+            "advertiser_id": advertiser_id
+        }
+        ad_response = requests.get(ad_url, headers=headers, params=ad_params)
+        ad_data = ad_response.json()
+
+        # Fetch ad performance data
+        performance_url = base_url + "reports/get/"
+        performance_params = {
+            "advertiser_id": advertiser_id,
+            "start_date": "2022-01-01",
+            "end_date": "2022-12-31",
+            "time_granularity": "daily",
+            "metrics": ["impressions", "clicks", "ctr", "video_views", "conversions", "conversion_rate", "cost_per_conversion", "likes", "shares", "comments", "engagement_rate", "spend", "cpm", "cpc", "roi"],
+            "dimensions": ["ad_id", "date"]
+        }
+        performance_response = requests.get(performance_url, headers=headers, params=performance_params)
+        performance_data = performance_response.json()
+
+        # Store all data in the dictionary
+        all_data[advertiser_id] = {
+            "campaign_data": campaign_data,
+            "adgroup_data": adgroup_data,
+            "ad_data": ad_data,
+            "performance_data": performance_data
+        }
+
+    return all_data
