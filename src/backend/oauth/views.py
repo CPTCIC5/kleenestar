@@ -6,7 +6,6 @@ from backend.settings import AUTH_USER_MODEL
 from channels.models import Channel
 import hashlib
 import os
-from urllib.parse import unquote
 from google_auth_oauthlib.flow import Flow
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -26,6 +25,8 @@ from facebook_business.adobjects.adaccount import AdAccount
 from twitter_ads.client import Client
 from twitter_ads.campaign import Campaign, LineItem
 from twitter_ads.analytics import Analytics
+from twitter_ads.creative import PromotedTweet
+# PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
 
@@ -659,25 +660,30 @@ def get_twitter_marketing_data(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCE
                 "placements": line_item.placements
             })
 
-        # Fetch ads
+        # Fetch ads (Promoted Tweets)
         for ad in PromotedTweet.all(account):
             data["ads"].append({
                 "id": ad.id,
-                "name": ad.name,
-                "creative_id": ad.creative_id,
-                "entity_status": ad.entity_status
+                "tweet_id": ad.tweet_id,
+                "line_item_id": ad.line_item_id,
+                "entity_status": ad.entity_status,
+                "approval_status": ad.approval_status,
+                "created_at": ad.created_at,
+                "updated_at": ad.updated_at
             })
 
         # Fetch analytics (audience, conversion, engagement, revenue, and time-based metrics)
-        analytics_data = Analytics.all(account,
-                                    entity='CAMPAIGN',
-                                    metric_groups=[
-                                        'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
-                                        'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
-                                    ],
-                                    granularity='TOTAL')
+        analytics = Analytics.all(
+            account,
+            entity='CAMPAIGN',
+            metric_groups=[
+                'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
+                'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
+            ],
+            granularity='TOTAL'
+        )
 
-        for stat in analytics_data:
+        for stat in analytics:
             data["audience_metrics"].append({
                 "impressions": stat['impressions'],
                 "reach": stat.get('reach'),  # Reach might not be directly available
@@ -702,7 +708,6 @@ def get_twitter_marketing_data(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCE
             })
 
         print(data)
-
 
 #-----------------------------------------------------LINKEDIN--------------------------------------------------#
 
