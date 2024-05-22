@@ -941,6 +941,13 @@ def tiktok_oauth_callback(request):
         # aryan
         # add token to tiktok model
         # no email here!
+        tiktok_channel = get_channel(
+            email= request.user.email,
+            channel_type_num=5
+        )
+
+        tiktok_channel.credentials.key_1= token
+        tiktok_channel.save()
 
         return redirect("http://localhost:3000/channels/")
     
