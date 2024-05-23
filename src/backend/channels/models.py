@@ -6,6 +6,7 @@ from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from .rag import RagData
+from .old_rag import RagData as RagData_2
 
 load_dotenv()
 
@@ -207,7 +208,7 @@ class Prompt(models.Model):
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
     #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
-    blocknote = models.ManyToManyField(BlockNote)
+    blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

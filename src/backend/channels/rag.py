@@ -4,26 +4,10 @@ from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 
+API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 
-
-# FOR SAVED SNIPPET IN MULTILINE COMMENT
-# from langchain import hub
-# from langchain_core.output_parsers import StrOutputParser
-# from langchain_core.runnables import RunnablePassthrough
-# from langchain_openai import OpenAI 
-# import sys
-# from langchain.text_splitter import CharacterTextSplitter
-
-
-
-
-
-
-
-API_URL ="http://127.0.0.1:8000/api/channels/xyz/"
-
+# Function to fetch workspace data
 def get_workspace():
-    
     response = requests.get(API_URL)
     if response.status_code == 200:
         ResponseData = response.json()
@@ -31,49 +15,59 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return None
 
-    # text_splitter = CharacterTextSplitter(chunk_size=25, chunk_overlap=15)
-    # ORIGINAL PART HERE, Pasting from main()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=80, chunk_overlap=30, length_function=len, is_separator_regex=False)
-    ResponseData = [Document(page_content=x) for x in text_splitter.split_text(str(ResponseData))]
-    return ResponseData
+    documents = [Document(page_content=x) for x in text_splitter.split_text(str(ResponseData))]
+    return documents
 
+# Function to apply metadata filtering
+def filter_by_metadata(documents, query):
+    # Placeholder: filter based on 'relevance' metadata
+    return sorted(documents, key=lambda x: x.metadata.get('relevance', 0), reverse=True)
 
+# Function to apply parent-child chunk retrieval
+def add_parent_child_chunks(documents):
+    enhanced_docs = []
+    for doc in documents:
+        enhanced_docs.append(doc)
+        if 'child_ids' in doc.metadata:
+            for child_id in doc.metadata['child_ids']:
+                child_doc = next((d for d in documents if d.metadata['id'] == child_id), None)
+                if child_doc:
+                    enhanced_docs.append(child_doc)
+    return enhanced_docs
 
-def RagData(question): 
-    embeddings_model = OpenAIEmbeddings()
-    data = get_workspace()
+# Function to simulate multiple document agents
+def retrieve_from_agents(query, embeddings_model, documents):
     db = Chroma(embedding_function=embeddings_model)
-    db.add_documents(data)
-    result = db.similarity_search_with_score(question, k=5)
+    db.add_documents(documents)
+    
+    results = db.similarity_search_with_score(query, k=5)
+    return results
 
+# Main RAG function
+def RagData(question):
+    embeddings_model = OpenAIEmbeddings()
+    documents = get_workspace()
+    
+    if documents is None:
+        return "Failed to retrieve documents."
+    
+    # Apply metadata filtering
+    filtered_docs = filter_by_metadata(documents, question)
+    
+    # Apply parent-child chunk retrieval
+    enriched_docs = add_parent_child_chunks(filtered_docs)
+    
+    # Simulate multiple document agents
+    results = retrieve_from_agents(question, embeddings_model, enriched_docs)
+    
+    # Format the retrieved documents
     def format_docs(result):
-        return "\n\n---\n\n".join([doc.page_content for doc,_score in result])
+        return "\n\n---\n\n".join([doc.page_content for doc, _score in result])
     
-
-    RaggedData = format_docs(result)
+    RaggedData = format_docs(results)
     return str(RaggedData).replace("\n", "")
-    
-    #DATA-FLOW: API -> DATA SEGMENTATION -> EMBEDDINGS -> ADD TO DB -> SIMILARITY SEARCH -> FORMAT DATA -> RETURN DATA
-    
-    
-    
-    
-    
-    ''' THIS SNIPPET IS BEING SAVED JUST IN CASE | IN-FILE LLM INTEGRATION 
-    prompt = hub.pull("rlm/rag-prompt")
-    example_messages = prompt.invoke({"context": "filler context", "question": "filler question"}).to_messages()
-    retriever = db.as_retriever()
 
-    llm = OpenAI()
-
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | prompt | llm | StrOutputParser())
-    os.system("clear")
-
-    system_answer = rag_chain.invoke(question)
-    print(question, "\n", system_answer)
-    return str(system_answer)'''
-    
+# Example usage
 if __name__ != "__main__":
     pass
