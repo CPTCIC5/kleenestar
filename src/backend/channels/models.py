@@ -148,6 +148,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         thread_id=thread.id,
         role="user",
         content=user_query
+        )
         """
         attachments=[
             {
@@ -156,7 +157,6 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
             }
         ]
         """
-    )
     else:
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
