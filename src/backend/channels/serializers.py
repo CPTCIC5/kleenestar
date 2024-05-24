@@ -34,7 +34,7 @@ class ConvoSerializer(serializers.ModelSerializer):
     workspace = WorkSpaceSerializer()
     class Meta:
         model = models.Convo
-        fields = ('id','assistant_id', 'workspace', 'title', 'archived', 'created_at')        
+        fields = ('id','thread_id', 'workspace', 'title', 'archived', 'created_at')        
 
 
 class NoteSerializer(serializers.ModelSerializer):
