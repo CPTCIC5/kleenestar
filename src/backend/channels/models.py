@@ -15,7 +15,7 @@ client = OpenAI()
 #from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
-    key_1 = models.CharField(max_length=255,unique=True)
+    key_1 = models.CharField(max_length=255,unique=True, blank=True, null=True)
     key_2 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_3 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_4 = models.CharField(max_length=255, null=True, blank=True,unique=True)
