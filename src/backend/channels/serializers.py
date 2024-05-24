@@ -47,12 +47,6 @@ class CreateBlockNoteSerializer(serializers.ModelSerializer):
         model = models.BlockNote
         fields = ("title","image")
 
-class UpdateBlockNoteSerializer(serializers.ModelSerializer):
-    note = NoteSerializer()
-    class Meta:
-        model = models.BlockNote
-        fields = ("title","image","note")
-
 
 class BlockNoteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
