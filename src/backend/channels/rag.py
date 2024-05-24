@@ -3,6 +3,7 @@ from langchain_openai import OpenAIEmbeddings, OpenAI
 from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
+from langchain_community.document_transformers import LongContextReorder
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 
@@ -36,6 +37,13 @@ def add_parent_child_chunks(documents):
                     enhanced_docs.append(child_doc)
     return enhanced_docs
 
+# Function to reorder documents based on LongContextReorder
+def long_context_reorder(documents, query):
+    reorder_transformer = LongContextReorder()
+    reordered_docs = reorder_transformer.transform_documents(documents, context=query)
+    return reordered_docs
+
+
 # Function to simulate multiple document agents
 def retrieve_from_agents(query, embeddings_model, documents):
     db = Chroma(embedding_function=embeddings_model)
@@ -58,8 +66,11 @@ def RagData(question):
     # Apply parent-child chunk retrieval
     enriched_docs = add_parent_child_chunks(filtered_docs)
     
+    # Reorder documents using LongContextReorder
+    reordered_docs = long_context_reorder(enriched_docs, question)
+    
     # Simulate multiple document agents
-    results = retrieve_from_agents(question, embeddings_model, enriched_docs)
+    results = retrieve_from_agents(question, embeddings_model, reordered_docs)
     
     # Format the retrieved documents
     def format_docs(result):
