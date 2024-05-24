@@ -37,10 +37,16 @@ class ConvoSerializer(serializers.ModelSerializer):
         fields = ('id','thread_id', 'workspace', 'title', 'archived', 'created_at')        
 
 
-class NoteSerializer(serializers.ModelSerializer):
+class CreateNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Note
-        fields = ['note','created_at','color']
+        fields = ["note", "created_at", "color"]
+
+class NoteSerializer(serializers.ModelSerializer):
+    prompt = "PromptSerializer()"
+    class Meta:
+        model = models.Note
+        fields = ['note','created_at','color','prompt']
 
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
