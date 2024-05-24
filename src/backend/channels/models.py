@@ -138,20 +138,24 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     if file is not None:
 
+        """
         message_file = client.files.create(
           file= open(file.path,"rb"), purpose="assistants"
         )
+        """
 
         message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=user_query,
+        content=user_query
+        """
         attachments=[
             {
                 "file_id": message_file.id,
                 "tools": [{"type": "file_search"}, {"type":"retrieval"} ]
             }
         ]
+        """
     )
     else:
         message = client.beta.threads.messages.create(
