@@ -24,6 +24,9 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
         model = models.Channel
         fields = ["channel_type","credentials"]
 
+
+
+
 class ConvoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
@@ -37,6 +40,8 @@ class ConvoSerializer(serializers.ModelSerializer):
         fields = ('id','thread_id', 'workspace', 'title', 'archived', 'created_at')        
 
 
+
+
 class CreateNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Note
@@ -47,6 +52,9 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Note
         fields = ['note','created_at','color','prompt']
+
+
+
 
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,6 +71,8 @@ class BlockNoteSerializer(serializers.ModelSerializer):
         fields = ("user", "workspace", "note", "title","image","id","created_at")
 
 
+
+
 class PromptCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
@@ -76,10 +86,14 @@ class PromptSerializer(serializers.ModelSerializer):
                   'response_text', 'response_image',  'created_at')
 
 
+
+
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PromptFeedback
         fields = ('category','note')
+
+
 
 
 class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
@@ -94,6 +108,8 @@ class KnowlodgeBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.KnowledgeBase
         fields= ("user","workspace","file","title","id","created_at")
+
+        
 
 """
 class PromptInputSerializer(serializers.Serializer):
