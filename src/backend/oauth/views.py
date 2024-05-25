@@ -206,12 +206,14 @@ def google_oauth_callback(request):
             email=email,
             channel_type_num=1
         )
-
+        
+        print(google_channel.credentials, "creds")
         print(google_channel,"channels")
         google_channel.credentials.key_1 = refresh_token
+        print(google_channel.credentials.key_1, "key")
         google_channel.credentials.key_2 = access_token
         google_channel.credentials.key_3 = customer_id
-        google_channel.save()
+        google_channel.credentials.save()
         
         
         return redirect("http://localhost:3001/channels/")
@@ -229,8 +231,8 @@ def get_google_marketing_data(customer_id):
 
     customer_id = "1766667019"
     credentials["refresh_token"] = "1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA"
-   
     
+        
     google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
     query = """
         SELECT
