@@ -125,6 +125,13 @@ class PromptViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user, prompt= self.get_object())
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
+    @action(methods=("POST",), detail=True, url_path="create-note")  
+    def create_note(self,request):
+        serializer = serializers.CreateNoteSerializer(data=request.data)
+        serializer.save(prompt=self.get_object())
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 """
 class PromptFeedbackView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]

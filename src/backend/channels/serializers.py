@@ -45,7 +45,7 @@ class ConvoSerializer(serializers.ModelSerializer):
 class CreateNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Note
-        fields = ["note", "color"]
+        fields = ["note", "color","blocknote"]
 
 class NoteSerializer(serializers.ModelSerializer):
     prompt = serializers.SerializerMethodField()
@@ -56,11 +56,9 @@ class NoteSerializer(serializers.ModelSerializer):
         fields = ['note', 'created_at', 'color', 'prompt', 'blocknote']
 
     def get_prompt(self, obj):
-        from .serializers import PromptSerializer
         return PromptSerializer(obj.prompt).data
 
     def get_blocknote(self, obj):
-        from .serializers import BlockNoteSerializer
         return BlockNoteSerializer(obj.blocknote).data
     
 
@@ -75,11 +73,15 @@ class CreateBlockNoteSerializer(serializers.ModelSerializer):
 class BlockNoteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     workspace = WorkSpaceSerializer()
-    note = NoteSerializer()
+    notes= NoteSerializer(many=True,read_only=True,source='note')
     
     class Meta:
         model = models.BlockNote
-        fields = ("user", "workspace", "note", "title", "image", "id", "created_at")
+        fields = ("user", "workspace", "title", "image", "id", "created_at","notes")
+
+    
+
+    
 
 
 
