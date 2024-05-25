@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Allow access to anyone
 def merge_json_files(request):
+    # GET the user email check the workspace and then get the credentials for the particular channel based on channel_type(parameter)
     merged_data = []
     
     # List all JSON files in the specified folder

@@ -225,7 +225,7 @@ class Prompt(models.Model):
     response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
     #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
-    blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
+    #blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
