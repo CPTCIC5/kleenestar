@@ -89,7 +89,7 @@ class BlockNoteSerializer(serializers.ModelSerializer):
 class PromptCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
-        fields = ("text_query", "file_query", "blocknote")
+        fields = ("text_query", "file_query")
 
 class PromptSerializer(serializers.ModelSerializer):
     class Meta:
