@@ -15,7 +15,7 @@ from rest_framework.permissions import AllowAny
 @permission_classes([AllowAny])  # Allow access to anyone
 def merge_json_files(request):
     merged_data = []
-
+    
     # List all JSON files in the specified folder
     json_files = [f for f in os.listdir("channels/") if f.endswith(".json")]
 

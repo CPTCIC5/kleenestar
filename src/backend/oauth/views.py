@@ -58,8 +58,8 @@ flow.redirect_uri = google_redirect_uri
 facebook_client_id = os.getenv("FACEBOOK_CLIENT_ID")
 facebook_client_secret = os.getenv("FACEBOOK_CLIENT_SECRET")
 facebook_authorization_base_url = 'https://www.facebook.com/dialog/oauth'
-facebook_redirect_uri = 'http://127.0.0.1:8000/api/oauth/facebook-callback/'
-facebook_scopes = ['ads_read','ads_management']  
+facebook_redirect_uri = 'https://127.0.0.1:8000/api/oauth/facebook-callback/'
+facebook_scopes = ['ads_read','ads_management','public_profile','email']  
 facebook = OAuth2Session(facebook_client_id, redirect_uri=facebook_redirect_uri, scope=facebook_scopes)
 facebook = facebook_compliance_fix(facebook)
 facebook_token_url = 'https://graph.facebook.com/oauth/access_token'
@@ -198,18 +198,21 @@ def google_oauth_callback(request):
             )
         
         customer_id = resource_names[0].split('/')[1]
+        
+        print(customer_id)
 
-        # google_channel = get_channel(
-        #     email=email,
-        #     channel_type_num=1
-        # )
+        google_channel = get_channel(
+            email=email,
+            channel_type_num=1
+        )
 
-        # google_channel.credentials.key_1 = code
-        # google_channel.credentials.key_2 = refresh_token
-        # google_channel.credentials.key_3 = access_token
-        # google_channel.credentials.key_4 = customer_id
-        # google_channel.save()
+        google_channel.credentials.key_1 = code
+        google_channel.credentials.key_2 = refresh_token
+        google_channel.credentials.key_3 = access_token
+        google_channel.credentials.key_4 = customer_id
+        google_channel.save()
 
+        
         return redirect("http://localhost:3000/channels/")
     
     except Exception as e:
@@ -221,9 +224,13 @@ def google_oauth_callback(request):
 
 
 def get_google_marketing_data(customer_id):
+    # credentials = {'email': 'griffin@kleenestar.io', 'code': '4/0AdLIrYfexY4rjSmgtHYgetnURuaiR3g-l15a5p9FAshczs4juOH9KQW4uhBfAEk2vYy9bg', 'refresh_token': '1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA', 'access_token': 'ya29.a0AXooCgvwSOWcRwHL3pweYXOkph__srmWKy7a5RuQXg1mOXqpVDFUsIQCIhZ4FWjRrp3CwFgUM_lJ-VqzEGI89rkqJUUbmvLRPhD8njsiyPsMVAeDEbl_C8VXyzgy_E7smRWN4s65MjTbuG3Ov3rJchJW81DwmiLWHdcoaCgYKAdISARISFQHGX2MiPs0SUQOlHKqRl1oS1zENpw0171', 'customer_id': '1766667019'}
     # aryan
     # get refresh token from db
-    credentials["refresh_token"] = "get refresh token from db"
+    customer_id = "1766667019"
+    credentials["refresh_token"] = "1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA"
+   
+    
     google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
     query = """
         SELECT
@@ -375,9 +382,7 @@ def facebook_oauth(request):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def facebook_oauth_callback(request):
-
     redirect_response = request.build_absolute_uri()
-
     if request.query_params.get("state") != passthrough_val:
         return Response(
             {"detail": "State token does not match the expected state."},
@@ -387,18 +392,18 @@ def facebook_oauth_callback(request):
     try:
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
                                      authorization_response=redirect_response) # access_token
-
+        access_token = token.get("access_token")
         user_info_url = 'https://graph.facebook.com/v10.0/me?fields=id,name,email'
         user_info_response = facebook.get(user_info_url)
         email = user_info_response.json()['email']  # email
 
-        FacebookAdsApi.init(access_token=token)
+        FacebookAdsApi.init(access_token=access_token)
         user = User('me')
         ad_accounts = user.get_ad_accounts()
         ad_accounts_list = []
         for account in ad_accounts:
             ad_accounts_list.append(account.get("id")) # account id list
-        
+        print(ad_accounts_list)
         #aryan
         #add ad accounts list as credentials (list of ads account ids associated with the facebook account)
 
