@@ -15,15 +15,16 @@ client = OpenAI()
 #from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
-    key_1 = models.CharField(max_length=255,unique=True, blank=True, null=True)
+    key_1 = models.CharField(max_length=255,null=True, blank=True)
     key_2 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_3 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_4 = models.CharField(max_length=255, null=True, blank=True,unique=True)
     key_5 = models.CharField(max_length=255,blank=True,null = True)
+    key_6=models.CharField(max_length=255,blank=True,null = True)
 
     def __str__(self):
-        return self.key_1
-
+        return self.key_6
+    
 
 class Channel(models.Model):
     # refresh token
@@ -39,11 +40,22 @@ class Channel(models.Model):
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
     connected = models.BooleanField(default=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE, blank=True, null=True)
+    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
     def save(self, *args, **kwargs):
+        if not self.credentials:
+
+            self.credentials= APICredentials.objects.create(
+                key_1="",
+                key_2="",
+                key_3="",
+                key_4="",
+                key_5="",
+                key_6=self.workspace.business_name
+            )
+        super().save(*args, **kwargs)
 
         # Check the subscription type of the workspace
         if self.workspace.subscription_type == 1:  # Pro
