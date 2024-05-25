@@ -73,18 +73,19 @@ COLOR_CHOICES = (
 
 class Note(models.Model):
     prompt = models.ForeignKey("Prompt",on_delete= models.CASCADE)
+    blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
     note= models.CharField(max_length=100)
     created_at= models.DateTimeField(auto_now_add=True)
     color = models.IntegerField(choices=COLOR_CHOICES)
 
     def __str__(self):
-        return self.note
+        return str(self.blocknote)
 
 
 class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE, null=True, blank=True)
-    note = models.ManyToManyField(Note,blank=True,null=True)
+    #note = models.ManyToManyField(Note,blank=True,null=True)
     title=  models.CharField(max_length=50)
     image= models.CharField(max_length=50,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)

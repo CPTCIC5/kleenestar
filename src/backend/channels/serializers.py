@@ -3,26 +3,26 @@ from workspaces.serializers import WorkSpaceSerializer
 from users.serializers import UserSerializer
 from . import models
 
-
 class APICredentialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.APICredentials
-        fields  = ['key_1','key_2','key_3','key_4','key_5']
-
+        fields = ['key_1', 'key_2', 'key_3', 'key_4', 'key_5']
 
 class ChannelSerializer(serializers.ModelSerializer):
     workspace = WorkSpaceSerializer()
     credentials = APICredentialsSerializer()
+
     class Meta:
         model = models.Channel
-        fields  = ['activated','channel_type','connected','workspace','credentials','created_at']
+        fields = ['activated', 'channel_type', 'connected', 'workspace', 'credentials', 'created_at']
         read_only = ['workspace']
 
 class ChannelCreateSerializer(serializers.ModelSerializer):
     credentials = APICredentialsSerializer()
+
     class Meta:
         model = models.Channel
-        fields = ["channel_type","credentials"]
+        fields = ["channel_type", "credentials"]
 
 
 
@@ -30,14 +30,14 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 class ConvoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
-        fields = ['title','archived']
-        
+        fields = ['title', 'archived']
 
 class ConvoSerializer(serializers.ModelSerializer):
     workspace = WorkSpaceSerializer()
+
     class Meta:
         model = models.Convo
-        fields = ('id','thread_id', 'workspace', 'title', 'archived', 'created_at')        
+        fields = ('id', 'thread_id', 'workspace', 'title', 'archived', 'created_at')
 
 
 
@@ -45,13 +45,24 @@ class ConvoSerializer(serializers.ModelSerializer):
 class CreateNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Note
-        fields = ["note", "created_at", "color"]
+        fields = ["note", "color"]
 
 class NoteSerializer(serializers.ModelSerializer):
-    prompt = "PromptSerializer()"
+    prompt = serializers.SerializerMethodField()
+    blocknote = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Note
-        fields = ['note','created_at','color','prompt']
+        fields = ['note', 'created_at', 'color', 'prompt', 'blocknote']
+
+    def get_prompt(self, obj):
+        from .serializers import PromptSerializer
+        return PromptSerializer(obj.prompt).data
+
+    def get_blocknote(self, obj):
+        from .serializers import BlockNoteSerializer
+        return BlockNoteSerializer(obj.blocknote).data
+    
 
 
 
@@ -59,16 +70,16 @@ class NoteSerializer(serializers.ModelSerializer):
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BlockNote
-        fields = ("title","image")
-
+        fields = ("title", "image")
 
 class BlockNoteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     workspace = WorkSpaceSerializer()
     note = NoteSerializer()
+    
     class Meta:
         model = models.BlockNote
-        fields = ("user", "workspace", "note", "title","image","id","created_at")
+        fields = ("user", "workspace", "note", "title", "image", "id", "created_at")
 
 
 
@@ -76,14 +87,13 @@ class BlockNoteSerializer(serializers.ModelSerializer):
 class PromptCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
-        fields = ("text_query","file_query","blocknote")
-
+        fields = ("text_query", "file_query", "blocknote")
 
 class PromptSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
-        fields = ('id', 'convo', 'author', 'text_query', 'file_query', 
-                  'response_text', 'response_image',  'created_at')
+        fields = ('id', 'convo', 'author', 'text_query', 'file_query', 'response_text', 'response_image', 'created_at')
+
 
 
 
@@ -91,7 +101,7 @@ class PromptSerializer(serializers.ModelSerializer):
 class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PromptFeedback
-        fields = ('category','note')
+        fields = ('category', 'note')
 
 
 
@@ -99,15 +109,16 @@ class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
 class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.KnowledgeBase
-        fields= ("file", "title")
-
+        fields = ("file", "title")
 
 class KnowlodgeBaseSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    workspace= WorkSpaceSerializer()
+    workspace = WorkSpaceSerializer()
+
     class Meta:
         model = models.KnowledgeBase
-        fields= ("user","workspace","file","title","id","created_at")
+        fields = ("user", "workspace", "file", "title", "id", "created_at")
+
 
         
 
