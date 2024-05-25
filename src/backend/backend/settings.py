@@ -97,12 +97,12 @@ CSRF_TRUSTED_ORIGINS = [
     "https://polite-awake-bobcat.ngrok-free.app",
     "https://kleenestar.vercel.app",
     "https://kleenestar.vercel.app/",
-    'http://localhost:3000/',
+    'http://localhost:3001/',
     "http://localhost:8000/"
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://localhost:3000',
+    'https://localhost:3001',
     "https://kleenestar.vercel.app",
     'http://localhost:5173',
     "https://polite-awake-bobcat.ngrok-free.app"
@@ -241,7 +241,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
-    'http://localhost:3000',
+    'http://localhost:3001',
     "http://localhost:8000",
     'http://localhost:5173',
     'https://polite-awake-bobcat.ngrok-free.app'

@@ -19,6 +19,7 @@ from requests_oauthlib import OAuth1Session
 from django.shortcuts import redirect
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.user import User
+from facebook_business.adobjects.adaccountuser import AdAccountUser as AdUser
 from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.adobjects.adaccount import AdAccount
 from twitter_ads.client import Client
@@ -200,20 +201,20 @@ def google_oauth_callback(request):
         customer_id = resource_names[0].split('/')[1]
         
         print(customer_id)
-
+        
         google_channel = get_channel(
             email=email,
             channel_type_num=1
         )
 
-        google_channel.credentials.key_1 = code
-        google_channel.credentials.key_2 = refresh_token
-        google_channel.credentials.key_3 = access_token
-        google_channel.credentials.key_4 = customer_id
+        print(google_channel,"channels")
+        google_channel.credentials.key_1 = refresh_token
+        google_channel.credentials.key_2 = access_token
+        google_channel.credentials.key_3 = customer_id
         google_channel.save()
-
         
-        return redirect("http://localhost:3000/channels/")
+        
+        return redirect("http://localhost:3001/channels/")
     
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
@@ -225,8 +226,7 @@ def google_oauth_callback(request):
 
 def get_google_marketing_data(customer_id):
     # credentials = {'email': 'griffin@kleenestar.io', 'code': '4/0AdLIrYfexY4rjSmgtHYgetnURuaiR3g-l15a5p9FAshczs4juOH9KQW4uhBfAEk2vYy9bg', 'refresh_token': '1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA', 'access_token': 'ya29.a0AXooCgvwSOWcRwHL3pweYXOkph__srmWKy7a5RuQXg1mOXqpVDFUsIQCIhZ4FWjRrp3CwFgUM_lJ-VqzEGI89rkqJUUbmvLRPhD8njsiyPsMVAeDEbl_C8VXyzgy_E7smRWN4s65MjTbuG3Ov3rJchJW81DwmiLWHdcoaCgYKAdISARISFQHGX2MiPs0SUQOlHKqRl1oS1zENpw0171', 'customer_id': '1766667019'}
-    # aryan
-    # get refresh token from db
+
     customer_id = "1766667019"
     credentials["refresh_token"] = "1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA"
    
@@ -392,31 +392,30 @@ def facebook_oauth_callback(request):
     try:
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
                                      authorization_response=redirect_response) # access_token
+        print(token)
         access_token = token.get("access_token")
         user_info_url = 'https://graph.facebook.com/v10.0/me?fields=id,name,email'
         user_info_response = facebook.get(user_info_url)
         email = user_info_response.json()['email']  # email
 
         FacebookAdsApi.init(access_token=access_token)
-        user = User('me')
-        ad_accounts = user.get_ad_accounts()
+        me = AdUser(fbid='me')
+        
+        ad_accounts = me.get_ad_accounts()
         ad_accounts_list = []
         for account in ad_accounts:
             ad_accounts_list.append(account.get("id")) # account id list
-        print(ad_accounts_list)
-        #aryan
-        #add ad accounts list as credentials (list of ads account ids associated with the facebook account)
+        
+        facebook_channel = get_channel(
+            email=email,
+            channel_type_num=2
+        )
 
-        # facebook_channel = get_channel(
-        #     email=email,
-        #     channel_type_num=2
-        # )
+        facebook_channel.credentials.key_1 = access_token
+        facebook_channel.credentials.key_2 = ad_accounts_list
+        facebook_channel.save()
 
-        # facebook_channel.credentials.key_1 = token
-        # facebook_channel.credentials.key_2= email
-        # facebook_channel.save()
-
-        return redirect("http://localhost:3000/channels/")
+        return redirect("http://localhost:3001/channels/")
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -428,7 +427,7 @@ def facebook_oauth_callback(request):
 def get_facebook_marketing_data(access_token,ad_account_id):
     #aryan 
     # pass access_token and iterate by passing all the account id from db.
-    
+
     FacebookAdsApi.init(access_token=access_token)
     ad_account = AdAccount(ad_account_id)
 
@@ -615,7 +614,7 @@ def twitter_oauth_callback(request):
         # twitter_channel.credentials.key_5 = email
         # twitter_channel.save()
 
-        return redirect("http://localhost:3000/channels/")
+        return redirect("http://localhost:3001/channels/")
 
     except Exception as e:
         print(f"Exception occurred: {e}")
@@ -774,7 +773,7 @@ def linkedin_oauth_callback(request):
         # linkedin_channel.credentials.key_3 = email
         # linkedin_channel.save()
 
-        return redirect("http://localhost:3000/channels/")
+        return redirect("http://localhost:3001/channels/")
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -959,7 +958,7 @@ def tiktok_oauth_callback(request):
         tiktok_channel.credentials.key_1= token
         tiktok_channel.save()
 
-        return redirect("http://localhost:3000/channels/")
+        return redirect("http://localhost:3001/channels/")
     
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
