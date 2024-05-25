@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from backend.settings import AUTH_USER_MODEL
 from channels.models import Channel
 import hashlib
 import os
@@ -26,12 +25,13 @@ from twitter_ads.client import Client
 from twitter_ads.campaign import Campaign, LineItem
 from twitter_ads.analytics import Analytics
 from twitter_ads.creative import PromotedTweet
+from users.models import User
 # PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
 
 def get_channel(email,channel_type_num):
-    user = get_object_or_404(AUTH_USER_MODEL,email=email)
+    user = get_object_or_404(User,email=email)
     workspace = user.workspace_set.all()[0]
     return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
 

@@ -39,7 +39,7 @@ class Channel(models.Model):
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
     connected = models.BooleanField(default=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE)
+    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
