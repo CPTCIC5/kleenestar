@@ -126,8 +126,9 @@ class PromptViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
     @action(methods=("POST",), detail=True, url_path="create-note")  
-    def create_note(self,request):
+    def create_note(self,request,pk):
         serializer = serializers.CreateNoteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         serializer.save(prompt=self.get_object())
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

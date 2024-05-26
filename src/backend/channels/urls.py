@@ -41,6 +41,8 @@ urlpatterns = [
     path('convos/<int:pk>/prompts/create/', PromptViewSet.as_view({'post': 'create'}), name='create-prompt'),
     path('prompts/<int:pk>/update/', PromptViewSet.as_view({'patch': 'update'}), name='update-prompt'),
     path('prompts/<int:pk>/delete/', PromptViewSet.as_view({'delete': 'destroy'}), name='delete-prompt'),
+    path('prompts/<int:pk>/feedback/', PromptViewSet.as_view({'post': 'prompt_feedback_upload'}), name='prompt-feedback-upload'),
+    path('prompts/<int:pk>/create-note/', PromptViewSet.as_view({'post': 'create_note'}), name='create-note'),
 
 ]
 urlpatterns += router.urls
