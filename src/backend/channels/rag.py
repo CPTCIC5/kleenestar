@@ -16,7 +16,7 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return None
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=80, chunk_overlap=30, length_function=len, is_separator_regex=False)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=30, length_function=len, is_separator_regex=False)
     documents = [Document(page_content=x) for x in text_splitter.split_text(str(ResponseData))]
     return documents
 

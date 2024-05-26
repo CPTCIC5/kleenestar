@@ -1,30 +1,488 @@
 {
-  "channel": "LinkedIn",
+  "channel": "LinkedIn Ads",
   "campaigns": [
     {
-      "campaign_id": "LNK001",
-      "name": "Lead Generation",
-      "impressions": 25000,
-      "clicks": 1200,
-      "conversions": 80,
-      "cost": 5000,
-      "ctr": 4.8,
-      "conversion_rate": 6.67
+      "campaign_id": "LI001",
+      "name": "Professional Networking Campaign",
+      "impressions": 120000,
+      "clicks": 4800,
+      "conversions": 380,
+      "cost": 18000,
+      "ctr": 4.0,
+      "conversion_rate": 7.92,
+      "top_ads": [
+        {"ad_id": "ad0101", "clicks": 2400, "conversions": 200},
+        {"ad_id": "ad0102", "clicks": 1440, "conversions": 108},
+        {"ad_id": "ad0103", "clicks": 960, "conversions": 72}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 60000, "clicks": 2400, "conversions": 190},
+        "United Kingdom": {"impressions": 30000, "clicks": 1440, "conversions": 110},
+        "Canada": {"impressions": 18000, "clicks": 960, "conversions": 60},
+        "Australia": {"impressions": 12000, "clicks": 0, "conversions": 20}
+      }
     },
     {
-      "campaign_id": "LNK002",
-      "name": "Brand Awareness",
-      "impressions": 18000,
-      "clicks": 800,
-      "conversions": 60,
-      "cost": 4000,
-      "ctr": 4.44,
-      "conversion_rate": 7.5
+      "campaign_id": "LI002",
+      "name": "Career Development Campaign",
+      "impressions": 95000,
+      "clicks": 3800,
+      "conversions": 320,
+      "cost": 14250,
+      "ctr": 4.0,
+      "conversion_rate": 8.42,
+      "top_ads": [
+        {"ad_id": "ad0201", "clicks": 1900, "conversions": 200},
+        {"ad_id": "ad0202", "clicks": 1140, "conversions": 85},
+        {"ad_id": "ad0203", "clicks": 760, "conversions": 35}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 47500, "clicks": 1900, "conversions": 170},
+        "United Kingdom": {"impressions": 23750, "clicks": 1140, "conversions": 100},
+        "Canada": {"impressions": 14250, "clicks": 760, "conversions": 45},
+        "Australia": {"impressions": 9500, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI003",
+      "name": "B2B Lead Generation Campaign",
+      "impressions": 110000,
+      "clicks": 4400,
+      "conversions": 400,
+      "cost": 16500,
+      "ctr": 4.0,
+      "conversion_rate": 9.09,
+      "top_ads": [
+        {"ad_id": "ad0301", "clicks": 2200, "conversions": 220},
+        {"ad_id": "ad0302", "clicks": 1320, "conversions": 100},
+        {"ad_id": "ad0303", "clicks": 880, "conversions": 80}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 55000, "clicks": 2200, "conversions": 200},
+        "United Kingdom": {"impressions": 27500, "clicks": 1320, "conversions": 110},
+        "Canada": {"impressions": 16500, "clicks": 880, "conversions": 65},
+        "Australia": {"impressions": 11000, "clicks": 0, "conversions": 25}
+      }
+    },
+    {
+      "campaign_id": "LI004",
+      "name": "Talent Acquisition Campaign",
+      "impressions": 105000,
+      "clicks": 4200,
+      "conversions": 360,
+      "cost": 15750,
+      "ctr": 4.0,
+      "conversion_rate": 8.57,
+      "top_ads": [
+        {"ad_id": "ad0401", "clicks": 2100, "conversions": 210},
+        {"ad_id": "ad0402", "clicks": 1260, "conversions": 90},
+        {"ad_id": "ad0403", "clicks": 840, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 52500, "clicks": 2100, "conversions": 180},
+        "United Kingdom": {"impressions": 26250, "clicks": 1260, "conversions": 100},
+        "Canada": {"impressions": 15750, "clicks": 840, "conversions": 55},
+        "Australia": {"impressions": 10500, "clicks": 0, "conversions": 25}
+      }
+    },
+    {
+      "campaign_id": "LI005",
+      "name": "Industry Insights Campaign",
+      "impressions": 92000,
+      "clicks": 3680,
+      "conversions": 310,
+      "cost": 13800,
+      "ctr": 4.0,
+      "conversion_rate": 8.42,
+      "top_ads": [
+        {"ad_id": "ad0501", "clicks": 1840, "conversions": 190},
+        {"ad_id": "ad0502", "clicks": 1104, "conversions": 85},
+        {"ad_id": "ad0503", "clicks": 736, "conversions": 35}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 46000, "clicks": 1840, "conversions": 170},
+        "United Kingdom": {"impressions": 23000, "clicks": 1104, "conversions": 95},
+        "Canada": {"impressions": 13800, "clicks": 736, "conversions": 40},
+        "Australia": {"impressions": 9200, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI006",
+      "name": "Webinar Promotion Campaign",
+      "impressions": 88000,
+      "clicks": 3520,
+      "conversions": 290,
+      "cost": 13200,
+      "ctr": 4.0,
+      "conversion_rate": 8.24,
+      "top_ads": [
+        {"ad_id": "ad0601", "clicks": 1760, "conversions": 180},
+        {"ad_id": "ad0602", "clicks": 1056, "conversions": 70},
+        {"ad_id": "ad0603", "clicks": 704, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 44000, "clicks": 1760, "conversions": 160},
+        "United Kingdom": {"impressions": 22000, "clicks": 1056, "conversions": 80},
+        "Canada": {"impressions": 13200, "clicks": 704, "conversions": 45},
+        "Australia": {"impressions": 8800, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI007",
+      "name": "Thought Leadership Campaign",
+      "impressions": 86000,
+      "clicks": 3440,
+      "conversions": 290,
+      "cost": 12900,
+      "ctr": 4.0,
+      "conversion_rate": 8.43,
+      "top_ads": [
+        {"ad_id": "ad0701", "clicks": 1720, "conversions": 180},
+        {"ad_id": "ad0702", "clicks": 1032, "conversions": 70},
+        {"ad_id": "ad0703", "clicks": 688, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 43000, "clicks": 1720, "conversions": 160},
+        "United Kingdom": {"impressions": 21500, "clicks": 1032, "conversions": 80},
+        "Canada": {"impressions": 12900, "clicks": 688, "conversions": 45},
+        "Australia": {"impressions": 8600, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI008",
+      "name": "Product Launch Campaign",
+      "impressions": 100000,
+      "clicks": 4000,
+      "conversions": 330,
+      "cost": 15000,
+      "ctr": 4.0,
+      "conversion_rate": 8.25,
+      "top_ads": [
+        {"ad_id": "ad0801", "clicks": 2000, "conversions": 200},
+        {"ad_id": "ad0802", "clicks": 1200, "conversions": 80},
+        {"ad_id": "ad0803", "clicks": 800, "conversions": 50}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 50000, "clicks": 2000, "conversions": 170},
+        "United Kingdom": {"impressions": 25000, "clicks": 1200, "conversions": 90},
+        "Canada": {"impressions": 15000, "clicks": 800, "conversions": 50},
+        "Australia": {"impressions": 10000, "clicks": 0, "conversions": 20}
+      }
+    },
+    {
+      "campaign_id": "LI009",
+      "name": "Brand Awareness Campaign",
+      "impressions": 108000,
+      "clicks": 4320,
+      "conversions": 370,
+      "cost": 16200,
+      "ctr": 4.0,
+      "conversion_rate": 8.56,
+      "top_ads": [
+        {"ad_id": "ad0901", "clicks": 2160, "conversions": 210},
+        {"ad_id": "ad0902", "clicks": 1296, "conversions": 100},
+        {"ad_id": "ad0903", "clicks": 864, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 54000, "clicks": 2160, "conversions": 190},
+        "United Kingdom": {"impressions": 27000, "clicks": 1296, "conversions": 110},
+        "Canada": {"impressions": 16200, "clicks": 864, "conversions": 60},
+        "Australia": {"impressions": 10800, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI010",
+      "name": "Event Promotion Campaign",
+      "impressions": 94000,
+      "clicks": 3760,
+      "conversions": 300,
+      "cost": 14100,
+      "ctr": 4.0,
+      "conversion_rate": 7.98,
+      "top_ads": [
+        {"ad_id": "ad1001", "clicks": 1880, "conversions": 180},
+        {"ad_id": "ad1002", "clicks": 1128, "conversions": 75},
+        {"ad_id": "ad1003", "clicks": 752, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 47000, "clicks": 1880, "conversions": 160},
+        "United Kingdom": {"impressions": 23500, "clicks": 1128, "conversions": 80},
+        "Canada": {"impressions": 14100, "clicks": 752, "conversions": 50},
+        "Australia": {"impressions": 9400, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI011",
+      "name": "Employee Advocacy Campaign",
+      "impressions": 99000,
+      "clicks": 3960,
+      "conversions": 320,
+      "cost": 14850,
+      "ctr": 4.0,
+      "conversion_rate": 8.08,
+      "top_ads": [
+        {"ad_id": "ad1101", "clicks": 1980, "conversions": 200},
+        {"ad_id": "ad1102", "clicks": 1188, "conversions": 80},
+        {"ad_id": "ad1103", "clicks": 792, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 49500, "clicks": 1980, "conversions": 180},
+        "United Kingdom": {"impressions": 24750, "clicks": 1188, "conversions": 90},
+        "Canada": {"impressions": 14850, "clicks": 792, "conversions": 40},
+        "Australia": {"impressions": 9900, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI012",
+      "name": "Content Marketing Campaign",
+      "impressions": 102000,
+      "clicks": 4080,
+      "conversions": 350,
+      "cost": 15300,
+      "ctr": 4.0,
+      "conversion_rate": 8.58,
+      "top_ads": [
+        {"ad_id": "ad1201", "clicks": 2040, "conversions": 210},
+        {"ad_id": "ad1202", "clicks": 1224, "conversions": 90},
+        {"ad_id": "ad1203", "clicks": 816, "conversions": 50}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 51000, "clicks": 2040, "conversions": 190},
+        "United Kingdom": {"impressions": 25500, "clicks": 1224, "conversions": 100},
+        "Canada": {"impressions": 15300, "clicks": 816, "conversions": 50},
+        "Australia": {"impressions": 10200, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI013",
+      "name": "E-book Promotion Campaign",
+      "impressions": 96000,
+      "clicks": 3840,
+      "conversions": 310,
+      "cost": 14400,
+      "ctr": 4.0,
+      "conversion_rate": 8.07,
+      "top_ads": [
+        {"ad_id": "ad1301", "clicks": 1920, "conversions": 180},
+        {"ad_id": "ad1302", "clicks": 1152, "conversions": 80},
+        {"ad_id": "ad1303", "clicks": 768, "conversions": 50}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 48000, "clicks": 1920, "conversions": 170},
+        "United Kingdom": {"impressions": 24000, "clicks": 1152, "conversions": 90},
+        "Canada": {"impressions": 14400, "clicks": 768, "conversions": 40},
+        "Australia": {"impressions": 9600, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI014",
+      "name": "Case Study Promotion Campaign",
+      "impressions": 98000,
+      "clicks": 3920,
+      "conversions": 320,
+      "cost": 14700,
+      "ctr": 4.0,
+      "conversion_rate": 8.16,
+      "top_ads": [
+        {"ad_id": "ad1401", "clicks": 1960, "conversions": 190},
+        {"ad_id": "ad1402", "clicks": 1176, "conversions": 80},
+        {"ad_id": "ad1403", "clicks": 784, "conversions": 50}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 49000, "clicks": 1960, "conversions": 170},
+        "United Kingdom": {"impressions": 24500, "clicks": 1176, "conversions": 90},
+        "Canada": {"impressions": 14700, "clicks": 784, "conversions": 50},
+        "Australia": {"impressions": 9800, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI015",
+      "name": "Podcast Promotion Campaign",
+      "impressions": 115000,
+      "clicks": 4600,
+      "conversions": 370,
+      "cost": 17250,
+      "ctr": 4.0,
+      "conversion_rate": 8.04,
+      "top_ads": [
+        {"ad_id": "ad1501", "clicks": 2300, "conversions": 200},
+        {"ad_id": "ad1502", "clicks": 1380, "conversions": 100},
+        {"ad_id": "ad1503", "clicks": 920, "conversions": 70}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 57500, "clicks": 2300, "conversions": 190},
+        "United Kingdom": {"impressions": 28750, "clicks": 1380, "conversions": 110},
+        "Canada": {"impressions": 17250, "clicks": 920, "conversions": 50},
+        "Australia": {"impressions": 11500, "clicks": 0, "conversions": 20}
+      }
+    },
+    {
+      "campaign_id": "LI016",
+      "name": "Online Course Promotion Campaign",
+      "impressions": 93000,
+      "clicks": 3720,
+      "conversions": 300,
+      "cost": 13950,
+      "ctr": 4.0,
+      "conversion_rate": 8.06,
+      "top_ads": [
+        {"ad_id": "ad1601", "clicks": 1860, "conversions": 180},
+        {"ad_id": "ad1602", "clicks": 1116, "conversions": 80},
+        {"ad_id": "ad1603", "clicks": 744, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 46500, "clicks": 1860, "conversions": 170},
+        "United Kingdom": {"impressions": 23250, "clicks": 1116, "conversions": 90},
+        "Canada": {"impressions": 13950, "clicks": 744, "conversions": 40},
+        "Australia": {"impressions": 9300, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI017",
+      "name": "Membership Drive Campaign",
+      "impressions": 108000,
+      "clicks": 4320,
+      "conversions": 360,
+      "cost": 16200,
+      "ctr": 4.0,
+      "conversion_rate": 8.33,
+      "top_ads": [
+        {"ad_id": "ad1701", "clicks": 2160, "conversions": 200},
+        {"ad_id": "ad1702", "clicks": 1296, "conversions": 100},
+        {"ad_id": "ad1703", "clicks": 864, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 54000, "clicks": 2160, "conversions": 180},
+        "United Kingdom": {"impressions": 27000, "clicks": 1296, "conversions": 90},
+        "Canada": {"impressions": 16200, "clicks": 864, "conversions": 60},
+        "Australia": {"impressions": 10800, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI018",
+      "name": "Lead Nurturing Campaign",
+      "impressions": 88000,
+      "clicks": 3520,
+      "conversions": 290,
+      "cost": 13200,
+      "ctr": 4.0,
+      "conversion_rate": 8.24,
+      "top_ads": [
+        {"ad_id": "ad1801", "clicks": 1760, "conversions": 180},
+        {"ad_id": "ad1802", "clicks": 1056, "conversions": 70},
+        {"ad_id": "ad1803", "clicks": 704, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 44000, "clicks": 1760, "conversions": 160},
+        "United Kingdom": {"impressions": 22000, "clicks": 1056, "conversions": 80},
+        "Canada": {"impressions": 13200, "clicks": 704, "conversions": 45},
+        "Australia": {"impressions": 8800, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI019",
+      "name": "Market Research Campaign",
+      "impressions": 87000,
+      "clicks": 3480,
+      "conversions": 280,
+      "cost": 13050,
+      "ctr": 4.0,
+      "conversion_rate": 8.05,
+      "top_ads": [
+        {"ad_id": "ad1901", "clicks": 1740, "conversions": 170},
+        {"ad_id": "ad1902", "clicks": 1044, "conversions": 70},
+        {"ad_id": "ad1903", "clicks": 696, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 43500, "clicks": 1740, "conversions": 160},
+        "United Kingdom": {"impressions": 21750, "clicks": 1044, "conversions": 80},
+        "Canada": {"impressions": 13050, "clicks": 696, "conversions": 35},
+        "Australia": {"impressions": 8700, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI020",
+      "name": "Influencer Collaboration Campaign",
+      "impressions": 94000,
+      "clicks": 3760,
+      "conversions": 300,
+      "cost": 14100,
+      "ctr": 4.0,
+      "conversion_rate": 7.98,
+      "top_ads": [
+        {"ad_id": "ad2001", "clicks": 1880, "conversions": 180},
+        {"ad_id": "ad2002", "clicks": 1128, "conversions": 75},
+        {"ad_id": "ad2003", "clicks": 752, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 47000, "clicks": 1880, "conversions": 160},
+        "United Kingdom": {"impressions": 23500, "clicks": 1128, "conversions": 80},
+        "Canada": {"impressions": 14100, "clicks": 752, "conversions": 50},
+        "Australia": {"impressions": 9400, "clicks": 0, "conversions": 10}
+      }
+    },
+    {
+      "campaign_id": "LI021",
+      "name": "Re-engagement Campaign",
+      "impressions": 87000,
+      "clicks": 3480,
+      "conversions": 280,
+      "cost": 13050,
+      "ctr": 4.0,
+      "conversion_rate": 8.05,
+      "top_ads": [
+        {"ad_id": "ad2101", "clicks": 1740, "conversions": 170},
+        {"ad_id": "ad2102", "clicks": 1044, "conversions": 70},
+        {"ad_id": "ad2103", "clicks": 696, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 43500, "clicks": 1740, "conversions": 160},
+        "United Kingdom": {"impressions": 21750, "clicks": 1044, "conversions": 80},
+        "Canada": {"impressions": 13050, "clicks": 696, "conversions": 35},
+        "Australia": {"impressions": 8700, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI022",
+      "name": "Online Event Campaign",
+      "impressions": 88000,
+      "clicks": 3520,
+      "conversions": 290,
+      "cost": 13200,
+      "ctr": 4.0,
+      "conversion_rate": 8.24,
+      "top_ads": [
+        {"ad_id": "ad2201", "clicks": 1760, "conversions": 180},
+        {"ad_id": "ad2202", "clicks": 1056, "conversions": 70},
+        {"ad_id": "ad2203", "clicks": 704, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 44000, "clicks": 1760, "conversions": 160},
+        "United Kingdom": {"impressions": 22000, "clicks": 1056, "conversions": 80},
+        "Canada": {"impressions": 13200, "clicks": 704, "conversions": 45},
+        "Australia": {"impressions": 8800, "clicks": 0, "conversions": 5}
+      }
+    },
+    {
+      "campaign_id": "LI023",
+      "name": "Product Update Campaign",
+      "impressions": 87000,
+      "clicks": 3480,
+      "conversions": 280,
+      "cost": 13050,
+      "ctr": 4.0,
+      "conversion_rate": 8.05,
+      "top_ads": [
+        {"ad_id": "ad2301", "clicks": 1740, "conversions": 170},
+        {"ad_id": "ad2302", "clicks": 1044, "conversions": 70},
+        {"ad_id": "ad2303", "clicks": 696, "conversions": 40}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 43500, "clicks": 1740, "conversions": 160},
+        "United Kingdom": {"impressions": 21750, "clicks": 1044, "conversions": 80},
+        "Canada": {"impressions": 13050, "clicks": 696, "conversions": 35},
+        "Australia": {"impressions": 8700, "clicks": 0, "conversions": 5}
+      }
     }
-  ],
-  "job_title_engagement": {
-    "Manager": 600,
-    "Director": 450,
-    "CEO": 300
-  }
+  ]
 }

@@ -4,39 +4,88 @@
     {
       "campaign_id": "GA001",
       "name": "Search Campaign",
-      "impressions": 50000,
-      "clicks": 2000,
-      "conversions": 150,
-      "cost": 8000,
-      "ctr": 4.0,
-      "conversion_rate": 7.5
+      "description": "A search campaign targeting high-intent keywords for our latest product launch.",
+      "objective": "Increase website traffic and drive conversions.",
+      "impressions": 75000,
+      "clicks": 3500,
+      "conversions": 200,
+      "cost": 12000,
+      "ctr": 4.67,
+      "conversion_rate": 5.71,
+      "comments": [
+        {
+          "date": "2024-05-20",
+          "user": "Marketing Manager",
+          "comment": "We saw a spike in clicks after adjusting our ad copy."
+        },
+        {
+          "date": "2024-05-25",
+          "user": "Campaign Analyst",
+          "comment": "The CTR improved by 1% after the latest keyword optimization."
+        }
+      ]
     },
     {
       "campaign_id": "GA002",
       "name": "Display Campaign",
-      "impressions": 35000,
-      "clicks": 1500,
-      "conversions": 120,
-      "cost": 6000,
-      "ctr": 4.29,
-      "conversion_rate": 8.0
+      "description": "A display campaign to increase brand awareness across various websites.",
+      "objective": "Enhance brand visibility and reach a broader audience.",
+      "impressions": 45000,
+      "clicks": 1800,
+      "conversions": 150,
+      "cost": 7000,
+      "ctr": 4.0,
+      "conversion_rate": 8.33,
+      "comments": [
+        {
+          "date": "2024-05-18",
+          "user": "Creative Director",
+          "comment": "The new banner designs received positive feedback."
+        },
+        {
+          "date": "2024-05-22",
+          "user": "Digital Strategist",
+          "comment": "We're considering A/B testing different color schemes."
+        }
+      ]
     }
   ],
   "top_locations": {
     "United States": {
-      "impressions": 35000,
-      "clicks": 1500,
-      "conversions": 100
+      "impressions": 50000,
+      "clicks": 2200,
+      "conversions": 150,
+      "comments": [
+        {
+          "date": "2024-05-21",
+          "user": "Regional Manager",
+          "comment": "Strong performance in California and New York."
+        }
+      ]
     },
     "United Kingdom": {
-      "impressions": 12000,
-      "clicks": 600,
-      "conversions": 40
+      "impressions": 15000,
+      "clicks": 900,
+      "conversions": 60,
+      "comments": [
+        {
+          "date": "2024-05-23",
+          "user": "Regional Manager",
+          "comment": "London is our top-performing city."
+        }
+      ]
     },
     "Australia": {
       "impressions": 10000,
       "clicks": 400,
-      "conversions": 30
+      "conversions": 40,
+      "comments": [
+        {
+          "date": "2024-05-24",
+          "user": "Regional Manager",
+          "comment": "Considering increasing the budget for Sydney."
+        }
+      ]
     }
   }
 }

@@ -1,31 +1,572 @@
 {
-    "channel": "TikTok",
-    "campaigns": [
-      {
-        "campaign_id": "TT001",
-        "name": "Influencer Partnership",
-        "impressions": 60000,
-        "clicks": 2500,
-        "conversions": 200,
-        "cost": 10000,
-        "ctr": 4.17,
-        "conversion_rate": 8.0
-      },
-      {
-        "campaign_id": "TT002",
-        "name": "Hashtag Challenge",
-        "impressions": 45000,
-        "clicks": 1800,
-        "conversions": 150,
-        "cost": 8000,
-        "ctr": 4.0,
-        "conversion_rate": 8.33
+  "channel": "TikTok Ads",
+  "campaigns": [
+    {
+      "campaign_id": "TT001",
+      "name": "Brand Awareness Campaign",
+      "impressions": 75000,
+      "clicks": 3000,
+      "conversions": 225,
+      "cost": 12000,
+      "ctr": 4.0,
+      "conversion_rate": 7.5,
+      "top_videos": [
+        {"video_id": "vid101", "clicks": 750, "conversions": 75},
+        {"video_id": "vid102", "clicks": 450, "conversions": 45},
+        {"video_id": "vid103", "clicks": 300, "conversions": 30}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 30000, "clicks": 1200, "conversions": 90},
+        "United Kingdom": {"impressions": 22500, "clicks": 900, "conversions": 75},
+        "Canada": {"impressions": 15000, "clicks": 600, "conversions": 45},
+        "Australia": {"impressions": 7500, "clicks": 300, "conversions": 15}
       }
-    ],
-    "user_age_distribution": {
-      "Under 18": 2000,
-      "18-24": 3500,
-      "25-34": 3001
+    },
+    {
+      "campaign_id": "TT002",
+      "name": "Engagement Campaign",
+      "impressions": 52500,
+      "clicks": 2250,
+      "conversions": 180,
+      "cost": 9000,
+      "ctr": 4.29,
+      "conversion_rate": 8.0,
+      "top_videos": [
+        {"video_id": "vid201", "clicks": 600, "conversions": 60},
+        {"video_id": "vid202", "clicks": 450, "conversions": 45},
+        {"video_id": "vid203", "clicks": 300, "conversions": 30}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 22500, "clicks": 900, "conversions": 60},
+        "United Kingdom": {"impressions": 15000, "clicks": 600, "conversions": 45},
+        "Canada": {"impressions": 7500, "clicks": 450, "conversions": 30},
+        "Australia": {"impressions": 7500, "clicks": 300, "conversions": 45}
+      }
+    },
+    {
+      "campaign_id": "TT003",
+      "name": "Conversion Campaign",
+      "impressions": 67500,
+      "clicks": 2700,
+      "conversions": 210,
+      "cost": 10500,
+      "ctr": 4.0,
+      "conversion_rate": 7.78,
+      "top_videos": [
+        {"video_id": "vid301", "clicks": 900, "conversions": 90},
+        {"video_id": "vid302", "clicks": 750, "conversions": 75},
+        {"video_id": "vid303", "clicks": 600, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 30000, "clicks": 1200, "conversions": 105},
+        "United Kingdom": {"impressions": 15000, "clicks": 750, "conversions": 60},
+        "Canada": {"impressions": 15000, "clicks": 600, "conversions": 30},
+        "Australia": {"impressions": 7500, "clicks": 150, "conversions": 15}
+      }
+    },
+    {
+      "campaign_id": "TT004",
+      "name": "App Install Campaign",
+      "impressions": 90000,
+      "clicks": 3750,
+      "conversions": 300,
+      "cost": 13500,
+      "ctr": 4.17,
+      "conversion_rate": 8.0,
+      "top_videos": [
+        {"video_id": "vid401", "clicks": 1200, "conversions": 120},
+        {"video_id": "vid402", "clicks": 1050, "conversions": 105},
+        {"video_id": "vid403", "clicks": 900, "conversions": 75}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 37500, "clicks": 1500, "conversions": 150},
+        "United Kingdom": {"impressions": 22500, "clicks": 1050, "conversions": 75},
+        "Canada": {"impressions": 15000, "clicks": 750, "conversions": 45},
+        "Australia": {"impressions": 15000, "clicks": 450, "conversions": 30}
+      }
+    },
+    {
+      "campaign_id": "TT005",
+      "name": "Product Launch Campaign",
+      "impressions": 82500,
+      "clicks": 3450,
+      "conversions": 270,
+      "cost": 12750,
+      "ctr": 4.18,
+      "conversion_rate": 7.83,
+      "top_videos": [
+        {"video_id": "vid501", "clicks": 1350, "conversions": 135},
+        {"video_id": "vid502", "clicks": 1200, "conversions": 90},
+        {"video_id": "vid503", "clicks": 900, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 37500, "clicks": 1500, "conversions": 120},
+        "United Kingdom": {"impressions": 22500, "clicks": 1200, "conversions": 90},
+        "Canada": {"impressions": 15000, "clicks": 600, "conversions": 45},
+        "Australia": {"impressions": 7500, "clicks": 150, "conversions": 15}
+      }
+    },
+    {
+      "campaign_id": "TT006",
+      "name": "Holiday Promotion Campaign",
+      "impressions": 97500,
+      "clicks": 4050,
+      "conversions": 330,
+      "cost": 14500,
+      "ctr": 4.15,
+      "conversion_rate": 8.15,
+      "top_videos": [
+        {"video_id": "vid601", "clicks": 1800, "conversions": 180},
+        {"video_id": "vid602", "clicks": 1350, "conversions": 135},
+        {"video_id": "vid603", "clicks": 900, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 45000, "clicks": 1800, "conversions": 165},
+        "United Kingdom": {"impressions": 22500, "clicks": 1350, "conversions": 90},
+        "Canada": {"impressions": 15000, "clicks": 750, "conversions": 45},
+        "Australia": {"impressions": 15000, "clicks": 150, "conversions": 30}
+      }
+    },
+    {
+      "campaign_id": "TT007",
+      "name": "Event Promotion Campaign",
+      "impressions": 102000,
+      "clicks": 4200,
+      "conversions": 360,
+      "cost": 16000,
+      "ctr": 4.12,
+      "conversion_rate": 8.57,
+      "top_videos": [
+        {"video_id": "vid701", "clicks": 1950, "conversions": 195},
+        {"video_id": "vid702", "clicks": 1500, "conversions": 135},
+        {"video_id": "vid703", "clicks": 1050, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 48000, "clicks": 1950, "conversions": 180},
+        "United Kingdom": {"impressions": 22500, "clicks": 1500, "conversions": 105},
+        "Canada": {"impressions": 15000, "clicks": 1050, "conversions": 60},
+        "Australia": {"impressions": 15000, "clicks": 150, "conversions": 15}
+      }
+    },
+    {
+      "campaign_id": "TT008",
+      "name": "Contest Campaign",
+      "impressions": 87000,
+      "clicks": 3600,
+      "conversions": 300,
+      "cost": 13500,
+      "ctr": 4.14,
+      "conversion_rate": 8.33,
+      "top_videos": [
+        {"video_id": "vid801", "clicks": 1800, "conversions": 180},
+        {"video_id": "vid802", "clicks": 1200, "conversions": 90},
+        {"video_id": "vid803", "clicks": 600, "conversions": 30}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 37500, "clicks": 1500, "conversions": 135},
+        "United Kingdom": {"impressions": 22500, "clicks": 1200, "conversions": 90},
+        "Canada": {"impressions": 15000, "clicks": 600, "conversions": 45},
+        "Australia": {"impressions": 12000, "clicks": 300, "conversions": 30}
+      }
+    },
+    {
+      "campaign_id": "TT009",
+      "name": "Influencer Campaign",
+      "impressions": 120000,
+      "clicks": 4800,
+      "conversions": 400,
+      "cost": 18000,
+      "ctr": 4.0,
+      "conversion_rate": 8.33,
+      "top_videos": [
+        {"video_id": "vid901", "clicks": 2400, "conversions": 240},
+        {"video_id": "vid902", "clicks": 1200, "conversions": 100},
+        {"video_id": "vid903", "clicks": 600, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 60000, "clicks": 2400, "conversions": 200},
+        "United Kingdom": {"impressions": 30000, "clicks": 1200, "conversions": 100},
+        "Canada": {"impressions": 20000, "clicks": 800, "conversions": 60},
+        "Australia": {"impressions": 10000, "clicks": 400, "conversions": 40}
+      }
+    },
+    {
+      "campaign_id": "TT010",
+      "name": "Retargeting Campaign",
+      "impressions": 105000,
+      "clicks": 4350,
+      "conversions": 360,
+      "cost": 16000,
+      "ctr": 4.14,
+      "conversion_rate": 8.28,
+      "top_videos": [
+        {"video_id": "vid1001", "clicks": 2100, "conversions": 210},
+        {"video_id": "vid1002", "clicks": 1350, "conversions": 90},
+        {"video_id": "vid1003", "clicks": 900, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 52500, "clicks": 2100, "conversions": 180},
+        "United Kingdom": {"impressions": 26250, "clicks": 1350, "conversions": 90},
+        "Canada": {"impressions": 15750, "clicks": 900, "conversions": 60},
+        "Australia": {"impressions": 10500, "clicks": 300, "conversions": 30}
+      }
+    },
+    {
+      "campaign_id": "TT011",
+      "name": "Product Demo Campaign",
+      "impressions": 97500,
+      "clicks": 3900,
+      "conversions": 315,
+      "cost": 15000,
+      "ctr": 4.0,
+      "conversion_rate": 8.08,
+      "top_videos": [
+        {"video_id": "vid1101", "clicks": 1950, "conversions": 195},
+        {"video_id": "vid1102", "clicks": 1170, "conversions": 78},
+        {"video_id": "vid1103", "clicks": 780, "conversions": 42}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 48750, "clicks": 1950, "conversions": 158},
+        "United Kingdom": {"impressions": 24375, "clicks": 1170, "conversions": 90},
+        "Canada": {"impressions": 14625, "clicks": 780, "conversions": 47},
+        "Australia": {"impressions": 9750, "clicks": 0, "conversions": 20}
+      }
+    },
+    {
+      "campaign_id": "TT012",
+      "name": "Seasonal Sales Campaign",
+      "impressions": 99000,
+      "clicks": 3960,
+      "conversions": 324,
+      "cost": 14850,
+      "ctr": 4.0,
+      "conversion_rate": 8.18,
+      "top_videos": [
+        {"video_id": "vid1201", "clicks": 1980, "conversions": 198},
+        {"video_id": "vid1202", "clicks": 1188, "conversions": 79},
+        {"video_id": "vid1203", "clicks": 792, "conversions": 47}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 49500, "clicks": 1980, "conversions": 160},
+        "United Kingdom": {"impressions": 24750, "clicks": 1188, "conversions": 95},
+        "Canada": {"impressions": 14850, "clicks": 792, "conversions": 48},
+        "Australia": {"impressions": 9900, "clicks": 0, "conversions": 21}
+      }
+    },
+    {
+      "campaign_id": "TT013",
+      "name": "Clearance Campaign",
+      "impressions": 86000,
+      "clicks": 3440,
+      "conversions": 279,
+      "cost": 12900,
+      "ctr": 4.0,
+      "conversion_rate": 8.11,
+      "top_videos": [
+        {"video_id": "vid1301", "clicks": 1720, "conversions": 172},
+        {"video_id": "vid1302", "clicks": 1032, "conversions": 71},
+        {"video_id": "vid1303", "clicks": 688, "conversions": 36}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 43000, "clicks": 1720, "conversions": 140},
+        "United Kingdom": {"impressions": 21500, "clicks": 1032, "conversions": 83},
+        "Canada": {"impressions": 12900, "clicks": 688, "conversions": 40},
+        "Australia": {"impressions": 8600, "clicks": 0, "conversions": 16}
+      }
+    },
+    {
+      "campaign_id": "TT014",
+      "name": "Flash Sale Campaign",
+      "impressions": 123000,
+      "clicks": 4920,
+      "conversions": 393,
+      "cost": 18450,
+      "ctr": 4.0,
+      "conversion_rate": 8.0,
+      "top_videos": [
+        {"video_id": "vid1401", "clicks": 2460, "conversions": 246},
+        {"video_id": "vid1402", "clicks": 1476, "conversions": 98},
+        {"video_id": "vid1403", "clicks": 984, "conversions": 49}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 61500, "clicks": 2460, "conversions": 197},
+        "United Kingdom": {"impressions": 30750, "clicks": 1476, "conversions": 99},
+        "Canada": {"impressions": 18450, "clicks": 984, "conversions": 50},
+        "Australia": {"impressions": 12300, "clicks": 0, "conversions": 20}
+      }
+    },
+    {
+      "campaign_id": "TT015",
+      "name": "Back-to-School Campaign",
+      "impressions": 98000,
+      "clicks": 3920,
+      "conversions": 320,
+      "cost": 14700,
+      "ctr": 4.0,
+      "conversion_rate": 8.16,
+      "top_videos": [
+        {"video_id": "vid1501", "clicks": 1960, "conversions": 196},
+        {"video_id": "vid1502", "clicks": 1176, "conversions": 78},
+        {"video_id": "vid1503", "clicks": 784, "conversions": 46}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 49000, "clicks": 1960, "conversions": 160},
+        "United Kingdom": {"impressions": 24500, "clicks": 1176, "conversions": 95},
+        "Canada": {"impressions": 14700, "clicks": 784, "conversions": 48},
+        "Australia": {"impressions": 9800, "clicks": 0, "conversions": 17}
+      }
+    },
+    {
+      "campaign_id": "TT016",
+      "name": "Customer Appreciation Campaign",
+      "impressions": 97000,
+      "clicks": 3880,
+      "conversions": 314,
+      "cost": 14600,
+      "ctr": 4.0,
+      "conversion_rate": 8.09,
+      "top_videos": [
+        {"video_id": "vid1601", "clicks": 1940, "conversions": 194},
+        {"video_id": "vid1602", "clicks": 1164, "conversions": 77},
+        {"video_id": "vid1603", "clicks": 776, "conversions": 43}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 48500, "clicks": 1940, "conversions": 157},
+        "United Kingdom": {"impressions": 24250, "clicks": 1164, "conversions": 92},
+        "Canada": {"impressions": 14550, "clicks": 776, "conversions": 45},
+        "Australia": {"impressions": 9700, "clicks": 0, "conversions": 20}
+      }
+    },
+    {
+      "campaign_id": "TT017",
+      "name": "Grand Opening Campaign",
+      "impressions": 103000,
+      "clicks": 4120,
+      "conversions": 333,
+      "cost": 15300,
+      "ctr": 4.0,
+      "conversion_rate": 8.09,
+      "top_videos": [
+        {"video_id": "vid1701", "clicks": 2060, "conversions": 206},
+        {"video_id": "vid1702", "clicks": 1236, "conversions": 82},
+        {"video_id": "vid1703", "clicks": 824, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 51500, "clicks": 2060, "conversions": 166},
+        "United Kingdom": {"impressions": 25750, "clicks": 1236, "conversions": 97},
+        "Canada": {"impressions": 15450, "clicks": 824, "conversions": 48},
+        "Australia": {"impressions": 10300, "clicks": 0, "conversions": 22}
+      }
+    },
+    {
+      "campaign_id": "TT018",
+      "name": "Market Expansion Campaign",
+      "impressions": 108000,
+      "clicks": 4320,
+      "conversions": 360,
+      "cost": 16200,
+      "ctr": 4.0,
+      "conversion_rate": 8.33,
+      "top_videos": [
+        {"video_id": "vid1801", "clicks": 2160, "conversions": 216},
+        {"video_id": "vid1802", "clicks": 1296, "conversions": 86},
+        {"video_id": "vid1803", "clicks": 864, "conversions": 58}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 54000, "clicks": 2160, "conversions": 180},
+        "United Kingdom": {"impressions": 27000, "clicks": 1296, "conversions": 97},
+        "Canada": {"impressions": 16200, "clicks": 864, "conversions": 53},
+        "Australia": {"impressions": 10800, "clicks": 0, "conversions": 30}
+      }
+    },
+    {
+      "campaign_id": "TT019",
+      "name": "Rebranding Campaign",
+      "impressions": 95000,
+      "clicks": 3800,
+      "conversions": 315,
+      "cost": 14000,
+      "ctr": 4.0,
+      "conversion_rate": 8.29,
+      "top_videos": [
+        {"video_id": "vid1901", "clicks": 1900, "conversions": 190},
+        {"video_id": "vid1902", "clicks": 1140, "conversions": 79},
+        {"video_id": "vid1903", "clicks": 760, "conversions": 46}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 47500, "clicks": 1900, "conversions": 155},
+        "United Kingdom": {"impressions": 23750, "clicks": 1140, "conversions": 93},
+        "Canada": {"impressions": 14250, "clicks": 760, "conversions": 50},
+        "Australia": {"impressions": 9500, "clicks": 0, "conversions": 17}
+      }
+    },
+    {
+      "campaign_id": "TT020",
+      "name": "Corporate Social Responsibility Campaign",
+      "impressions": 98000,
+      "clicks": 3920,
+      "conversions": 320,
+      "cost": 14700,
+      "ctr": 4.0,
+      "conversion_rate": 8.16,
+      "top_videos": [
+        {"video_id": "vid2001", "clicks": 1960, "conversions": 196},
+        {"video_id": "vid2002", "clicks": 1176, "conversions": 78},
+        {"video_id": "vid2003", "clicks": 784, "conversions": 46}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 49000, "clicks": 1960, "conversions": 160},
+        "United Kingdom": {"impressions": 24500, "clicks": 1176, "conversions": 95},
+        "Canada": {"impressions": 14700, "clicks": 784, "conversions": 48},
+        "Australia": {"impressions": 9800, "clicks": 0, "conversions": 17}
+      }
+    },
+    {
+      "campaign_id": "TT021",
+      "name": "Charity Campaign",
+      "impressions": 110000,
+      "clicks": 4400,
+      "conversions": 360,
+      "cost": 16500,
+      "ctr": 4.0,
+      "conversion_rate": 8.18,
+      "top_videos": [
+        {"video_id": "vid2101", "clicks": 2200, "conversions": 220},
+        {"video_id": "vid2102", "clicks": 1320, "conversions": 86},
+        {"video_id": "vid2103", "clicks": 880, "conversions": 54}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 55000, "clicks": 2200, "conversions": 180},
+        "United Kingdom": {"impressions": 27500, "clicks": 1320, "conversions": 100},
+        "Canada": {"impressions": 16500, "clicks": 880, "conversions": 54},
+        "Australia": {"impressions": 11000, "clicks": 0, "conversions": 26}
+      }
+    },
+    {
+      "campaign_id": "TT022",
+      "name": "Special Edition Product Campaign",
+      "impressions": 90000,
+      "clicks": 3600,
+      "conversions": 300,
+      "cost": 13500,
+      "ctr": 4.0,
+      "conversion_rate": 8.33,
+      "top_videos": [
+        {"video_id": "vid2201", "clicks": 1800, "conversions": 180},
+        {"video_id": "vid2202", "clicks": 1080, "conversions": 72},
+        {"video_id": "vid2203", "clicks": 720, "conversions": 48}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 45000, "clicks": 1800, "conversions": 150},
+        "United Kingdom": {"impressions": 22500, "clicks": 1080, "conversions": 90},
+        "Canada": {"impressions": 13500, "clicks": 720, "conversions": 48},
+        "Australia": {"impressions": 9000, "clicks": 0, "conversions": 12}
+      }
+    },
+    {
+      "campaign_id": "TT023",
+      "name": "Referral Campaign",
+      "impressions": 85000,
+      "clicks": 3400,
+      "conversions": 283,
+      "cost": 12750,
+      "ctr": 4.0,
+      "conversion_rate": 8.32,
+      "top_videos": [
+        {"video_id": "vid2301", "clicks": 1700, "conversions": 170},
+        {"video_id": "vid2302", "clicks": 1020, "conversions": 68},
+        {"video_id": "vid2303", "clicks": 680, "conversions": 45}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 42500, "clicks": 1700, "conversions": 142},
+        "United Kingdom": {"impressions": 21250, "clicks": 1020, "conversions": 85},
+        "Canada": {"impressions": 12750, "clicks": 680, "conversions": 41},
+        "Australia": {"impressions": 8500, "clicks": 0, "conversions": 15}
+      }
+    },
+    {
+      "campaign_id": "TT024",
+      "name": "VIP Exclusive Campaign",
+      "impressions": 106000,
+      "clicks": 4240,
+      "conversions": 340,
+      "cost": 15900,
+      "ctr": 4.0,
+      "conversion_rate": 8.02,
+      "top_videos": [
+        {"video_id": "vid2401", "clicks": 2120, "conversions": 212},
+        {"video_id": "vid2402", "clicks": 1272, "conversions": 81},
+        {"video_id": "vid2403", "clicks": 848, "conversions": 47}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 53000, "clicks": 2120, "conversions": 170},
+        "United Kingdom": {"impressions": 26500, "clicks": 1272, "conversions": 90},
+        "Canada": {"impressions": 15900, "clicks": 848, "conversions": 47},
+        "Australia": {"impressions": 10600, "clicks": 0, "conversions": 13}
+      }
+    },
+    {
+      "campaign_id": "TT025",
+      "name": "Black Friday Campaign",
+      "impressions": 125000,
+      "clicks": 5000,
+      "conversions": 410,
+      "cost": 18750,
+      "ctr": 4.0,
+      "conversion_rate": 8.2,
+      "top_videos": [
+        {"video_id": "vid2501", "clicks": 2500, "conversions": 250},
+        {"video_id": "vid2502", "clicks": 1500, "conversions": 100},
+        {"video_id": "vid2503", "clicks": 1000, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 62500, "clicks": 2500, "conversions": 205},
+        "United Kingdom": {"impressions": 31250, "clicks": 1500, "conversions": 105},
+        "Canada": {"impressions": 18750, "clicks": 1000, "conversions": 66},
+        "Australia": {"impressions": 12500, "clicks": 0, "conversions": 34}
+      }
+    },
+    {
+      "campaign_id": "TT026",
+      "name": "New Year Campaign",
+      "impressions": 94000,
+      "clicks": 3760,
+      "conversions": 300,
+      "cost": 14100,
+      "ctr": 4.0,
+      "conversion_rate": 7.98,
+      "top_videos": [
+        {"video_id": "vid2601", "clicks": 1880, "conversions": 188},
+        {"video_id": "vid2602", "clicks": 1128, "conversions": 75},
+        {"video_id": "vid2603", "clicks": 752, "conversions": 37}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 47000, "clicks": 1880, "conversions": 150},
+        "United Kingdom": {"impressions": 23500, "clicks": 1128, "conversions": 92},
+        "Canada": {"impressions": 14100, "clicks": 752, "conversions": 50},
+        "Australia": {"impressions": 9400, "clicks": 0, "conversions": 8}
+      }
+    },
+    {
+      "campaign_id": "TT027",
+      "name": "Anniversary Sale Campaign",
+      "impressions": 111000,
+      "clicks": 4440,
+      "conversions": 367,
+      "cost": 16650,
+      "ctr": 4.0,
+      "conversion_rate": 8.27,
+      "top_videos": [
+        {"video_id": "vid2701", "clicks": 2220, "conversions": 222},
+        {"video_id": "vid2702", "clicks": 1332, "conversions": 85},
+        {"video_id": "vid2703", "clicks": 888, "conversions": 60}
+      ],
+      "top_locations": {
+        "United States": {"impressions": 55500, "clicks": 2220, "conversions": 183},
+        "United Kingdom": {"impressions": 27750, "clicks": 1332, "conversions": 102},
+        "Canada": {"impressions": 16650, "clicks": 888, "conversions": 60},
+        "Australia": {"impressions": 11100, "clicks": 0, "conversions": 22}
+      }
     }
-  }
-  
+  ]
+}
