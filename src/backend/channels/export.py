@@ -8,7 +8,8 @@ import json
 import os
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from oauth import views
 
 
 @api_view(['GET'])
@@ -33,5 +34,26 @@ def merge_json_files(request):
 
         # Merge the file data into the merged_data dictionary
         merged_data.append(file_data)
+
+    return Response(merged_data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Allow access logged in user
+def merge_json_files(request):
+    merged_data = []
+
+    # Get data from each marketing channel function
+    google_data = views.get_google_marketing_data()
+    facebook_data = views.get_facebook_marketing_data()
+    twitter_data = views.get_twitter_marketing_data()
+    linkedin_data = views.get_linkedin_marketing_data()
+    tiktok_data = views.get_tiktok_marketing_data()
+
+    # Append each data to the merged_data list
+    merged_data.append(google_data)
+    merged_data.append(facebook_data)
+    merged_data.append(twitter_data)
+    merged_data.append(linkedin_data)
+    merged_data.append(tiktok_data)
 
     return Response(merged_data)
