@@ -37,6 +37,7 @@ def merge_json_files(request):
 
     return Response(merged_data)
 
+"""
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # Allow access logged in user
 def merge_json_files(request):
@@ -57,3 +58,4 @@ def merge_json_files(request):
     merged_data.append(tiktok_data)
 
     return Response(merged_data)
+"""
