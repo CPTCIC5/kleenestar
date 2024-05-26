@@ -235,7 +235,7 @@ class Prompt(models.Model):
         # error is coming from here
         response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
 
-        self.response_text = response_data.get('text', '')
+        self.response_text = response_data['text']
         self.response_image = response_data.get('image', None)
 
         super().save(*args, **kwargs)

@@ -86,33 +86,6 @@ AUTHENTICATION_BACKENDS = [
 
 CSRF_COOKIE_SECURE= False
 
-CORS_ALLOW_HEADERS = [
-    'X-CSRFToken',  # Add any other headers you need to allow
-    'Content-Type',  # Include Content-Type header
-]
-CORS_ALLOW_CREDENTIALS = True
-
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://polite-awake-bobcat.ngrok-free.app",
-    "https://kleenestar.vercel.app",
-    "https://kleenestar.vercel.app/",
-    'http://localhost:3001/',
-    "http://localhost:8000/"
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'https://localhost:3001',
-    "https://kleenestar.vercel.app",
-    'http://localhost:5173',
-    "https://polite-awake-bobcat.ngrok-free.app"
-    
-    #'https://1.0.0.127.in-addr.arpa'
-]
-CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
 T_URLCONF = "backend.urls"
 
 
@@ -242,6 +215,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://193a-2405-201-3023-68e8-99ba-718-4d2c-e83b.ngrok-free.app",
     'http://localhost:3001',
+    'http://localhost:3000',
     "http://localhost:8000",
     'http://localhost:5173',
     'https://polite-awake-bobcat.ngrok-free.app'
