@@ -27,6 +27,7 @@ from twitter_ads.campaign import Campaign, LineItem
 from twitter_ads.analytics import Analytics
 from twitter_ads.creative import PromotedTweet
 from users.models import User
+from datetime import datetime, timedelta
 # PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
@@ -207,10 +208,7 @@ def google_oauth_callback(request):
             channel_type_num=1
         )
         
-        print(google_channel.credentials, "creds")
-        print(google_channel,"channels")
         google_channel.credentials.key_1 = refresh_token
-        print(google_channel.credentials.key_1, "key")
         google_channel.credentials.key_2 = access_token
         google_channel.credentials.key_3 = customer_id
         google_channel.credentials.save()
@@ -226,141 +224,244 @@ def google_oauth_callback(request):
         )
 
 
-def get_google_marketing_data(customer_id):
-    # credentials = {'email': 'griffin@kleenestar.io', 'code': '4/0AdLIrYfexY4rjSmgtHYgetnURuaiR3g-l15a5p9FAshczs4juOH9KQW4uhBfAEk2vYy9bg', 'refresh_token': '1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA', 'access_token': 'ya29.a0AXooCgvwSOWcRwHL3pweYXOkph__srmWKy7a5RuQXg1mOXqpVDFUsIQCIhZ4FWjRrp3CwFgUM_lJ-VqzEGI89rkqJUUbmvLRPhD8njsiyPsMVAeDEbl_C8VXyzgy_E7smRWN4s65MjTbuG3Ov3rJchJW81DwmiLWHdcoaCgYKAdISARISFQHGX2MiPs0SUQOlHKqRl1oS1zENpw0171', 'customer_id': '1766667019'}
 
-    customer_id = "1766667019"
-    credentials["refresh_token"] = "1//0g85xxVT1qZOlCgYIARAAGBASNwF-L9IrH0qqgrCQHHV0rStYEb_r4YcyAw6LDyOKsfIZ3MhwZSnORgoKg2AoOqEOqTiowLUmRvA"
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def get_google_marketing_data(customer_id):
     
-        
-    google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+    #input creds
+    manager_id = "1766667019"
+    credentials["refresh_token"] = "1//0gS7DwvEs7fJDCgYIARAAGBASNwF-L9IrtCxQ9ZOGgyi-hQyuDGxKxZIKg6VsyKKv7NvTesJL-3PxugEoUya5FO42gxbpmlzmngc"
+    credentials["login_customer_id"] = manager_id
+    #retrive all the client account ids of the manager account
+    client_id_list = []
     query = """
         SELECT
-            campaign.id,
-            campaign.name,
-            campaign.status,
-            campaign.serving_status,
-            campaign.advertising_channel_type,
-            campaign.start_date,
-            campaign.end_date,
-            campaign_budget.amount_micros,
-            campaign.target.cpa_micros,
-            ad_group.id,
-            ad_group.name,
-            ad_group.status,
-            ad_group_ad.ad.id,
-            ad_group_ad.ad.name,
-            ad_group_ad.status,
-            ad_group_ad.ad.final_urls,
-            ad_group_ad.ad.type,
-            ad_group_ad.ad.text_ad.description,
-            keyword_view.resource_name,
-            keyword_plan_campaign_keyword.text,
-            keyword_plan_campaign_keyword.match_type,
-            metrics.impressions,
-            metrics.clicks,
-            metrics.cost_micros,
-            metrics.average_cpc,
-            metrics.ctr,
-            metrics.conversions,
-            metrics.conversion_rate,
-            metrics.cost_per_conversion,
-            metrics.all_conversions,
-            metrics.click_conversion_rate,
-            metrics.value_per_conversion,
-            metrics.all_conversion_value,
-            segments.age_range,
-            segments.gender,
-            segments.device,
-            segments.location,
-            segments.date,
-            metrics.conversions_value,
-            metrics.all_conversions_value,
-            metrics.view_through_conversions,
-            metrics.interaction_rate,
-            metrics.average_position,
-            segments.week,
-            segments.month,
-            segments.quarter,
-            segments.year
+            customer_client.client_customer,
+            customer_client.level,
+            customer_client.manager,
+            customer_client.descriptive_name,
+            customer_client.currency_code,
+            customer_client.time_zone,
+            customer_client.id
         FROM
-            campaign
-        WHERE
-            campaign.status = 'ENABLED'
+            customer_client
+        WHERE   
+            customer_client.level <= 1
     """
+    google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+    google_ads_service = google_client.get_service("GoogleAdsService")
+    response = google_ads_service.search(customer_id=manager_id, query=query)
+    for row in response:
+        client_id_list.append(row.customer_client.id)
 
-    ga_service = google_client.get_service("GoogleAdsService")
-    
-    try:
-        response = ga_service.search(customer_id=customer_id, query=query)
+    for id in client_id_list:
+        print(id, manager_id)
+        if(id == int(manager_id)):
+            print("true")
+            continue
+        # Ensure customer_id is a string
+        customer_id = str(id)
+        
+        # Define date range (e.g., past 30 days)
+        # add start date and end date
+        # end_date = datetime.now().date()
+        # start_date = end_date - timedelta(days=30)
+        ga_service = google_client.get_service("GoogleAdsService")
+        results = {
+            "campaigns": [],
+            "ad_groups": [],
+            "ad_group_ads": []
+        }
+        campaign_query = """
+        SELECT campaign.id, campaign.name, campaign.status, campaign.serving_status, campaign.advertising_channel_type, campaign.start_date, campaign.end_date, campaign.campaign_budget, campaign.target_cpa.cpc_bid_ceiling_micros, campaign.target_cpa.cpc_bid_floor_micros, campaign.target_cpa.target_cpa_micros, campaign_budget.id, campaign_budget.name, campaign_budget.period, campaign_budget.amount_micros, campaign_budget.status, campaign_budget.recommended_budget_estimated_change_weekly_views, campaign_budget.recommended_budget_estimated_change_weekly_interactions, campaign_budget.recommended_budget_estimated_change_weekly_cost_micros, campaign_budget.recommended_budget_estimated_change_weekly_clicks, campaign_budget.recommended_budget_amount_micros, campaign_budget.type, campaign_budget.total_amount_micros, campaign_group.id, campaign_group.name, campaign_group.resource_name, campaign_group.status, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM campaign"""  # + f"""WHERE segments.date BETWEEN {start_date} AND {end_date} """
+        
+        ad_group_query = """
+        SELECT campaign.name, ad_group.id, ad_group.name, ad_group.status, ad_group.campaign, ad_group.effective_target_cpa_micros, ad_group.effective_target_cpa_source, ad_group.type, ad_group.target_cpm_micros, ad_group.target_cpa_micros, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group """ # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
 
-        results = []
-        for row in response:
-            result = {
-                "campaign_id": row.campaign.id,
-                "campaign_name": row.campaign.name,
-                "campaign_status": row.campaign.status,
-                "campaign_serving_status": row.campaign.serving_status,
-                "campaign_advertising_channel_type": row.campaign.advertising_channel_type,
-                "campaign_start_date": row.campaign.start_date,
-                "campaign_end_date": row.campaign.end_date,
-                "campaign_budget": row.campaign_budget.amount_micros,
-                "campaign_target_cpa": row.campaign.target.cpa_micros,
-                "ad_group_id": row.ad_group.id,
-                "ad_group_name": row.ad_group.name,
-                "ad_group_status": row.ad_group.status,
-                "ad_id": row.ad_group_ad.ad.id,
-                "ad_name": row.ad_group_ad.ad.name,
-                "ad_status": row.ad_group_ad.status,
-                "ad_final_urls": row.ad_group_ad.ad.final_urls,
-                "ad_type": row.ad_group_ad.ad.type,
-                "ad_description": row.ad_group_ad.ad.text_ad.description,
-                "keyword_resource_name": row.keyword_view.resource_name,
-                "keyword_text": row.keyword_plan_campaign_keyword.text,
-                "keyword_match_type": row.keyword_plan_campaign_keyword.match_type,
-                "metrics_impressions": row.metrics.impressions,
-                "metrics_clicks": row.metrics.clicks,
-                "metrics_cost_micros": row.metrics.cost_micros,
-                "metrics_average_cpc": row.metrics.average_cpc,
-                "metrics_ctr": row.metrics.ctr,
-                "metrics_conversions": row.metrics.conversions,
-                "metrics_conversion_rate": row.metrics.conversion_rate,
-                "metrics_cost_per_conversion": row.metrics.cost_per_conversion,
-                "metrics_all_conversions": row.metrics.all_conversions,
-                "metrics_click_conversion_rate": row.metrics.click_conversion_rate,
-                "metrics_value_per_conversion": row.metrics.value_per_conversion,
-                "metrics_all_conversion_value": row.metrics.all_conversion_value,
-                "segments_age_range": row.segments.age_range,
-                "segments_gender": row.segments.gender,
-                "segments_device": row.segments.device,
-                "segments_location": row.segments.location,
-                "segments_date": row.segments.date,
-                "metrics_conversions_value": row.metrics.conversions_value,
-                "metrics_all_conversions_value": row.metrics.all_conversions_value,
-                "metrics_view_through_conversions": row.metrics.view_through_conversions,
-                "metrics_interaction_rate": row.metrics.interaction_rate,
-                "metrics_average_position": row.metrics.average_position,
-                "segments_week": row.segments.week,
-                "segments_month": row.segments.month,
-                "segments_quarter": row.segments.quarter,
-                "segments_year": row.segments.year
-            }
-            results.append(result)
+        ad_group_ad_query = """ 
+        SELECT campaign.name, ad_group.name, ad_group_ad.ad.id, ad_group_ad.ad.name, ad_group_ad.status, ad_group_ad.ad.final_urls, ad_group_ad.ad.text_ad.description1, ad_group_ad.ad.text_ad.description2, ad_group_ad.ad.type, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group_ad """  # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
+        keyword_view_query = """
+        SELECT campaign.name, ad_group.name,keyword_view.resource_name, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM keyword_view """
+        try:
+            campaign_response = ga_service.search(customer_id=customer_id, query=campaign_query)
+            campaign_data = []
+            ad_group_response = ga_service.search(customer_id=customer_id, query=ad_group_query)
+            ad_group_data = []
+            ad_group_ad_response = ga_service.search(customer_id=customer_id, query=ad_group_ad_query)
+            ad_group_ad_data = []
+            keyword_view_response = ga_service.search(customer_id=customer_id, query=keyword_view_query)
+            keyword_view_data = []
 
-        print(results)
+            for campaign_row in campaign_response:
+                campaign_data.append({
+                    "campaign_id": campaign_row.campaign.id,
+                    "campaign_name": campaign_row.campaign.name,
+                    "campaign_status": campaign_row.campaign.status,
+                    "campaign_serving_status": campaign_row.campaign.serving_status,
+                    "campaign_advertising_channel_type": campaign_row.campaign.advertising_channel_type,
+                    "campaign_start_date": campaign_row.campaign.start_date,
+                    "campaign_end_date": campaign_row.campaign.end_date,
+                    "campaign_budget": campaign_row.campaign.campaign_budget,
+                    "campaign_target_cpa": {
+                        "cpc_bid_ceiling_micros": campaign_row.campaign.target_cpa.cpc_bid_ceiling_micros,
+                        "cpc_bid_floor_micros": campaign_row.campaign.target_cpa.cpc_bid_floor_micros,
+                        "target_cpa_micros": campaign_row.campaign.target_cpa.target_cpa_micros
+                    },
+                    "campaign_budget_details": {
+                        "budget_id": campaign_row.campaign_budget.id,
+                        "budget_name": campaign_row.campaign_budget.name,
+                        "period": campaign_row.campaign_budget.period,
+                        "amount_micros": campaign_row.campaign_budget.amount_micros,
+                        "status": campaign_row.campaign_budget.status,
+                        "recommended_budget_estimated_change_weekly_views": campaign_row.campaign_budget.recommended_budget_estimated_change_weekly_views,
+                        "recommended_budget_estimated_change_weekly_interactions": campaign_row.campaign_budget.recommended_budget_estimated_change_weekly_interactions,
+                        "recommended_budget_estimated_change_weekly_cost_micros": campaign_row.campaign_budget.recommended_budget_estimated_change_weekly_cost_micros,
+                        "recommended_budget_estimated_change_weekly_clicks": campaign_row.campaign_budget.recommended_budget_estimated_change_weekly_clicks,
+                        "recommended_budget_amount_micros": campaign_row.campaign_budget.recommended_budget_amount_micros,
+                        "type": campaign_row.campaign_budget.type_,
+                        "total_amount_micros": campaign_row.campaign_budget.total_amount_micros,
+                    },
+                    "campaign_group": {
+                        "group_id": campaign_row.campaign_group.id,
+                        "group_name": campaign_row.campaign_group.name,
+                        "resource_name": campaign_row.campaign_group.resource_name,
+                        "status": campaign_row.campaign_group.status,
+                    },
+                    "metrics": {
+                        "cost_micros": campaign_row.metrics.cost_micros,
+                        "conversions_value": campaign_row.metrics.conversions_value,
+                        "clicks": campaign_row.metrics.clicks,
+                        "interaction_rate": campaign_row.metrics.interaction_rate,
+                        "view_through_conversions": campaign_row.metrics.view_through_conversions,
+                        "average_cpc": campaign_row.metrics.average_cpc,
+                        "conversions": campaign_row.metrics.conversions,
+                        "ctr": campaign_row.metrics.ctr,
+                        "all_conversions": campaign_row.metrics.all_conversions,
+                        "cost_per_conversion": campaign_row.metrics.cost_per_conversion,
+                        "value_per_conversion": campaign_row.metrics.value_per_conversion,
+                        "all_conversions_value": campaign_row.metrics.all_conversions_value,
+                        "conversions_from_interactions_rate": campaign_row.metrics.conversions_from_interactions_rate,
+                    }
+                })
 
-    except GoogleAdsException as ex:
-        print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
-        for error in ex.failure.errors:
-            print(f"\tError with message {error.message}.")
-            if error.location:
-                for field_path_element in error.location.field_path_elements:
-                    print(f"\t\tOn field: {field_path_element.field_name}")
+            for ad_group_row in ad_group_response:
+                ad_group_data.append({
+                    "ad_group_id": ad_group_row.ad_group.id,
+                    "ad_group_name": ad_group_row.ad_group.name,
+                    "campaign_name": ad_group_row.campaign.name,
+                    "ad_group_status": ad_group_row.ad_group.status,
+                    "campaign_id": ad_group_row.ad_group.campaign,
+                    "effective_target_cpa_micros": ad_group_row.ad_group.effective_target_cpa_micros,
+                    "effective_target_cpa_source": ad_group_row.ad_group.effective_target_cpa_source,
+                    "ad_group_type": ad_group_row.ad_group.type_,
+                    "target_cpm_micros": ad_group_row.ad_group.target_cpm_micros,
+                    "target_cpa_micros": ad_group_row.ad_group.target_cpa_micros,
+                    "metrics": {
+                        "cost_micros": ad_group_row.metrics.cost_micros,
+                        "conversions_value": ad_group_row.metrics.conversions_value,
+                        "clicks": ad_group_row.metrics.clicks,
+                        "interaction_rate": ad_group_row.metrics.interaction_rate,
+                        "view_through_conversions": ad_group_row.metrics.view_through_conversions,
+                        "average_cpc": ad_group_row.metrics.average_cpc,
+                        "conversions": ad_group_row.metrics.conversions,
+                        "ctr": ad_group_row.metrics.ctr,
+                        "all_conversions": ad_group_row.metrics.all_conversions,
+                        "cost_per_conversion": ad_group_row.metrics.cost_per_conversion,
+                        "value_per_conversion": ad_group_row.metrics.value_per_conversion,
+                        "all_conversions_value": ad_group_row.metrics.all_conversions_value,
+                        "conversions_from_interactions_rate": ad_group_row.metrics.conversions_from_interactions_rate
+                    }
+                })
 
-        return Response(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+            for ad_group_ad_row in ad_group_ad_response:
+                ad_group_ad_data.append({
+                    "ad_id": ad_group_ad_row.ad_group_ad.ad.id,
+                    "ad_name": ad_group_ad_row.ad_group_ad.ad.name,
+                    "campaign_name": ad_group_ad_row.campaign.name,
+                    "ad_group_name": ad_group_ad_row.ad_group.name,
+                    "ad_status": ad_group_ad_row.ad_group_ad.status,
+                    "final_urls": ad_group_ad_row.ad_group_ad.ad.final_urls,
+                    "description1": ad_group_ad_row.ad_group_ad.ad.text_ad.description1,
+                    "description2": ad_group_ad_row.ad_group_ad.ad.text_ad.description2,
+                    "ad_type": ad_group_ad_row.ad_group_ad.ad.type_,
+                    "metrics": {
+                        "cost_micros": ad_group_ad_row.metrics.cost_micros,
+                        "conversions_value": ad_group_ad_row.metrics.conversions_value,
+                        "clicks": ad_group_ad_row.metrics.clicks,
+                        "interaction_rate": ad_group_ad_row.metrics.interaction_rate,
+                        "view_through_conversions": ad_group_ad_row.metrics.view_through_conversions,
+                        "average_cpc": ad_group_ad_row.metrics.average_cpc,
+                        "conversions": ad_group_ad_row.metrics.conversions,
+                        "ctr": ad_group_ad_row.metrics.ctr,
+                        "all_conversions": ad_group_ad_row.metrics.all_conversions,
+                        "cost_per_conversion": ad_group_ad_row.metrics.cost_per_conversion,
+                        "value_per_conversion": ad_group_ad_row.metrics.value_per_conversion,
+                        "all_conversions_value": ad_group_ad_row.metrics.all_conversions_value,
+                        "conversions_from_interactions_rate": ad_group_ad_row.metrics.conversions_from_interactions_rate
+                    }
+                })
 
+            def get_keyword(id):
+                get_keyword_query = f"""
+                    SELECT
+                        ad_group_criterion.keyword.text,
+                        ad_group_criterion.keyword.match_type
+                    FROM
+                        ad_group_criterion
+                    WHERE
+                        ad_group_criterion.criterion_id = {id}
+                """ 
+                keyword_response = ga_service.search(customer_id=customer_id, query=get_keyword_query)
+                for response in keyword_response:
+                    keyword = response.ad_group_criterion.keyword
+                    print(keyword)
+                    return [keyword.text, keyword.match_type]
+                
+            for keyword_view_row in keyword_view_response:
+                keyword_view_data.append({
+                    "resource_name": keyword_view_row.keyword_view.resource_name,
+                    "keyword_text": get_keyword(keyword_view_row.keyword_view.resource_name.split("~")[-1])[0],
+                    "keyword_match_type": get_keyword(keyword_view_row.keyword_view.resource_name.split("~")[-1])[1],
+                    "campaign_name": keyword_view_row.campaign.name,
+                    "ad_group_name": keyword_view_row.ad_group.name,
+                    "metrics": {
+                        "cost_micros": keyword_view_row.metrics.cost_micros,
+                        "conversions_value": keyword_view_row.metrics.conversions_value,
+                        "clicks": keyword_view_row.metrics.clicks,
+                        "interaction_rate": keyword_view_row.metrics.interaction_rate,
+                        "view_through_conversions": keyword_view_row.metrics.view_through_conversions,
+                        "average_cpc": keyword_view_row.metrics.average_cpc,
+                        "conversions": keyword_view_row.metrics.conversions,
+                        "ctr": keyword_view_row.metrics.ctr,
+                        "all_conversions": keyword_view_row.metrics.all_conversions,
+                        "cost_per_conversion": keyword_view_row.metrics.cost_per_conversion,
+                        "value_per_conversion": keyword_view_row.metrics.value_per_conversion,
+                        "all_conversions_value": keyword_view_row.metrics.all_conversions_value,
+                        "conversions_from_interactions_rate": keyword_view_row.metrics.conversions_from_interactions_rate
+                    }
+                })
+
+            results["keyword_views"] = keyword_view_data
+            results["ad_group_ads"] = ad_group_ad_data
+            results["ad_groups"] = ad_group_data
+            results["campaigns"] = campaign_data
+            print(results)
+
+            return Response(status=status.HTTP_200_OK)
+        except GoogleAdsException as ex:
+            print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
+            for error in ex.failure.errors:
+                print(f"\tError with message {error.message}.")
+                if error.location:
+                    for field_path_element in error.location.field_path_elements:
+                        print(f"\t\tOn field: {field_path_element.field_name}")
+
+            return Response(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 #-----------------------------------------------------FACEBOOK--------------------------------------------------#
