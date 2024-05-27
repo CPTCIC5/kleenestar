@@ -28,6 +28,11 @@ from twitter_ads.analytics import Analytics
 from twitter_ads.creative import PromotedTweet
 from users.models import User
 from datetime import datetime, timedelta
+from facebook_business.api import FacebookAdsApi
+from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.adobjects.campaign import Campaign
+from facebook_business.adobjects.adset import AdSet
+from facebook_business.adobjects.ad import Ad
 # PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
@@ -192,16 +197,37 @@ def google_oauth_callback(request):
             )
 
         resource_names = accessible_customers.resource_names
-
-        if isinstance(resource_names, list):
+        manager_id = resource_names[0].split('/')[1]
+        
+        #retrive all the client account ids of the manager account
+        client_id_list = []
+        query = """
+            SELECT
+                customer_client.client_customer,
+                customer_client.level,
+                customer_client.manager,
+                customer_client.descriptive_name,
+                customer_client.currency_code,
+                customer_client.time_zone,
+                customer_client.id
+            FROM
+                customer_client
+            WHERE   
+                customer_client.level <= 1
+        """
+        google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+        google_ads_service = google_client.get_service("GoogleAdsService")
+        response = google_ads_service.search(customer_id=manager_id, query=query)
+        for row in response:
+            if(row.customer_client.id != int(manager_id)):
+                client_id_list.append(str(row.customer_client.id))
+        
+        if len(client_id_list) == 0:
             return Response(
-                {"detail": "manager accounts not allowed"},
+                {"detail": "No ads account found allowed"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         
-        customer_id = resource_names[0].split('/')[1]
-        
-        print(customer_id)
         
         google_channel = get_channel(
             email=email,
@@ -210,7 +236,8 @@ def google_oauth_callback(request):
         
         google_channel.credentials.key_1 = refresh_token
         google_channel.credentials.key_2 = access_token
-        google_channel.credentials.key_3 = customer_id
+        google_channel.credentials.key_3 = manager_id
+        google_channel.credentials.key_4 = client_id_list
         google_channel.credentials.save()
         
         
@@ -224,49 +251,19 @@ def google_oauth_callback(request):
         )
 
 
-
-
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-def get_google_marketing_data(customer_id):
-    
-    #input creds
-    manager_id = "1766667019"
-    credentials["refresh_token"] = "1//0gS7DwvEs7fJDCgYIARAAGBASNwF-L9IrtCxQ9ZOGgyi-hQyuDGxKxZIKg6VsyKKv7NvTesJL-3PxugEoUya5FO42gxbpmlzmngc"
-    credentials["login_customer_id"] = manager_id
-    #retrive all the client account ids of the manager account
-    client_id_list = []
-    query = """
-        SELECT
-            customer_client.client_customer,
-            customer_client.level,
-            customer_client.manager,
-            customer_client.descriptive_name,
-            customer_client.currency_code,
-            customer_client.time_zone,
-            customer_client.id
-        FROM
-            customer_client
-        WHERE   
-            customer_client.level <= 1
-    """
-    google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
-    google_ads_service = google_client.get_service("GoogleAdsService")
-    response = google_ads_service.search(customer_id=manager_id, query=query)
-    for row in response:
-        client_id_list.append(row.customer_client.id)
+def get_google_marketing_data(manager_id, client_id_list, refresh_token):
 
+
+    credentials["refresh_token"] = refresh_token
+    
+    credentials["login_customer_id"] = manager_id
+
+    google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
     for id in client_id_list:
-        print(id, manager_id)
-        if(id == int(manager_id)):
-            print("true")
-            continue
-        # Ensure customer_id is a string
-        customer_id = str(id)
         
-        # Define date range (e.g., past 30 days)
-        # add start date and end date
         # end_date = datetime.now().date()
         # start_date = end_date - timedelta(days=30)
         ga_service = google_client.get_service("GoogleAdsService")
@@ -286,13 +283,13 @@ def get_google_marketing_data(customer_id):
         keyword_view_query = """
         SELECT campaign.name, ad_group.name,keyword_view.resource_name, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM keyword_view """
         try:
-            campaign_response = ga_service.search(customer_id=customer_id, query=campaign_query)
+            campaign_response = ga_service.search(customer_id=id, query=campaign_query)
             campaign_data = []
-            ad_group_response = ga_service.search(customer_id=customer_id, query=ad_group_query)
+            ad_group_response = ga_service.search(customer_id=id, query=ad_group_query)
             ad_group_data = []
-            ad_group_ad_response = ga_service.search(customer_id=customer_id, query=ad_group_ad_query)
+            ad_group_ad_response = ga_service.search(customer_id=id, query=ad_group_ad_query)
             ad_group_ad_data = []
-            keyword_view_response = ga_service.search(customer_id=customer_id, query=keyword_view_query)
+            keyword_view_response = ga_service.search(customer_id=id, query=keyword_view_query)
             keyword_view_data = []
 
             for campaign_row in campaign_response:
@@ -450,7 +447,7 @@ def get_google_marketing_data(customer_id):
             results["campaigns"] = campaign_data
             print(results)
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(results,status=status.HTTP_200_OK)
         except GoogleAdsException as ex:
             print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
             for error in ex.failure.errors:
@@ -484,7 +481,7 @@ def facebook_oauth(request):
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-def facebook_oauth_callback(request):
+def facebook_oauth_callback(request):   
     redirect_response = request.build_absolute_uri()
     if request.query_params.get("state") != passthrough_val:
         return Response(
@@ -495,7 +492,7 @@ def facebook_oauth_callback(request):
     try:
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
                                      authorization_response=redirect_response) # access_token
-        print(token)
+
         access_token = token.get("access_token")
         user_info_url = 'https://graph.facebook.com/v10.0/me?fields=id,name,email'
         user_info_response = facebook.get(user_info_url)
@@ -509,16 +506,17 @@ def facebook_oauth_callback(request):
         for account in ad_accounts:
             ad_accounts_list.append(account.get("id")) # account id list
         
-        facebook_channel = get_channel(
-            email=email,
-            channel_type_num=2
-        )
+        # facebook_channel = get_channel(
+        #     email=email,
+        #     channel_type_num=2
+        # )
 
-        facebook_channel.credentials.key_1 = access_token
-        facebook_channel.credentials.key_2 = ad_accounts_list
-        facebook_channel.save()
-
+        # facebook_channel.credentials.key_1 = access_token
+        # facebook_channel.credentials.key_2 = ad_accounts_list
+        # facebook_channel.credentials.save()
+        print(access_token, ad_accounts_list, "creds")
         return redirect("http://localhost:3001/channels/")
+    
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -526,92 +524,112 @@ def facebook_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
 
-def get_facebook_marketing_data(access_token,ad_account_id):
-    #aryan 
-    # pass access_token and iterate by passing all the account id from db.
+def get_facebook_marketing_data(request):
+    ad_account_list = ['act_7406279979491861', 'act_2110667582640304']
+    access_token = "EAAGWukjjrvoBOZBhv9ZAUU8PABHsmENfOt6n6KsZCROHGb0SM9qVOEOU3ZBT8uP7IIfoQ02MG0aWRVWZAmaDRpC7ZAaDEuVZCya22dhmtbQH5gVaGW1ARLoFl80Ey11AJrNI77R2q5ZAUPmyNDkPZCov1SqZCAnGlhn0n8u97QSx7nWLo5gpUmZClsbxLZCfehl2OjQum7xENyKE8VXfZBrrQZBQZDZD"
 
-    FacebookAdsApi.init(access_token=access_token)
-    ad_account = AdAccount(ad_account_id)
+    marketing_data = []
+    try:
+        for account in ad_account_list:
+            FacebookAdsApi.init(access_token=access_token)
+            ad_account = AdAccount(account)
+            
+            params = {
+                'level': 'ad',
+                'time_range': {'since': '2024-01-01', 'until': '2024-5-20'},
+            }
+            
+            fields = [
+                'campaign_id', 'adset_id', 'ad_id',
+                'impressions', 'reach', 'frequency', 'unique_clicks', 'cpm', 'cpp',
+                'conversions', 'cost_per_conversion', 'website_ctr',
+                'clicks', 'spend', 'purchase_roas', 
+                'date_start', 'date_stop'
+            ]
 
-    fields = [
-        'campaign_id', 'campaign_name', 'objective', 'campaign_status', 'campaign_effective_status',
-        'campaign_start_time', 'campaign_stop_time', 'campaign_daily_budget', 'campaign_lifetime_budget',
-        'adset_id', 'adset_name', 'adset_status', 'adset_effective_status', 'billing_event', 'optimization_goal',
-        'targeting', 'ad_id', 'ad_name', 'ad_status', 'ad_effective_status', 'creative_body', 'creative_title',
-        'creative_image_url', 'impressions', 'reach', 'frequency', 'unique_clicks', 'cpm', 'cpp', 'conversions',
-        'cost_per_conversion', 'conversion_rate', 'website_ctr', 'clicks', 'cost_per_click', 'social_clicks',
-        'social_impressions', 'spend', 'roi', 'purchase_roas', 'value_per_conversion', 'date_start', 'date_stop'
-    ]
+            insights = ad_account.get_insights(fields=fields, params=params)
+            
+            results = []
+            for insight in insights:
+                result = {}
 
-    params = {
-        'level': 'ad',
-        'time_range': {'since': '2023-01-01', 'until': '2023-12-31'},
-        'filtering': [],
-        'breakdowns': [],
-    }
+                # Campaign details
+                campaign_id = insight['campaign_id']
+                campaign = Campaign(campaign_id).api_get(fields=[
+                    Campaign.Field.id, Campaign.Field.name, Campaign.Field.objective, Campaign.Field.status,
+                    Campaign.Field.effective_status, Campaign.Field.start_time, Campaign.Field.stop_time,
+                    Campaign.Field.daily_budget, Campaign.Field.lifetime_budget
+                ])
+                result['campaign'] = campaign
 
-    insights = ad_account.get_insights(fields=fields, params=params)
+                # AdSet details
+                adset_id = insight['adset_id']
+                adset = AdSet(adset_id).api_get(fields=[
+                    AdSet.Field.id, AdSet.Field.name, AdSet.Field.status, AdSet.Field.effective_status,
+                    AdSet.Field.billing_event, AdSet.Field.optimization_goal, AdSet.Field.targeting
+                ])
+                result['adset'] = adset
 
-    results = []
-    for insight in insights:
-        result = {
-            "campaign_id": insight.get('campaign_id'),
-            "name": insight.get('campaign_name'),
-            "objective": insight.get('objective'),
-            "status": insight.get('campaign_status'),
-            "effective_status": insight.get('campaign_effective_status'),
-            "start_time": insight.get('campaign_start_time'),
-            "stop_time": insight.get('campaign_stop_time'),
-            "daily_budget": insight.get('campaign_daily_budget'),
-            "lifetime_budget": insight.get('campaign_lifetime_budget'),
-            "adset_id": insight.get('adset_id'),
-            "adset_name": insight.get('adset_name'),
-            "adset_status": insight.get('adset_status'),
-            "adset_effective_status": insight.get('adset_effective_status'),
-            "billing_event": insight.get('billing_event'),
-            "optimization_goal": insight.get('optimization_goal'),
-            "targeting": {
-                "age_min": insight.get('targeting', {}).get('age_min'),
-                "age_max": insight.get('targeting', {}).get('age_max'),
-                "genders": insight.get('targeting', {}).get('genders'),
-                "geo_locations": insight.get('targeting', {}).get('geo_locations'),
-                "interests": insight.get('targeting', {}).get('interests')
-            },
-            "ad_id": insight.get('ad_id'),
-            "ad_name": insight.get('ad_name'),
-            "ad_status": insight.get('ad_status'),
-            "ad_effective_status": insight.get('ad_effective_status'),
-            "creative": {
-                "body": insight.get('creative_body'),
-                "title": insight.get('creative_title'),
-                "image_url": insight.get('creative_image_url')
-            },
-            "impressions": insight.get('impressions'),
-            "reach": insight.get('reach'),
-            "frequency": insight.get('frequency'),
-            "unique_clicks": insight.get('unique_clicks'),
-            "cpm": insight.get('cpm'),
-            "cpp": insight.get('cpp'),
-            "conversions": insight.get('conversions'),
-            "cost_per_conversion": insight.get('cost_per_conversion'),
-            "conversion_rate": insight.get('conversion_rate'),
-            "website_ctr": insight.get('website_ctr'),
-            "clicks": insight.get('clicks'),
-            "cost_per_click": insight.get('cost_per_click'),
-            "social_clicks": insight.get('social_clicks'),
-            "social_impressions": insight.get('social_impressions'),
-            "spend": insight.get('spend'),
-            "roi": insight.get('roi'),
-            "purchase_roas": insight.get('purchase_roas'),
-            "value_per_conversion": insight.get('value_per_conversion'),
-            "date_start": insight.get('date_start'),
-            "date_stop": insight.get('date_stop')
-        }
-        results.append(result)
+                ad_id = insight['ad_id']
+                ad = Ad(ad_id).api_get(fields=[
+                    Ad.Field.id, Ad.Field.name, Ad.Field.status, Ad.Field.effective_status,
+                    Ad.Field.creative
+                ])
+                ad_creative = ad['creative']
+                ad_creative_details = Ad(ad_creative['id']).api_get(fields=[
+                    'body', 'title', 'image_url'
+                ])
+                ad['creative_details'] = ad_creative_details
+                result['ad'] = ad
 
-    print(results)
+                audience_metrics = {
+                    'impressions': insight['impressions'],
+                    'reach': insight['reach'],
+                    'frequency': insight['frequency'],
+                    'unique_clicks': insight['unique_clicks'],
+                    'cpm': insight['cpm'],
+                    'cpp': insight['cpp'],
+                }
+                result['audience_metrics'] = audience_metrics
 
+                conversion_metrics = {
+                    'conversions': insight['conversions'],
+                    'cost_per_conversion': insight['cost_per_conversion'],
+                    'website_ctr': insight['website_ctr'],
+                }
+                result['conversion_metrics'] = conversion_metrics
+
+                engagement_metrics = {
+                    'clicks': insight['clicks'],
+                }
+                result['engagement_metrics'] = engagement_metrics
+
+                revenue_metrics = {
+                    'spend': insight['spend'],
+                    'purchase_roas': insight['purchase_roas'],
+                }
+                result['revenue_metrics'] = revenue_metrics
+
+                time_metrics = {
+                    'date_start': insight['date_start'],
+                    'date_stop': insight['date_stop'],
+                }
+                result['time_metrics'] = time_metrics
+
+                results.append(result)
+            marketing_data.append(results)
+        return Response(
+            marketing_data, status=status.HTTP_200_OK
+        )
+    except Exception as e:
+        print(f"Error with message {e}.")
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 #-----------------------------------------------------TWITTER--------------------------------------------------#
 

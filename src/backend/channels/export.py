@@ -37,14 +37,15 @@ def merge_json_files(request):
 
     return Response(merged_data)
 
-"""
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # Allow access logged in user
 def merge_json_files(request):
-    merged_data = []
 
-    # Get data from each marketing channel function
-    google_data = views.get_google_marketing_data()
+    merged_data = []
+    
+    #Get data from each marketing channel function
+    google_data = views.get_google_marketing_data(key1, key3) #pass key1 and key3 as params
     facebook_data = views.get_facebook_marketing_data()
     twitter_data = views.get_twitter_marketing_data()
     linkedin_data = views.get_linkedin_marketing_data()
@@ -58,4 +59,4 @@ def merge_json_files(request):
     merged_data.append(tiktok_data)
 
     return Response(merged_data)
-"""
+
