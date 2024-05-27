@@ -16,9 +16,9 @@ client = OpenAI()
 
 class APICredentials(models.Model):
     key_1 = models.CharField(max_length=255,null=True, blank=True)
-    key_2 = models.CharField(max_length=255, null=True, blank=True,unique=True)
-    key_3 = models.CharField(max_length=255, null=True, blank=True,unique=True)
-    key_4 = models.CharField(max_length=255, null=True, blank=True,unique=True)
+    key_2 = models.CharField(max_length=255, null=True, blank=True)
+    key_3 = models.CharField(max_length=255, null=True, blank=True)
+    key_4 = models.CharField(max_length=255, null=True, blank=True)
     key_5 = models.CharField(max_length=255,blank=True,null = True)
     key_6=models.CharField(max_length=255,blank=True,null = True)
 
