@@ -19,7 +19,7 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # All the workspaces the request user is a member of
         return self.request.user.workspace_set.all()
-    
+    #https://xyz.com
     
     
 

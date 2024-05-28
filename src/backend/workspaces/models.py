@@ -26,9 +26,14 @@ By following these guidelines, provide precise, insightful, and actionable marke
 
 
 INDUSTRIES = (
-    ("E-commerce", "E-commerce"),
-    ("Sales", "Sales"),
-    ("Enterprise", "Enterprise"),
+    ("⁠Retail", "⁠Retail"),
+    ("⁠Hospitality", "⁠Hospitality"),
+    ("⁠Media", "⁠Media"),
+    ("⁠Technology", "⁠Technology"),
+    ("⁠Finance", "⁠Finance"),
+    ("⁠Sport", "⁠Sport"),
+    ("⁠Beauty", "⁠Beauty"),
+    ("⁠Automotive", "⁠Automotive")
 )
 
 
