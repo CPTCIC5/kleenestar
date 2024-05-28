@@ -248,10 +248,10 @@ class Prompt(models.Model):
     
     
     class Meta:
-        ordering  = ['author','id']
+        ordering  = ['author','-id']
 
     def __str__(self):
-        return str(self.author)
+        return str(self.convo)
 
 
 CATEGORY  = (
