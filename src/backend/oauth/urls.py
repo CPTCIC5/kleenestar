@@ -7,7 +7,7 @@ urlpatterns = [
     # /api/oauth/google/
     path("google-callback/", views.google_oauth_callback),
     path("google/", views.google_oauth),
-    path("facebook_data/", views.get_facebook_marketing_data),
+    path("linkedin_data/", views.get_linkedin_marketing_data),
     path("facebook-callback/", views.facebook_oauth_callback),
     path("facebook/", views.facebook_oauth),
     path("twitter-callback/", views.twitter_oauth_callback),

@@ -530,10 +530,7 @@ def facebook_oauth_callback(request):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 
-def get_facebook_marketing_data(request):
-    ad_account_list = ['act_7406279979491861', 'act_2110667582640304']
-    access_token = "EAAGWukjjrvoBOZBhv9ZAUU8PABHsmENfOt6n6KsZCROHGb0SM9qVOEOU3ZBT8uP7IIfoQ02MG0aWRVWZAmaDRpC7ZAaDEuVZCya22dhmtbQH5gVaGW1ARLoFl80Ey11AJrNI77R2q5ZAUPmyNDkPZCov1SqZCAnGlhn0n8u97QSx7nWLo5gpUmZClsbxLZCfehl2OjQum7xENyKE8VXfZBrrQZBQZDZD"
-
+def get_facebook_marketing_data(access_token, ad_account_list):
     marketing_data = []
     try:
         for account in ad_account_list:
@@ -687,6 +684,7 @@ def twitter_oauth(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
@@ -724,18 +722,18 @@ def twitter_oauth_callback(request):
         print(email)
         print(resource_owner_key, resource_owner_secret, key, secret)
 
-        # twitter_channel = get_channel(
-        #     email=email,
-        #     channel_type_num=3
-        # )
+        twitter_channel = get_channel(
+            email=email,
+            channel_type_num=3
+        )
 
 
-        # twitter_channel.credentials.key_1= resource_owner_key
-        # twitter_channel.credentials.key_2= resource_owner_secret
-        # twitter_channel.credentials.key_3 = key
-        # twitter_channel.credentials.key_4 = secret
-        # twitter_channel.credentials.key_5 = email
-        # twitter_channel.save()
+        twitter_channel.credentials.key_1= resource_owner_key
+        twitter_channel.credentials.key_2= resource_owner_secret
+        twitter_channel.credentials.key_3 = key
+        twitter_channel.credentials.key_4 = secret
+        twitter_channel.credentials.key_5 = email
+        twitter_channel.credentials.save()
 
         return redirect("http://localhost:3001/channels/")
 
@@ -746,95 +744,109 @@ def twitter_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def get_twitter_marketing_data(request):
+    credentials = ['O4LCsAAAAAABtLEHAAABj7-SMNg', 'DA0C8sYZSdIbCgXo6OURZcGcx4ubLfMd', '1534198477127053312-VDMwg96nh8m8CEGRMTGj5w29RPbNVL', 'Us8sPPZjuZxMKv2EH6HBneTnGPOo8ENW0vYqoncYLVB1g']
 
-def get_twitter_marketing_data(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET):
-    # aryan
-    # get these credentials from twitter db and pass it to the function
-
-    twitter_client = Client(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    twitter_client = Client(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET") , credentials[2], credentials[3])
     accounts = twitter_client.accounts()
-    for account in accounts:
-        data = {
-            "campaigns": [],
-            "line_items": [],
-            "ads": [],
-            "audience_metrics": [],
-            "conversion_metrics": [],
-            "engagement_metrics": [],
-            "revenue_metrics": [],
-            "time_metrics": []
-        }
 
-        # Fetch campaigns
-        for campaign in Campaign.all(account):
-            data["campaigns"].append({
-                "id": campaign.id,
-                "name": campaign.name,
-                "entity_status": campaign.entity_status,
-                "start_time": campaign.start_time,
-                "end_time": campaign.end_time,
-                "daily_budget_amount_local_micro": campaign.daily_budget_amount_local_micro,
-                "total_budget_amount_local_micro": campaign.total_budget_amount_local_micro
-            })
+    try:    
+        for account in accounts:
+            print(account, "account")
+            data = {
+                "campaigns": [],
+                "line_items": [],
+                "ads": [],
+                "audience_metrics": [],
+                "conversion_metrics": [],
+                "engagement_metrics": [],
+                "revenue_metrics": [],
+                "time_metrics": []
+            }
 
-        # Fetch line items
-        for line_item in LineItem.all(account):
-            data["line_items"].append({
-                "id": line_item.id,
-                "name": line_item.name,
-                "campaign_id": line_item.campaign_id,
-                "objective": line_item.objective,
-                "placements": line_item.placements
-            })
+            # Fetch campaigns
+            for campaign in Campaign.all(account):
+                data["campaigns"].append({
+                    "id": campaign.id,
+                    "name": campaign.name,
+                    "entity_status": campaign.entity_status,
+                    "start_time": campaign.start_time,
+                    "end_time": campaign.end_time,
+                    "daily_budget_amount_local_micro": campaign.daily_budget_amount_local_micro,
+                    "total_budget_amount_local_micro": campaign.total_budget_amount_local_micro
+                })
 
-        # Fetch ads (Promoted Tweets)
-        for ad in PromotedTweet.all(account):
-            data["ads"].append({
-                "id": ad.id,
-                "tweet_id": ad.tweet_id,
-                "line_item_id": ad.line_item_id,
-                "entity_status": ad.entity_status,
-                "approval_status": ad.approval_status,
-                "created_at": ad.created_at,
-                "updated_at": ad.updated_at
-            })
+            # Fetch line items
+            for line_item in LineItem.all(account):
+                data["line_items"].append({
+                    "id": line_item.id,
+                    "name": line_item.name,
+                    "campaign_id": line_item.campaign_id,
+                    "objective": line_item.objective,
+                    "placements": line_item.placements
+                })
 
-        # Fetch analytics (audience, conversion, engagement, revenue, and time-based metrics)
-        analytics = Analytics.all(
-            account,
-            entity='CAMPAIGN',
-            metric_groups=[
-                'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
-                'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
-            ],
-            granularity='TOTAL'
+            # Fetch ads (Promoted Tweets)
+            for ad in PromotedTweet.all(account):
+                data["ads"].append({
+                    "id": ad.id,
+                    "tweet_id": ad.tweet_id,
+                    "line_item_id": ad.line_item_id,
+                    "entity_status": ad.entity_status,
+                    "approval_status": ad.approval_status,
+                    "created_at": ad.created_at,
+                    "updated_at": ad.updated_at
+                })
+
+            # Fetch analytics (audience, conversion, engagement, revenue, and time-based metrics)
+            analytics = Analytics.all(
+                account,
+                entity='CAMPAIGN',
+                metric_groups=[
+                    'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
+                    'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
+                ],
+                granularity='TOTAL'
+            )
+
+            for stat in analytics:
+                data["audience_metrics"].append({
+                    "impressions": stat['impressions'],
+                    "reach": stat.get('reach'),  # Reach might not be directly available
+                    "engagements": stat['engagements'],
+                    "engagement_rate": stat['engagement_rate']
+                })
+                data["conversion_metrics"].append(stat['activity_metrics'])
+                data["engagement_metrics"].append({
+                    "follows": stat['follows'],
+                    "likes": stat['likes'],
+                    "replies": stat['replies'],
+                    "retweets": stat['retweets']
+                })
+                data["revenue_metrics"].append({
+                    "billed_charge_local_micro": stat['billed_charge_local_micro'],
+                    "cpm": stat['cpm'],
+                    "cpc": stat['cpc']
+                })
+                data["time_metrics"].append({
+                    "start_time": stat['start_time'],
+                    "end_time": stat['end_time']
+                })
+
+            print(data)
+        return Response(
+            status=status.HTTP_200_OK
         )
 
-        for stat in analytics:
-            data["audience_metrics"].append({
-                "impressions": stat['impressions'],
-                "reach": stat.get('reach'),  # Reach might not be directly available
-                "engagements": stat['engagements'],
-                "engagement_rate": stat['engagement_rate']
-            })
-            data["conversion_metrics"].append(stat['activity_metrics'])
-            data["engagement_metrics"].append({
-                "follows": stat['follows'],
-                "likes": stat['likes'],
-                "replies": stat['replies'],
-                "retweets": stat['retweets']
-            })
-            data["revenue_metrics"].append({
-                "billed_charge_local_micro": stat['billed_charge_local_micro'],
-                "cpm": stat['cpm'],
-                "cpc": stat['cpc']
-            })
-            data["time_metrics"].append({
-                "start_time": stat['start_time'],
-                "end_time": stat['end_time']
-            })
+    except Exception as e:
+        print("Error :", e)
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
-        print(data)
 
 #-----------------------------------------------------LINKEDIN--------------------------------------------------#
 
@@ -886,15 +898,14 @@ def linkedin_oauth_callback(request):
 
         print(access_token, refresh_token, email)
 
-        # linkedin_channel = get_channel(
-        #     email=email,
-        #     channel_type_num=4
-        # )
+        linkedin_channel = get_channel(
+            email=email,
+            channel_type_num=4
+        )
 
-        # linkedin_channel.credentials.key_1= access_token
-        # linkedin_channel.credentials.key_2= refresh_token
-        # linkedin_channel.credentials.key_3 = email
-        # linkedin_channel.save()
+        linkedin_channel.credentials.key_1= access_token
+        linkedin_channel.credentials.key_2= refresh_token
+        linkedin_channel.credentials.save()
 
         return redirect("http://localhost:3001/channels/")
     except Exception as e:
@@ -905,13 +916,13 @@ def linkedin_oauth_callback(request):
         )
     
 
-# @csrf_exempt
+@csrf_exempt
 @api_view(("GET",))
-# @permission_classes([AllowAny]) 
-def get_linkedin_marketing_data(access_token):
-    # aryan
-    # get the access_token from the model 
-    # access_token = ??
+@permission_classes([AllowAny]) 
+def get_linkedin_marketing_data(request):
+
+    access_token = 'AQUivIYkkxTX9mDgEZ8LK3McT_-D6P8Q2FPn1N5ayQy83VPbTiWWSds2g9_IpMcB0PVC_QVcXFYqePDHUhfQ8dmjOsZVNQXQwFCKaJHWr17iAGDRNRz68p3P2AXwwto0SUMxnCWyRysdbHxDDz_zurxQ5Rd1t06sdRxpLXAI8w3lRmww7KaXQEgHlFqzirjwnrCkMQEXKzAnBfJzoQi8Xfd2b85FdTVw0IBm3jUdBLSzkOsqdJ7hL_m_S8RZOSZ56TbZyonXFtAnS-2jfTI1IQRTU_bnq4cQu5bhZDkpgXO6NSp8u2OztNREJ2daoNLM0ARCjeC1snxSI3BtDUE_fzJpnRKERw'
+
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
@@ -1027,7 +1038,9 @@ def get_linkedin_marketing_data(access_token):
 
             campaign_data.append(campaign_info)
         print(campaign_data)
-
+        return Response(
+        status=status.HTTP_200_OK
+        )
     except Exception as e:
         print(f"Exception found: {e}")
         return Response(

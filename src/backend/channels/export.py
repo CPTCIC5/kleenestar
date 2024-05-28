@@ -46,9 +46,9 @@ def merge_json_files(request):
     
     #Get data from each marketing channel function
     google_data = views.get_google_marketing_data(key1, key3) #pass key1 and key3 as params
-    facebook_data = views.get_facebook_marketing_data()
-    twitter_data = views.get_twitter_marketing_data()
-    linkedin_data = views.get_linkedin_marketing_data()
+    facebook_data = views.get_facebook_marketing_data(key1, key2) #pass key1 and key2 as params
+    twitter_data = views.get_twitter_marketing_data(key1,key2,key3,key4)
+    linkedin_data = views.get_linkedin_marketing_data(key1)
     tiktok_data = views.get_tiktok_marketing_data()
 
     # Append each data to the merged_data list
