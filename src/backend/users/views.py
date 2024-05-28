@@ -41,7 +41,7 @@ class LoginView(views.APIView):
 
         return response
 
-
+"""
 class SignupView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -64,7 +64,7 @@ class SignupView(views.APIView):
                 # add the user to the workspace
                 invite.workspace.users.add(user)
             except WorkSpaceInvite.DoesNotExist:
-                return Response(serializer.error,status=status.HTTP_404_NOT_FOUND)
+                return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
 
         login(request, user,backend='django.contrib.auth.backends.ModelBackend')
         print('here!!')
@@ -73,6 +73,44 @@ class SignupView(views.APIView):
         response.set_cookie('loggedIn', 'true', httponly=True)
         
         return response
+"""
+
+class SignupView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        # Check if invite code is provided
+        invite_code = request.data.get("invite_code")
+        if invite_code:
+            try:
+                invite = WorkSpaceInvite.objects.get(invite_code=invite_code)
+            except WorkSpaceInvite.DoesNotExist:
+                return Response({"detail": "Invalid invite code."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Validate and create user
+        serializer = serializers.UserCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        if invite_code:
+            # add the user to the workspace
+
+            #HERE imma add logic to check .exists()
+            invite.workspace.users.add(user)
+
+            
+            # Optionally, set the user's subscription type to team member
+            # user.subscription_type = 4
+            # user.save()
+
+        # Log in the user
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+        # Return the response
+        response = Response(status=status.HTTP_201_CREATED)
+        response.set_cookie('loggedIn', 'true', httponly=True)      
+        return response
+
 
 
 class LogoutView(views.APIView):
