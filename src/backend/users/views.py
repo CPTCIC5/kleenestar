@@ -68,7 +68,11 @@ class SignupView(views.APIView):
 
         login(request, user,backend='django.contrib.auth.backends.ModelBackend')
         print('here!!')
-        return Response(status=status.HTTP_201_CREATED)
+        #Response(status=status.HTTP_201_CREATED)
+        response= Response(status=status.HTTP_201_CREATED)
+        response.set_cookie('loggedIn', 'true', httponly=True)
+        
+        return response
 
 
 class LogoutView(views.APIView):

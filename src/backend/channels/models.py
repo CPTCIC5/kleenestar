@@ -136,6 +136,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     # Call RagData function with the user query to get RAG context
     rag_context = RagData(user_query)
+    print('this-is-rag-contextttt',rag_context)
 
     # Creating a new conversation thread
     if all_prompts >= 1:
@@ -248,7 +249,7 @@ class Prompt(models.Model):
     
     
     class Meta:
-        ordering  = ['author','-id']
+        ordering  = ['author','id']
 
     def __str__(self):
         return str(self.convo)
