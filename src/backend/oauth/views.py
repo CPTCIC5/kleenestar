@@ -256,18 +256,19 @@ def google_oauth_callback(request):
 @permission_classes([AllowAny]) 
 def get_google_marketing_data(manager_id, client_id_list, refresh_token):
 
-
     credentials["refresh_token"] = refresh_token
     
     credentials["login_customer_id"] = manager_id
 
     google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
+    marketing_data = []
     for id in client_id_list:
         
         # end_date = datetime.now().date()
         # start_date = end_date - timedelta(days=30)
         ga_service = google_client.get_service("GoogleAdsService")
         results = {
+            "channel": "Goolge Ads",
             "campaigns": [],
             "ad_groups": [],
             "ad_group_ads": []
@@ -401,7 +402,7 @@ def get_google_marketing_data(manager_id, client_id_list, refresh_token):
                     }
                 })
 
-            def get_keyword(id):
+            def get_keyword(criterion_id):
                 get_keyword_query = f"""
                     SELECT
                         ad_group_criterion.keyword.text,
@@ -409,9 +410,9 @@ def get_google_marketing_data(manager_id, client_id_list, refresh_token):
                     FROM
                         ad_group_criterion
                     WHERE
-                        ad_group_criterion.criterion_id = {id}
+                        ad_group_criterion.criterion_id = {criterion_id}
                 """ 
-                keyword_response = ga_service.search(customer_id=customer_id, query=get_keyword_query)
+                keyword_response = ga_service.search(customer_id=id, query=get_keyword_query)
                 for response in keyword_response:
                     keyword = response.ad_group_criterion.keyword
                     print(keyword)
@@ -445,9 +446,9 @@ def get_google_marketing_data(manager_id, client_id_list, refresh_token):
             results["ad_group_ads"] = ad_group_ad_data
             results["ad_groups"] = ad_group_data
             results["campaigns"] = campaign_data
-            print(results)
+            marketing_data.append(results)
 
-            return Response(results,status=status.HTTP_200_OK)
+            return Response(marketing_data,status=status.HTTP_200_OK)
         except GoogleAdsException as ex:
             print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
             for error in ex.failure.errors:
@@ -506,14 +507,15 @@ def facebook_oauth_callback(request):
         for account in ad_accounts:
             ad_accounts_list.append(account.get("id")) # account id list
         
-        # facebook_channel = get_channel(
-        #     email=email,
-        #     channel_type_num=2
-        # )
+        facebook_channel = get_channel(
+            email=email,
+            channel_type_num=2
+        )
 
-        # facebook_channel.credentials.key_1 = access_token
-        # facebook_channel.credentials.key_2 = ad_accounts_list
-        # facebook_channel.credentials.save()
+        facebook_channel.credentials.key_1 = access_token
+        facebook_channel.credentials.key_2 = ad_accounts_list
+        facebook_channel.credentials.save()
+
         print(access_token, ad_accounts_list, "creds")
         return redirect("http://localhost:3001/channels/")
     
