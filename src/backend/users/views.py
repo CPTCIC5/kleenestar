@@ -20,19 +20,26 @@ class LoginView(views.APIView):
         user = authenticate(request, **login_serializer.data)
 
         if user is None:
-            return Response(
+            response = Response(
                 {"detail": "Invalid Credentials"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+            response.set_cookie('loggedIn', 'false', httponly=True)
+            return response
 
         if not user.is_active:
-            return Response(
+            response = Response(
                 {"detail": "Account disabled"}, status=status.HTTP_401_UNAUTHORIZED
             )
+            response.set_cookie('loggedIn', 'false', httponly=True)
+            return response
 
         login(request, user)
 
-        return Response(status=status.HTTP_200_OK)
+        response = Response(status=status.HTTP_200_OK)
+        response.set_cookie('loggedIn', 'true', httponly=True)
+
+        return response
 
 
 class SignupView(views.APIView):
