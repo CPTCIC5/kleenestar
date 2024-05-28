@@ -78,7 +78,11 @@ class SignupView(views.APIView):
 class LogoutView(views.APIView):
     def post(self, request):
         logout(request)
-        return Response(status=status.HTTP_200_OK)
+        
+        response = Response(status=status.HTTP_200_OK)
+        response.set_cookie('logginIn', 'false', httponly=True)
+        
+        return response
 
 
 class UserViewSet(viewsets.ModelViewSet):
