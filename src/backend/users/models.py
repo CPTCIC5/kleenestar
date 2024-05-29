@@ -25,6 +25,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         is_created = self._state.adding
         self.clean()  # Ensure the email is normalized
+        
         super().save(*args, **kwargs)
 
         if is_created:
