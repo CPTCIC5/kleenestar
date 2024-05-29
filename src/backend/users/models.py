@@ -10,7 +10,7 @@ from random import randint
 
 class User(AbstractUser):
     username = None
-    email = models.EmailField("email address", unique=True)
+    email = models.EmailField(("email address"), unique=True)
     newsletter = models.BooleanField(default=True, help_text="Do you want to receive the newsletter?")
 
     USERNAME_FIELD = "email"
@@ -18,13 +18,21 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
+    def clean(self):
+        super().clean()
+        self.email = self.email.lower()
+
     def save(self, *args, **kwargs):
         is_created = self._state.adding
-
+        self.clean()  # Ensure the email is normalized
+        
         super().save(*args, **kwargs)
 
         if is_created:
             Profile.objects.create(user=self)
+
+    def __str__(self):
+        return self.email
 
 
 class Profile(models.Model):

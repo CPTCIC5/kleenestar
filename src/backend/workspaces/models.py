@@ -62,6 +62,10 @@ class WorkSpace(models.Model):
     assistant_id = models.CharField(max_length=40,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def clean(self):
+        super().clean()
+        self.website_url= self.website_url.lower()
+
     @property
     def monthly_bill(self):
         total_count = self.users.all().count()
@@ -98,6 +102,7 @@ class WorkSpace(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         is_being_created = self._state.adding
+        self.clean()
         super().save(*args, **kwargs)
 
         if is_being_created:
