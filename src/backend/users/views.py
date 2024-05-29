@@ -100,6 +100,8 @@ class SignupView(views.APIView):
                 invite.accepted=True
                 invite.save()
             else:
+                print(user)
+                user.delete()
                 return Response({"detail": "Invite Code already used"}, status=status.HTTP_226_IM_USED)
 
             
