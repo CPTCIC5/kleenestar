@@ -118,7 +118,7 @@ class LogoutView(views.APIView):
         logout(request)
         
         response = Response(status=status.HTTP_200_OK)
-        response.set_cookie('logginIn', 'false', httponly=True)
+        response.delete_cookie('loggedIn')
         
         return response
 
