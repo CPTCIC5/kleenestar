@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from channels.models import Channel
 import hashlib
 import os
+import base64
 from google_auth_oauthlib.flow import Flow
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -33,6 +34,8 @@ from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.campaign import Campaign
 from facebook_business.adobjects.adset import AdSet
 from facebook_business.adobjects.ad import Ad
+import random
+import string
 # PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
@@ -96,13 +99,21 @@ linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri,
 #tiktok
 tiktok_client_id = os.getenv('TIKTOK_CLIENT_ID')
 tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
-tiktok_redirect_uri = 'http://127.0.0.1:8000/api/oauth/tiktok-callback/'
-tiktok_authorization_base_url = 'https://business-api.tiktok.com/open_api/v1.2/oauth/authorize/'
-tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.2/oauth/token/'
-tiktok_scopes = ['ads.read', 'ads.management','user.info']
+tiktok_redirect_uri = 'https://127.0.0.1:8000/api/oauth/tiktok-callback/'
+tiktok_authorization_base_url = 'https://www.tiktok.com/v2/auth/authorize/'
+tiktok_token_url = 'https://www.tiktok.com/v2/auth/authorize/'
+tiktok_scopes = ['ads.read', 'ads.management', 'user.info']
 tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_uri, scope=tiktok_scopes)
+def generate_code_verifier():
+    return base64.urlsafe_b64encode(os.urandom(40)).decode('utf-8').rstrip('=')
 
+def generate_code_challenge(verifier):
+    challenge = hashlib.sha256(verifier.encode('utf-8')).digest()
+    return base64.urlsafe_b64encode(challenge).decode('utf-8').rstrip('=')
 
+code_verifier = generate_code_verifier()
+code_challenge = generate_code_challenge(code_verifier)
+csrf_state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
 
 
 #-----------------------------------------------------GOOGLE--------------------------------------------------#
@@ -748,7 +759,7 @@ def twitter_oauth_callback(request):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def get_twitter_marketing_data(request):
-    credentials = ['O4LCsAAAAAABtLEHAAABj7-SMNg', 'DA0C8sYZSdIbCgXo6OURZcGcx4ubLfMd', '1534198477127053312-VDMwg96nh8m8CEGRMTGj5w29RPbNVL', 'Us8sPPZjuZxMKv2EH6HBneTnGPOo8ENW0vYqoncYLVB1g']
+    credentials = ['O4LCsAAAAAABtLEHAAABj7-SMNg', 'DA0C8sYZSdIbCgXo6OURZcGcx4ubLfMd', '1764216680820224000-DIB8DqQXZUA91onsjJ1dN61eelzjyp', 'WjWThCAGwU0QkOkFNreoBrQRUoSiwVuoo3x6Ntl0aL7VO']
 
     twitter_client = Client(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET") , credentials[2], credentials[3])
     accounts = twitter_client.accounts()
@@ -849,6 +860,22 @@ def get_twitter_marketing_data(request):
 
 
 #-----------------------------------------------------LINKEDIN--------------------------------------------------#
+def get_linkedin_ad_accounts(access_token):
+    url = "https://api.linkedin.com/v2/adAccountsV2?q=search&search.type.values[0]=BUSINESS&search.status.values[0]=ACTIVE"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        accounts = response.json().get("elements", [])
+        for account in accounts:
+            print(f"Account ID: {account['id']}")
+            print(f"Account Name: {account['name']}")
+            print(f"Currency: {account['currency']}")
+            print("-" * 20)
+    else:
+        print("Failed to fetch ad accounts", response.status_code, response.text)
+
 
 @api_view(("GET",))
 def linkedin_oauth(request):
@@ -921,8 +948,8 @@ def linkedin_oauth_callback(request):
 @permission_classes([AllowAny]) 
 def get_linkedin_marketing_data(request):
 
-    access_token = 'AQUivIYkkxTX9mDgEZ8LK3McT_-D6P8Q2FPn1N5ayQy83VPbTiWWSds2g9_IpMcB0PVC_QVcXFYqePDHUhfQ8dmjOsZVNQXQwFCKaJHWr17iAGDRNRz68p3P2AXwwto0SUMxnCWyRysdbHxDDz_zurxQ5Rd1t06sdRxpLXAI8w3lRmww7KaXQEgHlFqzirjwnrCkMQEXKzAnBfJzoQi8Xfd2b85FdTVw0IBm3jUdBLSzkOsqdJ7hL_m_S8RZOSZ56TbZyonXFtAnS-2jfTI1IQRTU_bnq4cQu5bhZDkpgXO6NSp8u2OztNREJ2daoNLM0ARCjeC1snxSI3BtDUE_fzJpnRKERw'
-
+    access_token = 'AQWV-3ceUyYyGEG47Yzh4RFoapl8i9j9N7_yCUmZE6I0u48q9zmD1bWilq0S1UgxhEzqYoPmhElwzzDyWHTVPz4OIrM7sW1DLWyI2cpmYOwLEnv3DZtIbQu0zqGtNXMcKeY_B_e4b9uLuT4yEbUhvKf6_XCm5iIqyRjce6TN3Tjah_7wktZ5cY3p8hIlagQPbt2gI6nql4XZ9QiPLmW9wYRP4eq8tZbyn5_SvwXKuQcZWGePObt5Rt8RsQ8mIWutGmcfr-ZWmf_Zr1t1jDrLATe37UPUFT9ifFJ2X9Zi_D9yTufmwIfRK8FqaW_USKwrOwVekRmjyhGbSxT2i_8WDCcgDzzdqw'
+    get_linkedin_ad_accounts(access_token)
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
@@ -1053,7 +1080,12 @@ def get_linkedin_marketing_data(request):
 @api_view(("GET",))
 def tiktok_oauth(request):
     try:
-        authorization_url, state = tiktok.authorization_url(url=tiktok_authorization_base_url, state=passthrough_val)
+        authorization_url, state = tiktok.authorization_url(
+        tiktok_authorization_base_url,
+        code_challenge=code_challenge,
+        code_challenge_method='S256',
+        state=csrf_state
+        )
         print(authorization_url)
         return Response({
             "url": authorization_url},
