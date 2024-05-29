@@ -95,8 +95,12 @@ class SignupView(views.APIView):
         if invite_code:
             # add the user to the workspace
 
-            #HERE imma add logic to check .exists()
-            invite.workspace.users.add(user)
+            if invite.accepted == False:
+                invite.workspace.users.add(user)
+                invite.accepted=True
+                invite.save()
+            else:
+                return Response({"detail": "Invite Code already used"}, status=status.HTTP_226_IM_USED)
 
             
             # Optionally, set the user's subscription type to team member
