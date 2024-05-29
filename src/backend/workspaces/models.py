@@ -64,7 +64,7 @@ class WorkSpace(models.Model):
 
     def clean(self):
         super().clean()
-        self.business_name= self.business_name.lower()
+        self.website_url= self.website_url.lower()
 
     @property
     def monthly_bill(self):
