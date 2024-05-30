@@ -86,7 +86,7 @@ COLOR_CHOICES = (
 class Note(models.Model):
     prompt = models.ForeignKey("Prompt",on_delete= models.CASCADE)
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
-    note= models.CharField(max_length=100)
+    note_text= models.CharField(max_length=100)
     created_at= models.DateTimeField(auto_now_add=True)
     color = models.IntegerField(choices=COLOR_CHOICES)
 

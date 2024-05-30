@@ -162,17 +162,15 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
         filter = models.BlockNote.objects.filter(user=self.request.user)
         return filter
     
-    """
+    
     def retrieve(self, request, *args, **kwargs):
-        instance = get_object_or_404()
-        try:
-            instance = self.get_queryset().get(pk=kwargs['pk'])
-        except models.BlockNote.DoesNotExist:
-            raise NotFound('BlockNote not found')
-        
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-    """
+        instance = get_object_or_404(models.BlockNote,pk=kwargs['pk'], user=request.user)
+        notes = (instance.note_set.all())
+        print(notes, notes[0].note_text)
+        note_serializer = serializers.NoteSerializer(notes, many=True)
+        return Response(note_serializer.data)
+        #return Response(xyz)
+    
     
     def create(self, request, *args, **kwargs):
         serializer = serializers.CreateBlockNoteSerializer(
