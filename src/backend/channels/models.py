@@ -125,7 +125,7 @@ class Convo(models.Model):
         return self.title
     
     class Meta:
-        ordering = ['-id']
+        ordering = ['-created_at']
     
 
 

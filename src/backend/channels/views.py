@@ -77,6 +77,14 @@ class ConvoViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
+        workspace = self.request.user.workspace_set.all()[0]
+
+        if models.Convo.objects.filter(workspace=workspace).count() < 1:
+            models.Convo.objects.create(
+                workspace= workspace,
+                
+            )
+            
         return Response(status=status.HTTP_200_OK)
 
         
@@ -153,6 +161,18 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         filter = models.BlockNote.objects.filter(user=self.request.user)
         return filter
+    
+    """
+    def retrieve(self, request, *args, **kwargs):
+        instance = get_object_or_404()
+        try:
+            instance = self.get_queryset().get(pk=kwargs['pk'])
+        except models.BlockNote.DoesNotExist:
+            raise NotFound('BlockNote not found')
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    """
     
     def create(self, request, *args, **kwargs):
         serializer = serializers.CreateBlockNoteSerializer(
