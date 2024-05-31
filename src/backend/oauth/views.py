@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from channels.models import Channel
 import hashlib
+import urllib.parse 
 import os
 import base64
 from google_auth_oauthlib.flow import Flow
@@ -16,7 +17,7 @@ from rest_framework.decorators import permission_classes
 from requests_oauthlib import OAuth2Session
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
-from requests_oauthlib import OAuth1Session
+from requests_oauthlib import OAuth1Session, OAuth1
 from django.shortcuts import redirect
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.user import User
@@ -82,6 +83,8 @@ twitter_redirect_uri = 'http://127.0.0.1:8000/api/oauth/twitter-callback/'
 twitter_authorization_base_url = "https://api.twitter.com/oauth/authenticate"
 twitter_token_url = "https://api.twitter.com/oauth/access_token"
 twitter_scopes = ["email", "ads_read", "ads_management"]
+twitter_ads_api_url = 'https://ads-api.twitter.com/'
+twitter_api_version = '11'
 resource_owner_key = ''
 resource_owner_secret = ''
 
@@ -90,7 +93,7 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 linkedin_client_id = os.getenv('LINKEDIN_CLIENT_ID')
 linkedin_client_secret = os.getenv('LINKEDIN_CLIENT_SECRET')
-linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "email","openid","profile"]
+linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "email","openid","profile","r_organization_social"]
 linkedin_authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
 linkedin_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
 linkedin_redirect_uri = 'http://127.0.0.1:8000/api/oauth/linkedin-callback/'
@@ -104,17 +107,6 @@ tiktok_authorization_base_url = 'https://www.tiktok.com/v2/auth/authorize/'
 tiktok_token_url = 'https://www.tiktok.com/v2/auth/authorize/'
 tiktok_scopes = ['ads.read', 'ads.management', 'user.info']
 tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_uri, scope=tiktok_scopes)
-def generate_code_verifier():
-    return base64.urlsafe_b64encode(os.urandom(40)).decode('utf-8').rstrip('=')
-
-def generate_code_challenge(verifier):
-    challenge = hashlib.sha256(verifier.encode('utf-8')).digest()
-    return base64.urlsafe_b64encode(challenge).decode('utf-8').rstrip('=')
-
-code_verifier = generate_code_verifier()
-code_challenge = generate_code_challenge(code_verifier)
-csrf_state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-
 
 #-----------------------------------------------------GOOGLE--------------------------------------------------#
 
@@ -695,7 +687,6 @@ def twitter_oauth(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
@@ -755,100 +746,184 @@ def twitter_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
+def get_twitter_ad_accounts(auth):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts'
+    response = requests.get(url, auth=auth)
+
+    if response.status_code == 200:
+        data = response.json()
+        accounts = data['data']
+        account_list = []
+        for i in accounts:
+            account_list.append(i['id'])
+        return account_list
+    else:
+        print(f'Failed to fetch ad accounts: {response.status_code}')
+        print('Response:', response.text)
+        return None
+    
+def get_twitter_campaign_data(auth, account_id):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/campaigns'
+    response = requests.get(url, auth=auth)
+
+    if response.status_code == 200:
+        data = response.json()
+        campaign_data = data['data']
+        campaign_data_list = []
+        for single_campaign in campaign_data:
+            campaign_data_dict = {
+                "id" : single_campaign.get("id"),
+                "name": single_campaign.get("name"),
+                "entity_status": single_campaign.get("entity_status"),
+                "created_at": single_campaign.get("created_at"),
+                "duration_in_days": single_campaign.get("duration_in_days"),
+                "total_budget_amount_local_micro": single_campaign.get("total_budget_amount_local_micro"),
+                "daily_budget_amount_local_micro": single_campaign.get("daily_budget_amount_local_micro"),
+            }
+            campaign_data_list.append(campaign_data_dict)
+        
+        return campaign_data_list
+    else:
+        print(f'Failed to fetch ad accounts: {response.status_code}')
+        print('Response:', response.text)
+        return None
+
+def get_twitter_line_items_data(auth, account_id):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/line_items'
+    response = requests.get(url, auth=auth)
+
+    if response.status_code == 200:
+        data = response.json()
+        line_items_data_long = data['data']
+        line_items_data_list = []
+        for line_items_data in line_items_data_long:
+            line_items_data_dict = {
+                "id" : line_items_data.get("id"),
+                "name": line_items_data.get("name"),
+                "campaign_id": line_items_data.get("campaign_id"),
+                "objective": line_items_data.get("objective"),
+                "placements": line_items_data.get("placements"),
+                "goal": line_items_data.get("goal"),
+                "product_type": line_items_data.get("product_type"),
+                "start_time": line_items_data.get("start_time"),
+                "end_time": line_items_data.get("end_time"),
+            }
+            line_items_data_list.append(line_items_data_dict)
+        
+        return line_items_data_list
+    else:
+        print(f'Failed to fetch ad accounts: {response.status_code}')
+        print('Response:', response.text)
+        return None
+    
+def get_twitter_active_entities_data(auth, account_id):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/stats/accounts/{account_id}/active_entities'
+
+    all_active_entities = []
+    end_time = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+    start_time = end_time - timedelta(days=7)
+    start_time = start_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+    end_time = end_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+    entities = ['CAMPAIGN', 'FUNDING_INSTRUMENT', 'LINE_ITEM', 'MEDIA_CREATIVE', 'PROMOTED_ACCOUNT', 'PROMOTED_TWEET']
+
+    for entity in entities:
+        params = {
+            'start_time': start_time,
+            'end_time': end_time,
+            'entity': entity
+        }
+
+        response = requests.get(url, params=params, auth=auth)
+
+        if response.status_code == 200:
+            data = response.json()
+            entity_data_long = data['data']
+            entity_data_list = []
+            for entity_data in entity_data_long:
+                entity_data_dict = {
+                    "entity_type": entity,
+                    "entity_id": entity_data.get("entity_id"),
+                    "activity_start_time": entity_data.get("activity_start_time"),
+                    "activity_end_time": entity_data.get("activity_end_time"),
+                    "placements": entity_data.get("placements")[0],
+                }
+                entity_data_list.append(entity_data_dict)
+            all_active_entities.append({entity: entity_data_list})
+        else:
+            print(f'Failed to fetch active entities for {entity}: {response.status_code}')
+            print('Response:', response.text)
+
+    return all_active_entities if all_active_entities else None
+
+def fetch_entity_stats(auth, account_id, entities_info):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/stats/accounts/{account_id}'
+    granularity = 'TOTAL'
+    metric_groups = 'ENGAGEMENT'
+    results = []
+    end_time = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+    start_time = end_time - timedelta(days=7)
+    start_time = start_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+    end_time = end_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    for entity_info in entities_info:
+        for entity_type, entities in entity_info.items():
+            for entity in entities:
+                params = {
+                    'entity': entity_type,
+                    'entity_ids': entity['entity_id'],
+                    'start_time': str(start_time),
+                    'end_time': str(end_time),
+                    'granularity': granularity,
+                    'placement': entity['placements'],
+                    'metric_groups': metric_groups
+                }
+
+                response = requests.get(url, params=params, auth=auth)
+
+                if response.status_code == 200:
+                    data = response.json()
+                    results.append({
+                        'entity_type': entity_type,
+                        'entity_id': entity['entity_id'],
+                        'statistics': data
+                    })
+                else:
+                    print(f'Failed to fetch stats for {entity_type} {entity["entity_id"]}: {response.status_code}')
+                    print('Response:', response.text)
+    
+    return results
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-def get_twitter_marketing_data(request):
-    credentials = ['O4LCsAAAAAABtLEHAAABj7-SMNg', 'DA0C8sYZSdIbCgXo6OURZcGcx4ubLfMd', '1764216680820224000-DIB8DqQXZUA91onsjJ1dN61eelzjyp', 'WjWThCAGwU0QkOkFNreoBrQRUoSiwVuoo3x6Ntl0aL7VO']
+def get_twitter_marketing_data(access_token, access_token_secret):
 
-    twitter_client = Client(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET") , credentials[2], credentials[3])
-    accounts = twitter_client.accounts()
+    auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
 
+    accounts = get_twitter_ad_accounts(auth)
+    marketing_data = []
     try:    
-        for account in accounts:
-            print(account, "account")
-            data = {
-                "campaigns": [],
-                "line_items": [],
-                "ads": [],
-                "audience_metrics": [],
-                "conversion_metrics": [],
-                "engagement_metrics": [],
-                "revenue_metrics": [],
-                "time_metrics": []
+        for account_id in accounts:
+            campaigns_data = get_twitter_campaign_data(auth, account_id)
+
+            line_items_data = get_twitter_line_items_data(auth, account_id)
+
+            entities_info = get_twitter_active_entities_data(auth, account_id)
+            
+            entities_with_stats = fetch_entity_stats(auth, account_id, entities_info)
+
+            marketing_data_dict = {
+                "account_id": account_id,
+                "campaigns_data": campaigns_data,
+                "line_items_data": line_items_data,
+                "entities_and_statistics": entities_with_stats
             }
 
-            # Fetch campaigns
-            for campaign in Campaign.all(account):
-                data["campaigns"].append({
-                    "id": campaign.id,
-                    "name": campaign.name,
-                    "entity_status": campaign.entity_status,
-                    "start_time": campaign.start_time,
-                    "end_time": campaign.end_time,
-                    "daily_budget_amount_local_micro": campaign.daily_budget_amount_local_micro,
-                    "total_budget_amount_local_micro": campaign.total_budget_amount_local_micro
-                })
-
-            # Fetch line items
-            for line_item in LineItem.all(account):
-                data["line_items"].append({
-                    "id": line_item.id,
-                    "name": line_item.name,
-                    "campaign_id": line_item.campaign_id,
-                    "objective": line_item.objective,
-                    "placements": line_item.placements
-                })
-
-            # Fetch ads (Promoted Tweets)
-            for ad in PromotedTweet.all(account):
-                data["ads"].append({
-                    "id": ad.id,
-                    "tweet_id": ad.tweet_id,
-                    "line_item_id": ad.line_item_id,
-                    "entity_status": ad.entity_status,
-                    "approval_status": ad.approval_status,
-                    "created_at": ad.created_at,
-                    "updated_at": ad.updated_at
-                })
-
-            # Fetch analytics (audience, conversion, engagement, revenue, and time-based metrics)
-            analytics = Analytics.all(
-                account,
-                entity='CAMPAIGN',
-                metric_groups=[
-                    'ENGAGEMENT', 'VIDEO', 'WEB_CONVERSION', 'MOBILE_CONVERSION',
-                    'BILLING', 'MEDIA', 'LIFE_TIME_VALUE_MOBILE_CONVERSION'
-                ],
-                granularity='TOTAL'
-            )
-
-            for stat in analytics:
-                data["audience_metrics"].append({
-                    "impressions": stat['impressions'],
-                    "reach": stat.get('reach'),  # Reach might not be directly available
-                    "engagements": stat['engagements'],
-                    "engagement_rate": stat['engagement_rate']
-                })
-                data["conversion_metrics"].append(stat['activity_metrics'])
-                data["engagement_metrics"].append({
-                    "follows": stat['follows'],
-                    "likes": stat['likes'],
-                    "replies": stat['replies'],
-                    "retweets": stat['retweets']
-                })
-                data["revenue_metrics"].append({
-                    "billed_charge_local_micro": stat['billed_charge_local_micro'],
-                    "cpm": stat['cpm'],
-                    "cpc": stat['cpc']
-                })
-                data["time_metrics"].append({
-                    "start_time": stat['start_time'],
-                    "end_time": stat['end_time']
-                })
-
-            print(data)
+            marketing_data.append(marketing_data_dict)
+        
         return Response(
+            marketing_data,
             status=status.HTTP_200_OK
         )
 
@@ -858,24 +933,7 @@ def get_twitter_marketing_data(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-
 #-----------------------------------------------------LINKEDIN--------------------------------------------------#
-def get_linkedin_ad_accounts(access_token):
-    url = "https://api.linkedin.com/v2/adAccountsV2?q=search&search.type.values[0]=BUSINESS&search.status.values[0]=ACTIVE"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        accounts = response.json().get("elements", [])
-        for account in accounts:
-            print(f"Account ID: {account['id']}")
-            print(f"Account Name: {account['name']}")
-            print(f"Currency: {account['currency']}")
-            print("-" * 20)
-    else:
-        print("Failed to fetch ad accounts", response.status_code, response.text)
-
 
 @api_view(("GET",))
 def linkedin_oauth(request):
@@ -943,128 +1001,170 @@ def linkedin_oauth_callback(request):
         )
     
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
-def get_linkedin_marketing_data(request):
+def get_linkedin_ad_accounts(access_token):
+    url = "https://api.linkedin.com/v2/adAccountsV2?q=search&search.type.values[0]=BUSINESS&search.status.values[0]=ACTIVE"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    
+    response = requests.get(url, headers=headers)
+    account_list = []
+    if response.status_code == 200:
+        accounts = response.json().get("elements", [])
+        for account in accounts:
+            item = {
+                "account_id": account['id'],
+                "account_name": account['name']
+            }
+            account_list.append(item)
+        return account_list
+    else:
+        print("Failed to fetch ad accounts", response.status_code, response.text)
 
-    access_token = 'AQWV-3ceUyYyGEG47Yzh4RFoapl8i9j9N7_yCUmZE6I0u48q9zmD1bWilq0S1UgxhEzqYoPmhElwzzDyWHTVPz4OIrM7sW1DLWyI2cpmYOwLEnv3DZtIbQu0zqGtNXMcKeY_B_e4b9uLuT4yEbUhvKf6_XCm5iIqyRjce6TN3Tjah_7wktZ5cY3p8hIlagQPbt2gI6nql4XZ9QiPLmW9wYRP4eq8tZbyn5_SvwXKuQcZWGePObt5Rt8RsQ8mIWutGmcfr-ZWmf_Zr1t1jDrLATe37UPUFT9ifFJ2X9Zi_D9yTufmwIfRK8FqaW_USKwrOwVekRmjyhGbSxT2i_8WDCcgDzzdqw'
-    get_linkedin_ad_accounts(access_token)
+def get_linkedin_campaigns(access_token, account_id):
+    
+    account_urn = f'urn:li:sponsoredAccount:{account_id}'
+    url = f"https://api.linkedin.com/v2/adCampaignsV2?q=search&search.account.values[0]={account_urn}"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    
+    response = requests.get(url, headers=headers)
+    campaign_list = []
+    if response.status_code == 200:
+        campaigns = response.json().get("elements", [])
+        for campaign in campaigns:
+            item = {
+                "id": campaign.get('id'),
+                "name": campaign.get('name'),
+                "status": campaign.get('status'),
+                "created": campaign['changeAuditStamps']['created']['time'],
+                "lastModified": campaign['changeAuditStamps']['lastModified']['time'],
+                "costType": campaign.get('costType'),
+                "totalBudget": campaign.get('totalBudget'),
+                "unitCost": campaign.get('unitCost'),
+                "type": campaign.get('type'),
+                "locale": campaign.get('locale')
+            }
+            campaign_list.append(item)
+        return campaign_list
+    else:
+        print("Failed to fetch campaigns", response.status_code, response.text)
+
+def get_linkedin_ad_creatives(access_token, campaign_id):
+    print(campaign_id)
+    campaign_urn = f'urn:li:sponsoredCampaign:{campaign_id}'
+    url = f"https://api.linkedin.com/v2/adCreativesV2?q=search&search.campaign.values[0]={campaign_urn}"
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+    }
+
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        ad_creatives = response.json()
+        creative = ad_creatives['elements'][0]
+        ad_creatives_dict = {
+                "id": creative.get('id'),
+                "status": creative.get('status'),
+                "type": creative.get('type'),
+                "campaign": creative.get('campaign'),
+                "created": creative['changeAuditStamps']['created']['time'],
+                "lastModified": creative['changeAuditStamps']['lastModified']['time'],
+                "variables": creative.get('variables'),
+                "reference": creative.get('reference'),
+                "reference_content": [],   
+            }
+        return ad_creatives_dict
+    else:
+        return {'error': response.json()}
+
+def get_post_details(access_token, post_urn):
+    encoded_urn = urllib.parse.quote(post_urn)
+    url = f"https://api.linkedin.com/v2/posts/{encoded_urn}"
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        post_data = response.json()
+        post_content = {
+            "content": post_data.get("content"),
+            "contentLandingPage": post_data.get("contentLandingPage"),
+            "commentary": post_data.get("commentary")
+        }
+        return post_content
     
-    base_url = "https://api.linkedin.com/v2"
+    else:
+        return {
+            "error": response.status_code,
+            "message": response.text
+        }
+    
+# def get_linkedin_ad_analytics(access_token, sponsoredaccount_id):
+#     url = (
+#         f"https://api.linkedin.com/v2/adAnalytics?q=statistics&dateRange=(start:(day:1,month:1,year:2024),end:(day:30,month:5,year:2024))&timeGranularity=ALL&accounts=List(urn%3Ali%3AsponsoredAccount%3A{sponsoredaccount_id})&pivots=List(CREATIVE,CAMPAIGN)&fields=impressions,clicks,totalEngagements,comments,shares,reactions,approximateUniqueImpressions,externalWebsiteConversions,externalWebsitePostClickConversions,externalWebsitePostViewConversions,conversionValueInLocalCurrency,oneClickLeads,pivot,pivotValues,pivotValue&projection=(*,elements*(*,pivotValues(*~sponsoredCampaign(id,name,type,objectiveType,status,campaignGroup~(id,name,status))~sponsoredCreative(status,type))))"
+#     )
+    
+#     headers = {
+#         'Authorization': f'Bearer {access_token}',
+#         'Content-Type': 'application/json',
+#         'LinkedIn-Version': '202401',
+#         'X-Restli-Protocol-Version': '2.0.0'
+#     }
 
-    # Get Campaign Information
+#     try:
+#         response = requests.get(url, headers=headers)
+#         response.raise_for_status()  
+#         return response.json() 
+#     except requests.exceptions.HTTPError as http_err:
+#         print(f"HTTP error occurred: {http_err}")
+#     except Exception as err:
+#         print(f"Other error occurred: {err}")
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def get_linkedin_marketing_data(access_token):
     try:
-        campaigns_url = f"{base_url}/adCampaignsV2"
-        response = requests.get(campaigns_url, headers=headers)
-        campaigns = response.json().get('elements', [])
-        print(response.json())
-        campaign_data = []
-        for campaign in campaigns:
-            campaign_info = {
-                'id': campaign.get('id'),
-                'name': campaign.get('name'),
-                'status': campaign.get('status'),
-                'created': campaign.get('created'),
-                'lastModified': campaign.get('lastModified'),
-                'dailyBudget': campaign.get('dailyBudget'),
-                'totalBudget': campaign.get('totalBudget'),
-                'objective': campaign.get('objective'),
-                'type': campaign.get('type'),
-            }
-            
-            # Get Ad Set
-            ad_creatives_url = f"{base_url}/adCreativesV2?q=campaign&campaign={campaign['id']}"
-            ad_response = requests.get(ad_creatives_url, headers=headers)
-            ad_creatives = ad_response.json().get('elements', [])
-
-            ad_creative_data = []
-            for ad in ad_creatives:
-                ad_info = {
-                    'id': ad.get('id'),
-                    'campaignId': ad.get('campaign'),
-                    'format': ad.get('format'),
-                    'status': ad.get('status'),
-                    'created': ad.get('created'),
-                    'lastModified': ad.get('lastModified'),
-                    'textAdTitle': ad.get('textAdTitle'),
-                    'textAdDescription': ad.get('textAdDescription'),
-                    'landingPageUrl': ad.get('landingPageUrl'),
+        account_list = get_linkedin_ad_accounts(access_token)
+        marketing_data = []
+        for account in account_list:
+            # marketing data dictionary (structure)
+            account_data = {
+            'account_id': "",
+            'account_name':"",
+            'campaign_data': {
+                "details": [],
+                "ad_creatives": {
+                    "data": [],
+                    "analytics": [],
+                    "statistics": [],
+                    "adbudgetstats":[]
                 }
-                ad_creative_data.append(ad_info)
+            },
+            }
+
+            # add account related data
+            account_data['account_id'] = account.get("account_id")
+            account_data['account_name'] = account.get("account_name")
             
-            campaign_info['ad_creatives'] = ad_creative_data
+            #add campaign related data
+            account_data['campaign_data']['details'] = get_linkedin_campaigns(access_token, account.get("account_id"))
+            ad_creative_list = []
+            for campaign in account_data['campaign_data']['details']:
+                ad_creative = get_linkedin_ad_creatives(access_token, campaign.get('id') )
+                ad_creative['reference_content'] = get_post_details(access_token, ad_creative['reference'])
+                ad_creative_list.append(ad_creative)
 
-            # Get Audience Metrics, Conversion Metrics, Revenue Metrics, and Time-based Metrics
-            metrics_url = f"{base_url}/adAnalyticsV2?q=analytics&pivot=AD&timeGranularity=ALL&campaigns={campaign['id']}"
-            metrics_response = requests.get(metrics_url, headers=headers)
-            metrics = metrics_response.json().get('elements', [])
+                # ad analytic endpoints are not configured (yet to be done)
+                # get_linkedin_ad_analytics(access_token, account.get("account_id") )
 
-            audience_metrics = {
-                'impressions': 0,
-                'clicks': 0,
-                'uniqueImpressions': 0,
-                'uniqueClicks': 0,
-                'totalEngagements': 0,
-            }
-
-            conversion_metrics = {
-                'likes': 0,
-                'shares': 0,
-                'comments': 0,
-                'socialActions': 0,
-                'engagementRate': 0.0,
-            }
-
-            revenue_metrics = {
-                'costInUsd': 0.0,
-                'cpm': 0.0,
-                'cpc': 0.0,
-                'totalSpent': 0.0,
-            }
-
-            time_based_metrics = {
-                'startDate': None,
-                'endDate': None,
-            }
-
-            for metric in metrics:
-                audience_metrics.update({
-                    'impressions': metric.get('impressions', 0),
-                    'clicks': metric.get('clicks', 0),
-                    'uniqueImpressions': metric.get('uniqueImpressions', 0),
-                    'uniqueClicks': metric.get('uniqueClicks', 0),
-                    'totalEngagements': metric.get('totalEngagements', 0),
-                })
-                conversion_metrics.update({
-                    'likes': metric.get('likes', 0),
-                    'shares': metric.get('shares', 0),
-                    'comments': metric.get('comments', 0),
-                    'socialActions': metric.get('socialActions', 0),
-                    'engagementRate': metric.get('engagementRate', 0.0),
-                })
-                revenue_metrics.update({
-                    'costInUsd': metric.get('costInUsd', 0.0),
-                    'cpm': metric.get('cpm', 0.0),
-                    'cpc': metric.get('cpc', 0.0),
-                    'totalSpent': metric.get('totalSpent', 0.0),
-                })
-                time_based_metrics.update({
-                    'startDate': metric.get('startDate'),
-                    'endDate': metric.get('endDate'),
-                })
+            account_data['campaign_data']['data'] = ad_creative_list
             
-            campaign_info['audience_metrics'] = audience_metrics
-            campaign_info['conversion_metrics'] = conversion_metrics
-            campaign_info['revenue_metrics'] = revenue_metrics
-            campaign_info['time_based_metrics'] = time_based_metrics
+            
+            marketing_data.append(account_data)
 
-            campaign_data.append(campaign_info)
-        print(campaign_data)
+        print(marketing_data)
         return Response(
         status=status.HTTP_200_OK
         )
@@ -1073,22 +1173,22 @@ def get_linkedin_marketing_data(request):
         return Response(
         status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-    
 
 #-----------------------------------------------------TIKTOK--------------------------------------------------#
 
 @api_view(("GET",))
 def tiktok_oauth(request):
     try:
-        authorization_url, state = tiktok.authorization_url(
-        tiktok_authorization_base_url,
-        code_challenge=code_challenge,
-        code_challenge_method='S256',
-        state=csrf_state
-        )
-        print(authorization_url)
+        csrf_state = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        url = "https://www.tiktok.com/v2/auth/authorize/"
+        url += f"?client_key={os.getenv('TIKTOK_CLIENT_ID')}"
+        url += "&scope=ads.read,ads.management,user.info"
+        url += "&response_type=code"
+        url += f"&redirect_uri={tiktok_redirect_uri}"
+        url += "&state=" + csrf_state
+
         return Response({
-            "url": authorization_url},
+            "url": url},
             status=status.HTTP_200_OK
         )
     
@@ -1153,7 +1253,6 @@ def get_tiktok_marketing_data(access_token):
     all_data = {}
 
     for advertiser_id in advertiser_ids:
-        # Fetch campaign information
         campaign_url = base_url + "campaign/get/"
         campaign_params = {
             "advertiser_id": advertiser_id
@@ -1161,7 +1260,6 @@ def get_tiktok_marketing_data(access_token):
         campaign_response = requests.get(campaign_url, headers=headers, params=campaign_params)
         campaign_data = campaign_response.json()
 
-        # Fetch ad group information
         adgroup_url = base_url + "adgroup/get/"
         adgroup_params = {
             "advertiser_id": advertiser_id
@@ -1169,7 +1267,6 @@ def get_tiktok_marketing_data(access_token):
         adgroup_response = requests.get(adgroup_url, headers=headers, params=adgroup_params)
         adgroup_data = adgroup_response.json()
 
-        # Fetch ad information
         ad_url = base_url + "ad/get/"
         ad_params = {
             "advertiser_id": advertiser_id
@@ -1177,7 +1274,6 @@ def get_tiktok_marketing_data(access_token):
         ad_response = requests.get(ad_url, headers=headers, params=ad_params)
         ad_data = ad_response.json()
 
-        # Fetch ad performance data
         performance_url = base_url + "reports/get/"
         performance_params = {
             "advertiser_id": advertiser_id,
@@ -1190,7 +1286,6 @@ def get_tiktok_marketing_data(access_token):
         performance_response = requests.get(performance_url, headers=headers, params=performance_params)
         performance_data = performance_response.json()
 
-        # Store all data in the dictionary
         all_data[advertiser_id] = {
             "campaign_data": campaign_data,
             "adgroup_data": adgroup_data,
