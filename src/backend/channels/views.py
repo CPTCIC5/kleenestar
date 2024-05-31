@@ -166,7 +166,6 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = get_object_or_404(models.BlockNote,pk=kwargs['pk'], user=request.user)
         notes = (instance.note_set.all())
-        print(notes, notes[0].note_text)
         note_serializer = serializers.NoteSerializer(notes, many=True)
         return Response(note_serializer.data)
         #return Response(xyz)
