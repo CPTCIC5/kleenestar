@@ -18,4 +18,6 @@ urlpatterns = [
     path("linkedin-data/", views.get_linkedin_marketing_data),
     path("tiktok-callback/", views.tiktok_oauth_callback),
     path("tiktok/", views.tiktok_oauth),
+    path("reddit/", views.reddit_oauth),
+    path("reddit-callback/", views.reddit_oauth_callback)
 ]

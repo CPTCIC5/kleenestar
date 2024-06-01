@@ -6,7 +6,6 @@ from channels.models import Channel
 import hashlib
 import urllib.parse 
 import os
-import base64
 from google_auth_oauthlib.flow import Flow
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -22,12 +21,7 @@ from django.shortcuts import redirect
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.user import User
 from facebook_business.adobjects.adaccountuser import AdAccountUser as AdUser
-from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.adobjects.adaccount import AdAccount
-from twitter_ads.client import Client
-from twitter_ads.campaign import Campaign, LineItem
-from twitter_ads.analytics import Analytics
-from twitter_ads.creative import PromotedTweet
 from users.models import User
 from datetime import datetime, timedelta
 from facebook_business.api import FacebookAdsApi
@@ -37,7 +31,6 @@ from facebook_business.adobjects.adset import AdSet
 from facebook_business.adobjects.ad import Ad
 import random
 import string
-# PromotedTweet = PromotedTweet.attach()
 load_dotenv()
 
 
@@ -108,6 +101,11 @@ tiktok_token_url = 'https://www.tiktok.com/v2/auth/authorize/'
 tiktok_scopes = ['ads.read', 'ads.management', 'user.info']
 tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_uri, scope=tiktok_scopes)
 
+#reddit
+reddit_redirect_uri = 'http://127.0.0.1:8000/api/oauth/reddit-callback/'
+reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
+reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+reddit_token_url = 'https://www.reddit.com/api/v1/access_token'
 #-----------------------------------------------------GOOGLE--------------------------------------------------#
 
 @api_view(("GET",))
@@ -233,7 +231,7 @@ def google_oauth_callback(request):
         
         
         google_channel = get_channel(
-            email=email,
+            email=request.user.email,
             channel_type_num=1
         )
         
@@ -511,7 +509,7 @@ def facebook_oauth_callback(request):
             ad_accounts_list.append(account.get("id")) # account id list
         
         facebook_channel = get_channel(
-            email=email,
+            email=request.user.email,
             channel_type_num=2
         )
 
@@ -725,7 +723,7 @@ def twitter_oauth_callback(request):
         print(resource_owner_key, resource_owner_secret, key, secret)
 
         twitter_channel = get_channel(
-            email=email,
+            email=request.user.email,
             channel_type_num=3
         )
 
@@ -1066,7 +1064,7 @@ def linkedin_oauth_callback(request):
         print(access_token, refresh_token, email)
 
         linkedin_channel = get_channel(
-            email=email,
+            email=request.user.email,
             channel_type_num=4
         )
 
@@ -1297,9 +1295,7 @@ def tiktok_oauth_callback(request):
 
         print(token)
 
-        # aryan
-        # add token to tiktok model
-        # no email here!
+
         tiktok_channel = get_channel(
             email= request.user.email,
             channel_type_num=5
@@ -1376,3 +1372,108 @@ def get_tiktok_marketing_data(access_token):
         }
 
     return all_data
+
+#-----------------------------------------------------REDDIT---------------------------------------------------------#
+
+@api_view(("GET",))
+def reddit_oauth(request):
+    try:  
+        authorization_url = f'https://www.reddit.com/api/v1/authorize?client_id={reddit_client_id}&response_type=code&state={passthrough_val}&redirect_uri={reddit_redirect_uri}&duration=permanent&scope=identity read account history mysubreddits adsread'
+        
+        return Response({
+            "url": authorization_url},
+            status=status.HTTP_200_OK
+        )
+    
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+def reddit_refresh_token_exchange(refresh_token):
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token,
+    }
+
+    auth = requests.auth.HTTPBasicAuth(reddit_client_id, reddit_client_secret)
+    headers = {'User-Agent': 'YourApp/0.1'}
+    response = requests.post(reddit_token_url, auth=auth, data=data, headers=headers)
+
+    if response.status_code == 200:
+        token_info = response.json()
+        access_token = token_info['access_token']
+        
+        return access_token
+    else:
+        return f"Error: {response.content}", response.status_code
+
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def reddit_oauth_callback(request):
+    try:
+        if request.query_params.get("state") != passthrough_val:
+            return Response(
+            {"detail": "State token does not match the expected state."},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        code = request.query_params.get('code')
+        if code is None:
+            return Response(
+            {"detail": "Code is missing in the redirect uri, Invalid request!"},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': reddit_redirect_uri
+        }
+
+        auth = requests.auth.HTTPBasicAuth(reddit_client_id, reddit_client_secret)
+        headers = {'User-Agent': 'YourApp/0.1'}
+        response = requests.post(reddit_token_url, auth=auth, data=data, headers=headers)
+
+        if response.status_code == 200:
+            token_info = response.json()
+            access_token = token_info['access_token']
+            refresh_token = token_info['refresh_token']
+
+            print(access_token, refresh_token)
+            reddit_channel = get_channel(
+                email= request.user.email,
+                channel_type_num=6
+            )
+
+            reddit_channel.credentials.key_1= access_token
+            reddit_channel.credentials.key_2= refresh_token
+            reddit_channel.save()
+
+            return redirect("http://localhost:3001/channels/")
+
+        else:
+            return Response(
+            {"detail": f"Error: {response.content}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+    
+    except Exception as e:
+        print(f"Exception occurred: {str(e)}")
+        return Response(
+            {"detail": "An error occurred during the OAuth process"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny])
+def get_reddit_marketing_data(request):
+    # (Incomplete) - Building right now...
+    return 
