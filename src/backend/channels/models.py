@@ -60,12 +60,12 @@ class Channel(models.Model):
         # Check the subscription type of the workspace
         if self.workspace.subscription_type == 1:  # Pro
             # Check if the workspace already has 3 channels
-            if Channel.objects.filter(workspace=self.workspace).count() >= 3:
+            if Channel.objects.filter(workspace=self.workspace).count() > 3:
                 raise ValidationError("Pro workspace can have only up to 3 channels.")
 
         elif self.workspace.subscription_type == 2:  # Scale
             # Check if the workspace already has 5 channels
-            if Channel.objects.filter(workspace=self.workspace).count() >= 5:
+            if Channel.objects.filter(workspace=self.workspace).count() > 5:
                 raise ValidationError("Scale workspace can have only up to 5 channels.")
         # Call the superclass save method if no validation error is raised
         super().save(*args, **kwargs)
