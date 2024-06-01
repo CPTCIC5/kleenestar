@@ -746,7 +746,6 @@ def twitter_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-
 def get_twitter_ad_accounts(auth):
     url = f'{twitter_ads_api_url}{twitter_api_version}/accounts'
     response = requests.get(url, auth=auth)
@@ -894,12 +893,85 @@ def fetch_entity_stats(auth, account_id, entities_info):
     
     return results
 
+
+def get_promoted_tweets(auth, account_id):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/promoted_tweets'
+
+    response = requests.get(url, auth=auth)
+    response.raise_for_status()
+    
+    promoted_tweets = response.json()
+    tweet_ids = [tweet['tweet_id'] for tweet in promoted_tweets['data']]
+    
+    return tweet_ids
+
+def get_tweet_details(auth, account_id, tweet_ids):
+
+    if(len(tweet_ids) == 0):
+        return "NA"
+    tweet_ids_str = ','.join(tweet_ids)
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/tweets?tweet_ids={tweet_ids_str}&tweet_type=PUBLISHED&trim_user=true'
+
+    response = requests.get(url, auth=auth)
+    response.raise_for_status()
+    
+    tweet_details = response.json()
+    tweet_data = tweet_details['data']
+    tweet_data_list = []
+    for i in tweet_data:
+        medias = []
+        for j in i['entities']['media']:
+            medias.append({
+                "media_url": j['media_url'],
+                "type": j['type']
+            })
+        hashtag_list = []
+        for x in i['entities']['hashtags']:
+            hashtag_list.append(x['text'])
+        tweet_data_dict = {
+            "media": medias,
+            "hashtags": hashtag_list ,
+            "retweet_count" : i['retweet_count'],
+            "full_text" : i['full_text'],
+            "favorite_count": i['favorite_count'],
+            "tweet_type": i['tweet_type'],
+            "lang": i['lang']
+        }
+    tweet_data_list.append(tweet_data_dict)
+    return tweet_data_list
+
+def get_media_creatives(auth, account_id):
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/media_creatives'
+
+    response = requests.get(url, auth=auth)
+    response.raise_for_status()
+    
+    media_creatives = response.json()
+    account_media_ids = [media['account_media_id'] for media in media_creatives['data']]
+    
+    return account_media_ids
+
+def get_media_details(auth, account_id, account_media_ids):
+    if (len(account_media_ids) == 0):
+        return "NA"
+    account_media_ids_str = ','.join(account_media_ids)
+    url = f'{twitter_ads_api_url}{twitter_api_version}/accounts/{account_id}/account_media?account_media_ids={account_media_ids_str}'
+
+    response = requests.get(url, auth=auth)
+    response.raise_for_status()
+    
+    media_details = response.json()
+    return media_details['data']
+
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def get_twitter_marketing_data(access_token, access_token_secret):
+# def get_twitter_marketing_data(request):
 
     auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
+
 
     accounts = get_twitter_ad_accounts(auth)
     marketing_data = []
@@ -913,11 +985,21 @@ def get_twitter_marketing_data(access_token, access_token_secret):
             
             entities_with_stats = fetch_entity_stats(auth, account_id, entities_info)
 
+            tweet_ids = get_promoted_tweets(auth, account_id)
+            
+            tweet_details = get_tweet_details(auth,account_id, tweet_ids)
+            
+            account_media_ids = get_media_creatives(auth,account_id)
+            
+            media_details = get_media_details(auth, account_id, account_media_ids)
+            
             marketing_data_dict = {
                 "account_id": account_id,
                 "campaigns_data": campaigns_data,
                 "line_items_data": line_items_data,
-                "entities_and_statistics": entities_with_stats
+                "entities_and_statistics": entities_with_stats,
+                "tweets_data": tweet_details,
+                "media_data": media_details
             }
 
             marketing_data.append(marketing_data_dict)
