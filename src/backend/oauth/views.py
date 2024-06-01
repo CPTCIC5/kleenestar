@@ -200,7 +200,6 @@ def google_oauth_callback(request):
         resource_names = accessible_customers.resource_names
         manager_id = resource_names[0].split('/')[1]
         
-        #retrive all the client account ids of the manager account
         client_id_list = []
         query = """
             SELECT
@@ -229,7 +228,11 @@ def google_oauth_callback(request):
                 status=status.HTTP_403_FORBIDDEN,
             )
         
+        """
+        Email of the workspace user is passed as a argument,
+        along with the channel type
         
+        """
         google_channel = get_channel(
             email=request.user.email,
             channel_type_num=1
@@ -717,7 +720,7 @@ def twitter_oauth_callback(request):
         params = {"include_email": True}
         user_data = oauth_user.get(url_user, params=params)
         user_json = user_data.json()
-        email = user_json.get('email', None)   # gets email only if twitter account connected with email else None
+        email = user_json.get('email', None)  
 
         print(email)
         print(resource_owner_key, resource_owner_secret, key, secret)
@@ -1445,6 +1448,7 @@ def reddit_oauth_callback(request):
             refresh_token = token_info['refresh_token']
 
             print(access_token, refresh_token)
+            
             reddit_channel = get_channel(
                 email= request.user.email,
                 channel_type_num=6
