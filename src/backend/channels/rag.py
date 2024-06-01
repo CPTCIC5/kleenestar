@@ -54,7 +54,8 @@ def retrieve_from_agents(query, embeddings_model, documents):
 
 # Main RAG function
 def RagData(question):
-    embeddings_model = OpenAIEmbeddings()
+    embeddings_model = OpenAIEmbeddings(model='text-embedding-3-large')
+    print(embeddings_model.model , 'xyz')
     documents = get_workspace()
     
     if documents is None:
