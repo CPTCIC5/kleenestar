@@ -14,7 +14,7 @@ def get_workspace():
         ResponseData = response.json()
     else:
         print("Failed to fetch data:", response.status_code)
-        return None
+        return response.raise_for_status()
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=30, length_function=len, is_separator_regex=False)
     documents = [Document(page_content=x) for x in text_splitter.split_text(str(ResponseData))]
@@ -45,10 +45,8 @@ def long_context_reorder(documents, query):
 
 
 # Function to simulate multiple document agents
-def retrieve_from_agents(query, embeddings_model, documents):
-    db = Chroma(embedding_function=embeddings_model)
+def retrieve_from_agents(query, embeddings_model, documents, db):
     db.add_documents(documents)
-    
     results = db.similarity_search_with_score(query, k=5)
     return results
 
@@ -70,8 +68,10 @@ def RagData(question):
     # Reorder documents using LongContextReorder
     reordered_docs = long_context_reorder(enriched_docs, question)
     
+    db = Chroma(embedding_function=embeddings_model)
+    
     # Simulate multiple document agents
-    results = retrieve_from_agents(question, embeddings_model, reordered_docs)
+    results = retrieve_from_agents(question, embeddings_model, reordered_docs, db)
     
     # Format the retrieved documents
     def format_docs(result):

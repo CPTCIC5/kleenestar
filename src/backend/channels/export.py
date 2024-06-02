@@ -5,7 +5,7 @@ print(xd)
 """
 
 
-"""
+
 import json
 import os
 from rest_framework.decorators import api_view,permission_classes
@@ -41,11 +41,11 @@ def merge_json_files(request):
         merged_data.append(file_data)
 
     return Response(merged_data)
+
+
+
+
 """
-
-
-
-
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -97,3 +97,4 @@ def merge_json_files(request):
     logger.info(f"Merged data: {merged_data}")
 
     return Response(merged_data)
+"""
