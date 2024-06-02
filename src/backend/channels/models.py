@@ -34,7 +34,8 @@ class Channel(models.Model):
         (2, "Meta"),
         (3, "X (Twitter)"),
         (4, "Linkedin"),
-        (5, "TikTok")
+        (5, "TikTok"),
+        (6, 'Reddit')
     )
     activated = models.BooleanField(default=True)
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
@@ -53,7 +54,7 @@ class Channel(models.Model):
                 key_3="",
                 key_4="",
                 key_5="",
-                key_6=self.workspace.business_name
+                key_6=f"{self.workspace.business_name} - {self.channel_type}"
             )
         super().save(*args, **kwargs)
 

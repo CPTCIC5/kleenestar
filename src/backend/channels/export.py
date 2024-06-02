@@ -4,6 +4,8 @@ xd = rag.RagData("What is my avatar?", "xyz@gmail.com", "123")
 print(xd)
 """
 
+
+"""
 import json
 import os
 from rest_framework.decorators import api_view,permission_classes
@@ -13,7 +15,7 @@ from oauth import views
 from channels.models import Channel
 from django.shortcuts import get_object_or_404
 
-"""
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Allow access to anyone
@@ -42,28 +44,56 @@ def merge_json_files(request):
 """
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Allow access logged in user
-def merge_json_files(request):
-    user= request.user
-    workspace= user.workspace_set.all()[0]
-    google_cred= get_object_or_404(Channel, workspace=workspace,channel_type=1).credentials
-    meta_cred= get_object_or_404(Channel, workspace=workspace,channel_type=2).credentials
-    twitter_cred= get_object_or_404(Channel, workspace=workspace,channel_type=3).credentials
-    linkedin_cred= get_object_or_404(Channel, workspace=workspace,channel_type=4).credentials
-    tiktok_cred= get_object_or_404(Channel, workspace=workspace,channel_type=5).credentials
 
+
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+import json
+import logging
+from .models import Channel
+from oauth import views
+
+logger = logging.getLogger(__name__)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def merge_json_files(request):
+    user = request.user
+    workspace = user.workspace_set.first()  # Use first() instead of all()[0] for better practice
+
+    if not workspace:
+        return Response({"error": "No workspace found for the user"}, status=400)
 
     merged_data = []
+
+    channel_types = {
+        1: views.get_google_marketing_data,
+        2: views.get_facebook_marketing_data,
+        3: views.get_twitter_marketing_data,
+        4: views.get_linkedin_marketing_data,
+        5: views.get_tiktok_marketing_data
+    }
+
+    channels = Channel.objects.filter(workspace=workspace)
+
+    for channel in channels:
+        get_data_func = channel_types.get(channel.channel_type)
+        if get_data_func:
+            credentials = channel.credentials
+            if channel.channel_type == 1:
+                data = get_data_func(credentials.key_1, credentials.key_3)
+            elif channel.channel_type == 2:
+                data = get_data_func(credentials.key_1, credentials.key_2)
+            elif channel.channel_type == 3:
+                data = get_data_func(credentials.key_1, credentials.key_2, credentials.key_3, credentials.key_4)
+            elif channel.channel_type == 4:
+                data = get_data_func(credentials.key_1)
+            elif channel.channel_type == 5:
+                data = get_data_func()
+            merged_data.append(data)
     
-    #Get data from each marketing channel function
-    google_data = views.get_google_marketing_data(google_cred.key_1, google_cred.key_3) #pass key1 and key3 as params
-    facebook_data = views.get_facebook_marketing_data(meta_cred.key_1, meta_cred.key_2) #pass key1 and key2 as params
-    twitter_data = views.get_twitter_marketing_data(twitter_cred.key_1, twitter_cred.key_2, twitter_cred.key_3, twitter_cred.key_4)
-    linkedin_data = views.get_linkedin_marketing_data(linkedin_cred.key_1)
-    tiktok_data = views.get_tiktok_marketing_data()
-
-    merged_data.extend([google_data, facebook_data, twitter_data, linkedin_data, tiktok_data])
-
+    logger.info(f"Merged data: {merged_data}")
 
     return Response(merged_data)
