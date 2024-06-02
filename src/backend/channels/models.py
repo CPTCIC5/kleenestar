@@ -6,6 +6,7 @@ from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from .rag import RagData
+from .new_rag import RagData as RagData_3
 from .old_rag import RagData as RagData_2
 
 load_dotenv()
@@ -136,7 +137,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     all_prompts = history.count()
 
     # Call RagData function with the user query to get RAG context
-    rag_context = RagData(user_query)
+    rag_context = RagData_3(user_query)
     print('this-is-rag-contextttt',rag_context)
 
     # Creating a new conversation thread
