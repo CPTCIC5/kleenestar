@@ -1,6 +1,7 @@
 import requests
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain.schema.document import Document
 from langchain_community.document_transformers import LongContextReorder
@@ -17,6 +18,7 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
 
+    #text_splitter= RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=30, length_function=len, is_separator_regex=False)
     text_splitter = SemanticChunker(OpenAIEmbeddings())
     documents = [Document(page_content=x) for x in text_splitter.split_text(str(response_data))]
     return documents
