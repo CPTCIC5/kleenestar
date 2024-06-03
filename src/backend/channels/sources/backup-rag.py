@@ -1,10 +1,9 @@
-import json
 import requests
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma, FAISS
+from langchain_community.vectorstores import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain.schema.document import Document
-from langchain_community.retrievers import BM25Retriever
 from langchain_community.document_transformers import LongContextReorder
 from langchain.retrievers import EnsembleRetriever
 
@@ -19,6 +18,7 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
 
+    #text_splitter= RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=30, length_function=len, is_separator_regex=False)
     text_splitter = SemanticChunker(OpenAIEmbeddings())
     documents = [Document(page_content=x) for x in text_splitter.split_text(str(response_data))]
     return documents
@@ -45,60 +45,60 @@ def long_context_reorder(documents, query):
     reordered_docs = reorder_transformer.transform_documents(documents, context=query)
     return reordered_docs
 
-# Function to retrieve documents using Chroma
-def retrieve_from_chroma(query, embeddings_model, documents):
-    db = Chroma(embedding_function=embeddings_model)
-    db.add_documents(documents)
+def create_chroma_vectorstore(chunks):
+    embedding_function = OpenAIEmbeddings(model='text-embedding-3-large')
+    
+    return Chroma.from_documents(chunks, embedding_function)
+
+def create_chroma_long_context_retriever(db, documents):
+    reordered_docs = long_context_reorder(db)
+
+# Function to create Chroma retriever with metadata filtering
+def create_chroma_metadata_retriever(query, db, documents):
+    filtered_docs = filter_by_metadata(documents, query)
+    db.add_documents(filtered_docs)
     results = db.similarity_search_with_score(query, k=5)
     return results
 
-# Function to retrieve documents using BM25
-def retrieve_from_bm25(query, documents):
-    retriever = BM25Retriever(docs=documents)
-    retriever.from_documents(documents)  # Adding documents to the retriever
-    print(retriever,'dy')
-    results = retriever.get_relevant_documents(query)  # Performing the search with the query
+# Function to create Chroma retriever with parent-child chunk retrieval
+def create_chroma_parent_child_retriever(query, db, documents):
+    enriched_docs = add_parent_child_chunks(documents)
+    db.add_documents(enriched_docs)
+    results = db.similarity_search_with_score(query, k=5)
     return results
 
-# Function to retrieve documents using FAISS
-def retrieve_from_faiss(query, embeddings_model, documents):
-    db = FAISS(embedding_function=embeddings_model)
-    db.add_documents(documents)
+# Function to create Chroma retriever with long-context reordering
+def create_chroma_long_context_retriever(query, db, documents):
+    reordered_docs = long_context_reorder(documents, query)
+    db.add_documents(reordered_docs)
     results = db.similarity_search_with_score(query, k=5)
     return results
 
 # Function to use Ensemble Retriever to combine results
 def ensemble_retrieve(query, embeddings_model, documents):
-    results_chroma = retrieve_from_chroma(query, embeddings_model, documents)
-    results_bm25 = retrieve_from_bm25(query, documents)
-    results_faiss = retrieve_from_faiss(query, embeddings_model, documents)
+    db = Chroma(embedding_function=embeddings_model)
     
-    combined_results = EnsembleRetriever(retrievers=[results_chroma, results_bm25, results_faiss])
-    #combined_results = ensemble_retriever(retrievers)#[results_chroma, results_bm25, results_faiss])
+    results_metadata = create_chroma_metadata_retriever(query, db, documents)
+    results_parent_child = create_chroma_parent_child_retriever(query, db, documents)
+    results_long_context = create_chroma_long_context_retriever(query, db, documents)
+    
+    combined_results = EnsembleRetriever(retrievers=[results_metadata, 
+                                                     results_parent_child, 
+                                                     results_long_context])
     
     return combined_results
 
 # Main RAG function
 def RagData(question):
     embeddings_model = OpenAIEmbeddings(model='text-embedding-3-large')
-    print(embeddings_model.model, 'xyz')
     
     documents = get_workspace()
     
     if documents is None:
         return "Failed to retrieve documents."
     
-    # Apply metadata filtering
-    filtered_docs = filter_by_metadata(documents, question)
-    
-    # Apply parent-child chunk retrieval
-    enriched_docs = add_parent_child_chunks(filtered_docs)
-    
-    # Reorder documents using LongContextReorder
-    reordered_docs = long_context_reorder(enriched_docs, question)
-    
     # Use ensemble retrieval to get the final results
-    results = ensemble_retrieve(question, embeddings_model, reordered_docs)
+    results = ensemble_retrieve(question, embeddings_model, documents)
     
     # Format the retrieved documents
     def format_docs(result):
@@ -107,6 +107,7 @@ def RagData(question):
     ragged_data = format_docs(results)
     return str(ragged_data).replace("\n", "")
 
+
 # Example usage
-if __name__ != "__main__":
+if __name__ == "__main__":
     pass
