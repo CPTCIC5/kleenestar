@@ -9,6 +9,8 @@ urlpatterns = [
     path("google/", views.google_oauth),
     path("linkedin_data/", views.get_linkedin_marketing_data),
     path("twitter_data/", views.get_twitter_marketing_data),
+    path("reddit_data/", views.get_reddit_marketing_data),
+    path("google_data/", views.get_google_marketing_data),
     path("facebook-callback/", views.facebook_oauth_callback),
     path("facebook/", views.facebook_oauth),
     path("twitter-callback/", views.twitter_oauth_callback),
