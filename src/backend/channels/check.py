@@ -72,7 +72,7 @@ def ensemble_retrieve(query, embeddings_model, documents):
     results_parent_child = create_chroma_parent_child_retriever(query, db, documents)
     results_long_context = create_chroma_long_context_retriever(query, db, documents)
     
-    combined_results = EnsembleRetriever(retrievers=[results_metadata, results_parent_child, results_long_context], weights=[0.4,0.3,0.3])
+    combined_results = EnsembleRetriever(retrievers=[results_metadata, results_parent_child, results_long_context])
     
     return combined_results
 

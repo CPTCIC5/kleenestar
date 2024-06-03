@@ -131,13 +131,18 @@ class Convo(models.Model):
 
 
 def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
+
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
 
+    
+
     # Call RagData function with the user query to get RAG context
     rag_context = RagData(user_query)
     print('this-is-rag-contextttt',rag_context)
+
+
 
     # Creating a new conversation thread
     if all_prompts >= 1:
@@ -150,6 +155,9 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         get_convo.thread_id = thread.id
         get_convo.save()
         #convo.assistant_id = thread
+
+
+        
 
     if file is not None:
 
