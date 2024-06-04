@@ -11,7 +11,7 @@ import os
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from oauth import views
+from oauth.channels import google,facebook,twitter,linkedin,reddit,tiktok
 from channels.models import Channel
 from django.shortcuts import get_object_or_404
 
@@ -69,11 +69,12 @@ def merge_json_files(request):
     merged_data = []
 
     channel_types = {
-        1: views.get_google_marketing_data,
-        2: views.get_facebook_marketing_data,
-        3: views.get_twitter_marketing_data,
-        4: views.get_linkedin_marketing_data,
-        5: views.get_tiktok_marketing_data
+        1: google.get_google_marketing_data,
+        2: facebook.get_facebook_marketing_data,
+        3: twitter.get_twitter_marketing_data,
+        4: linkedin.get_linkedin_marketing_data,
+        5: tiktok.get_tiktok_marketing_data,
+        6: reddit.get_reddit_marketing_data
     }
 
     channels = Channel.objects.filter(workspace=workspace)
@@ -91,7 +92,9 @@ def merge_json_files(request):
             elif channel.channel_type == 4:
                 data = get_data_func(credentials.key_1)
             elif channel.channel_type == 5:
-                data = get_data_func()
+                data = get_data_func(credentials.key_1, credentials.key_2)
+            elif channel.channel_type == 6:
+                data = get_data_func(credentials.key_1, credentials.key_2)
             merged_data.append(data)
     
     logger.info(f"Merged data: {merged_data}")
