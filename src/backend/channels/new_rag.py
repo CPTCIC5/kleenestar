@@ -7,6 +7,7 @@ from langchain.schema.document import Document
 from langchain_community.retrievers import BM25Retriever
 from langchain_community.document_transformers import LongContextReorder
 from langchain.retrievers import EnsembleRetriever
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 
@@ -19,7 +20,8 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
 
-    text_splitter = SemanticChunker(OpenAIEmbeddings())
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=30, length_function=len, is_separator_regex=False)
+    #text_splitter = SemanticChunker(OpenAIEmbeddings())
     documents = [Document(page_content=x) for x in text_splitter.split_text(str(response_data))]
     return documents
 
