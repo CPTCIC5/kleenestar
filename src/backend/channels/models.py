@@ -265,10 +265,10 @@ class Prompt(models.Model):
 
 
 CATEGORY  = (
-        (1,"Don't like the style"),
-        (2,"Not factually correct"),
+        (1, "Don't like the style"),
+        (2, "Not factually correct"),
         (3, "Being Lazy"),
-        (4,"Other")
+        (4, "Other")
     )
 class PromptFeedback(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
