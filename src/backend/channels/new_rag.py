@@ -7,6 +7,8 @@ from langchain.schema.document import Document
 from langchain_community.retrievers import BM25Retriever
 from langchain_community.document_transformers import LongContextReorder
 from langchain.retrievers import EnsembleRetriever
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveJsonSplitter
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 
@@ -15,13 +17,20 @@ def get_workspace():
     response = requests.get(API_URL)
     if response.status_code == 200:
         response_data = response.json()
+
     else:
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
-
-    text_splitter = SemanticChunker(OpenAIEmbeddings())
-    documents = [Document(page_content=x) for x in text_splitter.split_text(str(response_data))]
+    
+    text_splitter= RecursiveJsonSplitter(max_chunk_size=300)
+    documents = text_splitter.create_documents(texts=response_data)
     return documents
+
+
+    #text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=30, length_function=len, is_separator_regex=False)
+    #text_splitter = SemanticChunker(OpenAIEmbeddings())
+    #documents = [Document(page_content=x) for x in text_splitter.split_text(str(response_data))]
+    #return documents
 
 # Function to apply metadata filtering
 def filter_by_metadata(documents, query):
