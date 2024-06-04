@@ -96,11 +96,9 @@ linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri,
 #tiktok
 tiktok_client_id = os.getenv('TIKTOK_CLIENT_ID')
 tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
-tiktok_redirect_uri = 'https://127.0.0.1:8000/api/oauth/tiktok-callback/'
-tiktok_authorization_base_url = 'https://www.tiktok.com/v2/auth/authorize/'
-tiktok_token_url = 'https://www.tiktok.com/v2/auth/authorize/'
-tiktok_scopes = ['ads.read', 'ads.management', 'user.info']
-tiktok = OAuth2Session(client_id=tiktok_client_id, redirect_uri=tiktok_redirect_uri, scope=tiktok_scopes)
+# configured in tiktok app (browser)
+# tiktok_redirect_uri = 'https://a7b1-2401-4900-57e1-6bfc-4182-80ff-5d55-cbdf.ngrok-free.app/api/oauth/tiktok-callback/'
+tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.3/oauth2/access_token/'
 
 #reddit
 reddit_redirect_uri = 'http://127.0.0.1:8000/api/oauth/reddit-callback/'
@@ -1264,16 +1262,10 @@ def get_linkedin_marketing_data(access_token):
 @api_view(("GET",))
 def tiktok_oauth(request):
     try:
-        csrf_state = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-        url = "https://www.tiktok.com/v2/auth/authorize/"
-        url += f"?client_key={os.getenv('TIKTOK_CLIENT_ID')}"
-        url += "&scope=ads.read,ads.management,user.info"
-        url += "&response_type=code"
-        url += f"&redirect_uri={tiktok_redirect_uri}"
-        url += "&state=" + csrf_state
+        authorization_url = f"https://business-api.tiktok.com/portal/auth?app_id={tiktok_client_id}&state={passthrough_val}&redirect_uri=https%3A%2F%2Fa7b1-2401-4900-57e1-6bfc-4182-80ff-5d55-cbdf.ngrok-free.app%2Fapi%2Foauth%2Ftiktok-callback%2F"
 
         return Response({
-            "url": url},
+            "url": authorization_url},
             status=status.HTTP_200_OK
         )
     
@@ -1294,21 +1286,37 @@ def tiktok_oauth_callback(request):
             {"detail": "State token does not match the expected state."},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
-        redirect_response = request.build_absolute_uri()
+        code = request.query_params.get("auth_code")
+        if  code == None:
+            return Response(
+            {"detail": "code not found, invalid request."},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        data = {
+            "app_id": tiktok_client_id,
+            "auth_code":  code,
+            "secret": tiktok_client_secret,
+        }
+        response = requests.post(tiktok_token_url, headers=headers, data=json.dumps(data))
 
-        token = tiktok.fetch_token(token_url=tiktok_token_url, authorization_response=redirect_response, client_secret=tiktok_client_secret)
+        if response.status_code != 200:
+            return Response(
+                {"detail": "An error occurred during the OAuth process: " + response.text},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+        access_token = response.json()['data']['access_token']  # does not expire
 
-        print(token)
-
-
-        tiktok_channel = get_channel(
+        tiktok_channel = get_channel(  # stores the access token to model
             email= request.user.email,
             channel_type_num=5
         )
 
-        tiktok_channel.credentials.key_1= token
-        tiktok_channel.save()
-
+        tiktok_channel.credentials.key_1= access_token
+        tiktok_channel.credentials.save()
         return redirect("http://localhost:3001/channels/")
     
     except Exception as e:
@@ -1320,8 +1328,7 @@ def tiktok_oauth_callback(request):
 
 
 def get_tiktok_marketing_data(access_token):
-    #aryan
-    # pass access token from tiktok model
+
     base_url = "https://ads.tiktok.com/open_api/2/"
     headers = {
         "access_token": access_token,
@@ -1458,7 +1465,7 @@ def reddit_oauth_callback(request):
 
             reddit_channel.credentials.key_1= access_token
             reddit_channel.credentials.key_2= refresh_token
-            reddit_channel.save()
+            reddit_channel.credentials.save()
 
             return redirect("http://localhost:3001/channels/")
 
