@@ -37,10 +37,6 @@ tiktok_api_url = "https://business-api.tiktok.com/open_api"
 tiktok_sandbox_api_url = "https://sandbox-ads.tiktok.com/open_api"
 
 
-
-
-
-
 @api_view(("GET",))
 def tiktok_oauth(request):
     try:
@@ -111,43 +107,114 @@ def tiktok_oauth_callback(request):
 
 
 def get_tiktok_campaign_data(access_token, advertiser_ids):
-
     campaign_account_data = []
-    for advertiser_Id in advertiser_ids:
-        print(advertiser_Id)
-        campaign_url = f"{tiktok_sandbox_api_url}/campaign/get/?advertiser_id={advertiser_Id}"
+    for advertiser_id in advertiser_ids:
+        campaign_url = f"{tiktok_sandbox_api_url}/campaign/get/?advertiser_id={advertiser_id}"
         headers = {
             'Access-Token': access_token
         }
-        campaign_list = []
         response = requests.get(campaign_url, headers=headers)
         campaign_data = response.json()
-        print(campaign_data)
-    #     response.raise_for_status()
-    #     for campaign in campaign_list:
-    #         campaign_list.append({
+        if campaign_data['code'] == 0:
+            campaign_account_data.extend(campaign_data['data']['list'])
+    return campaign_account_data
 
-    #         })
-    # return campaign_account_data
+def get_tiktok_adgroup_data(access_token, advertiser_ids):
+    adgroup_account_data = []
+    for advertiser_id in advertiser_ids:
+        adgroup_url = f"{tiktok_sandbox_api_url}/adgroup/get/?advertiser_id={advertiser_id}"
+        headers = {
+            'Access-Token': access_token
+        }
+        response = requests.get(adgroup_url, headers=headers)
+        adgroup_data = response.json()
+        if adgroup_data['code'] == 0:
+            adgroup_account_data.extend(adgroup_data['data']['list'])
+    return adgroup_account_data
 
+def get_tiktok_ad_data(access_token, advertiser_ids):
+    ad_account_data = []
+    for advertiser_id in advertiser_ids:
+        ad_url = f"{tiktok_sandbox_api_url}/ad/get/?advertiser_id={advertiser_id}"
+        headers = {
+            'Access-Token': access_token
+        }
+        response = requests.get(ad_url, headers=headers)
+        ad_data = response.json()
+        if ad_data['code'] == 0:
+            ad_account_data.extend(ad_data['data']['list'])
+    return ad_account_data
+
+def get_tiktok_creative_metrics(access_token, advertiser_ids, material_type):
+    creative_metrics_data = []
+    for advertiser_id in advertiser_ids:
+        metrics_url = f"{tiktok_sandbox_api_url}/creative/report/get/?advertiser_id={advertiser_id}&material_type={material_type}&metrics_fields=[\"spend\",\"impressions\",\"reach\",\"cpc\",\"cpm\",\"clicks\",\"ctr\",\"cost_per_conversion\",\"conversion_rate\"]"
+        headers = {
+            'Access-Token': access_token
+        }
+        response = requests.get(metrics_url, headers=headers)
+        metrics_data = response.json()
+        if metrics_data['code'] == 0:
+            creative_metrics_data.extend(metrics_data['data']['list'])
+    return creative_metrics_data
+
+def get_tiktok_ultimate_report(access_token, advertiser_ids):
+    ultimate_report_data = []
+    for advertiser_id in advertiser_ids:
+        report_url = f"{tiktok_sandbox_api_url}/report/integrated/get/"
+        headers = {
+            'Access-Token': access_token
+        }
+        
+        payload = {
+            "advertiser_id": advertiser_id,
+            "service_type": "AUCTION",
+            "report_type": "BASIC",
+            "data_level": "AUCTION_AD",
+            "dimensions": ["campaign_id"],
+            "metrics": ["spend", "impressions", "reach", "cpc", "cpm", "clicks", "ctr", "cost_per_conversion", "conversion_rate", "likes", "comments", "shares", "follows"],
+            "filtering": [{"field_name": "ad_status", "filter_type": "IN", "filter_value": "[\"STATUS_ALL\"]"}],
+            "query_lifetime": True,
+            "page": 1,
+            "page_size": 200
+        }
+        response = requests.get(report_url, headers=headers, params=payload)
+        report_data = response.json()
+        if report_data['code'] == 0:
+            ultimate_report_data.extend(report_data['data']['list'])
+    return ultimate_report_data
 
 @csrf_exempt
-@api_view(("GET",))
+@api_view(["GET"])
 @permission_classes([AllowAny]) 
-# def get_tiktok_marketing_data(access_token, advertiser_ids):
-def get_tiktok_marketing_data(access_token):
+def get_tiktok_marketing_data(request):
     try:
         # access_token = "a8017ab343d6b56eea3bd68ddfcad3bd3a483032"
         access_token = "3c174dc93fb84d1f1d9f8b288941c0c6e668cd8f"
         # advertiser_account_list = get_tiktok_advertiser_id(access_token)
         advertiser_ids = ['7365545989899354113']
-        get_tiktok_campaign_data(access_token, advertiser_ids)
 
-        return Response(status=status.HTTP_200_OK)
+        campaign_data = get_tiktok_campaign_data(access_token, advertiser_ids)
+        adgroup_data = get_tiktok_adgroup_data(access_token, advertiser_ids)
+        ad_data = get_tiktok_ad_data(access_token, advertiser_ids)
+        video_metrics = get_tiktok_creative_metrics(access_token, advertiser_ids, "VIDEO")
+        image_metrics = get_tiktok_creative_metrics(access_token, advertiser_ids, "IMAGE")
+        instant_page_metrics = get_tiktok_creative_metrics(access_token, advertiser_ids, "INSTANT_PAGE")
+        ultimate_report = get_tiktok_ultimate_report(access_token, advertiser_ids)
+
+        final_data = {
+            "campaign_data": campaign_data,
+            "adgroup_data": adgroup_data,
+            "ad_data": ad_data,
+            "video_metrics": video_metrics,
+            "image_metrics": image_metrics,
+            "instant_page_metrics": instant_page_metrics,
+            "ultimate_report": ultimate_report
+        }
+
+        return Response(final_data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response(f"Error in api: {e}",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        return Response(f"Error in API: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
