@@ -79,8 +79,11 @@ class Channel(models.Model):
         return "xyz"
 
 COLOR_CHOICES = (
-    (1,"Red"),
-    (2,"Green")
+    (1,"#90EE90"),
+    (2,"#FFCCCC"),
+    (3,"#D3D3D3"),
+    (4,"#E6E6FA"),
+    (5,"#ADD8E6")
 )
 
 
