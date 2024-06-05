@@ -273,7 +273,7 @@ CATEGORY  = (
 class PromptFeedback(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     prompt = models.ForeignKey(Prompt,on_delete=models.CASCADE)
-    category = models.CharField(max_length=60,choices=CATEGORY)
+    category = models.IntegerField(choices=CATEGORY)
     note = models.TextField()
 
     def __str__(self):
