@@ -128,16 +128,18 @@ class PromptViewSet(viewsets.ModelViewSet):
     
     @action(methods=("POST",) ,detail=True, url_path="feedback")
     def prompt_feedback_upload(self,request,pk):
+        prompt= get_object_or_404(models.Prompt,id=pk)
         serializer = serializers.PromptFeedbackCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user, prompt= self.get_object())
+        serializer.save(user=self.request.user, prompt= prompt)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
     @action(methods=("POST",), detail=True, url_path="create-note")  
     def create_note(self,request,pk):
+        prompt= get_object_or_404(models.Prompt,id=pk)
         serializer = serializers.CreateNoteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(prompt=self.get_object())
+        serializer.save(prompt=prompt)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
