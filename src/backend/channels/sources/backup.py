@@ -9,11 +9,6 @@ from langchain_community.document_transformers import LongContextReorder
 from langchain.retrievers import EnsembleRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_text_splitters import RecursiveJsonSplitter
-from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.chat_models import ChatOpenAI
-
-
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 
@@ -27,7 +22,7 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
     
-    text_splitter= RecursiveJsonSplitter(max_chunk_size=80)
+    text_splitter= RecursiveJsonSplitter(max_chunk_size=30)
     documents = text_splitter.create_documents(texts=response_data)
     return documents
 
@@ -38,23 +33,6 @@ def get_workspace():
     #return documents
 
 # Function to apply metadata filtering
-
-
-def self_querying_retriever(vectorstore):
-    llm = ChatOpenAI(temperature=0)
-    metadata_field_info = []
-    document_content_description = "marketing channel data in real-time"
-    retriever = SelfQueryRetriever.from_llm(
-    llm= llm,
-    vectorstore= vectorstore,
-    metadata_field_info=metadata_field_info,
-    document_contents= document_content_description
-        )
-    return retriever
-
-
-
-
 def filter_by_metadata(documents, query):
     return sorted(documents, key=lambda x: x.metadata.get('relevance', 0), reverse=True)
 
@@ -150,7 +128,7 @@ def RagData(question):
     chroma_vs = get_chroma_vectorestore(documents=documents)
 
 
-    retriever = get_retriver([faiss_vs.as_retriever(),bm25_vs, chroma_vs.as_retriever(), self_querying_retriever(chroma_vs)])
+    retriever = get_retriver([faiss_vs.as_retriever(),bm25_vs, chroma_vs.as_retriever()])
     return retriever.get_relevant_documents(query=question)
     
     # Format the retrieved documents
