@@ -71,8 +71,8 @@ class CreateBlockNoteSerializer(serializers.ModelSerializer):
         fields = ("title", "image")
 
 class BlockNoteSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    workspace = WorkSpaceSerializer()
+    #user = UserSerializer()
+    #workspace = WorkSpaceSerializer()
     notes= NoteSerializer(many=True,read_only=True,source='note')
     
     class Meta:
