@@ -15,6 +15,7 @@ urlpatterns = [
 
     path("facebook/", facebook.facebook_oauth),
     path("facebook-callback/", facebook.facebook_oauth_callback),
+    path("facebook_data/", facebook.get_facebook_marketing_data),
 
     path("twitter-callback/", twitter.twitter_oauth_callback),
     path("twitter/", twitter.twitter_oauth),

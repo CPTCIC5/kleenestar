@@ -15,13 +15,8 @@ from django.shortcuts import redirect
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.user import User
 from facebook_business.adobjects.adaccountuser import AdAccountUser as AdUser
-from facebook_business.adobjects.adaccount import AdAccount
 from users.models import User
-from facebook_business.api import FacebookAdsApi
-from facebook_business.adobjects.adaccount import AdAccount
-from facebook_business.adobjects.campaign import Campaign
-from facebook_business.adobjects.adset import AdSet
-from facebook_business.adobjects.ad import Ad
+import requests
 load_dotenv()
 
 
@@ -46,9 +41,6 @@ facebook_scopes = ['ads_read','ads_management','public_profile','email']
 facebook = OAuth2Session(facebook_client_id, redirect_uri=facebook_redirect_uri, scope=facebook_scopes)
 facebook = facebook_compliance_fix(facebook)
 facebook_token_url = 'https://graph.facebook.com/oauth/access_token'
-
-
-
 
 
 @api_view(("GET",))
@@ -113,101 +105,155 @@ def facebook_oauth_callback(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     
+def get_facebook_campaign_data(access_token, account_list):
+    campaign_account_list = []
+    for account in account_list:
+        campaign_url = f"https://graph.facebook.com/v20.0/{account}/campaigns"
+        campaign_params = {
+            "access_token": access_token,
+            "effective_status": '["ACTIVE"]',
+            "fields": 'name,objective,status,effective_status,start_time,stop_time,daily_budget,lifetime_budget,adsets'
+        }
+        response = requests.get(campaign_url,params=campaign_params)
+        response.raise_for_status()
+        campaign_data = response.json()['data']
+        for campaign in campaign_data:
+            campaign['adsets'] = campaign['adsets']['data']
+        campaign_account_list.append(campaign_data)
+    return campaign_account_list
+
+def get_facebook_campaign_statistics(access_token, campaign_data):
+    
+    for account_campaings in campaign_data:
+        for campaigns in account_campaings:
+            campaign_insights_params = {
+                'access_token': access_token,
+                'date_preset': 'last_7d',  # gets the insights for the last 7 days.
+                'fields': 'campaign_id,campaign_name,spend,impressions,clicks,reach,frequency,unique_clicks,cpm,cpp,cost_per_conversion,conversions,website_ctr'
+            }
+            campaign_insights_url = f"https://graph.facebook.com/v20.0/{campaigns['id']}/insights"
+            response = requests.get(campaign_insights_url, params=campaign_insights_params)
+
+            campaigns['insights'] = response.json()['data']
+
+    return campaign_data
+
+def get_page_posts(access_token):
+    
+    pages_url = f'https://graph.facebook.com/v20.0/me/accounts'
+    
+    pages_params = {
+        'access_token': access_token
+    }
+    pages_response = requests.get(pages_url, params=pages_params)
+    pages_data = pages_response.json().get('data', [])
+
+    result = []
+    
+    for page in pages_data:
+        page_id = page['id']
+        page_name = page['name']
+        page_access_token = page['access_token']
+        
+        posts_url = f'https://graph.facebook.com/v20.0/{page_id}/posts'
+        
+        posts_params = {
+            'fields': 'id,message,created_time,story,permalink_url,attachments{media_type,url,media,title},comments.summary(true),reactions.summary(true),shares',
+            'access_token': page_access_token
+        }
+        
+        posts_response = requests.get(posts_url, params=posts_params)
+        posts_data = posts_response.json().get('data', [])
+        
+        for post in posts_data:
+            post_details = {
+                'page_id': page_id,
+                'page_name': page_name,
+                'post_id': post.get('id'),
+                'message': post.get('message'),
+                'created_time': post.get('created_time'),
+                'story': post.get('story'),
+                'permalink_url': post.get('permalink_url'),
+                'attachments': post.get('attachments', {}).get('data', []),
+                'comments_count': post.get('comments', {}).get('summary', {}).get('total_count', 0),
+                'reactions_count': post.get('reactions', {}).get('summary', {}).get('total_count', 0),
+                'shares_count': post.get('shares', {}).get('count', 0)
+            }
+            result.append(post_details)
+    return result
+
+def get_ads_creative_data(access_token, campaign_data):
+
+    for account_campaings in campaign_data:
+        
+        for campaings in account_campaings:
+            adsets_list = campaings['adsets']
+            ads_data = []
+            for adsets in adsets_list:
+                ad_set_url = f"https://graph.facebook.com/v20.0/{adsets['id']}/ads"
+                
+                ad_set_params = {
+                    "access_token" : access_token,
+                    "fields": 'name,status,effective_status,creative'
+                }
+
+                response = requests.get(ad_set_url, params=ad_set_params)
+
+                ads_data = response.json()['data']
+
+                for ads in ads_data:
+                    creative_url = f"https://graph.facebook.com/v20.0/{ads['creative']['id']}"
+                    creative_params = {
+                        'access_token' : access_token,
+                        'fields': 'body,title,image_url'
+                    }   
+                    response = requests.get(creative_url, params=creative_params)
+                    
+                    ads['creative'] = response.json()
+
+                adsets['ads_data'] = ads_data
+        
+        campaings['adsets'] = adsets_list
+
+    return campaign_data
+
+def get_adset_data(access_token, campaing_data):
+    for account_campaings in campaing_data:    
+        for campaings in account_campaings:
+            adsets_list = campaings['adsets']
+            adsets_data = []
+            for adsets in adsets_list:
+                ad_set_url = f"https://graph.facebook.com/v20.0/{adsets['id']}"
+                
+                ad_set_params = {
+                    "access_token" : access_token,
+                    "fields": 'name,status,effective_status,billing_event,optimization_goal,targeting'
+                }
+
+                response = requests.get(ad_set_url, params=ad_set_params)
+                ad_set_data = response.json()
+                ad_set_data['id'] = adsets['id']
+                adsets_data.append(ad_set_data)
+        
+            campaings['adsets'] = adsets_data
+
+    return campaing_data
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-
 def get_facebook_marketing_data(access_token, ad_account_list):
     marketing_data = []
-    try:
-        for account in ad_account_list:
-            FacebookAdsApi.init(access_token=access_token)
-            ad_account = AdAccount(account)
-            
-            params = {
-                'level': 'ad',
-                'time_range': {'since': '2024-01-01', 'until': '2024-5-20'},
-            }
-            
-            fields = [
-                'campaign_id', 'adset_id', 'ad_id',
-                'impressions', 'reach', 'frequency', 'unique_clicks', 'cpm', 'cpp',
-                'conversions', 'cost_per_conversion', 'website_ctr',
-                'clicks', 'spend', 'purchase_roas', 
-                'date_start', 'date_stop'
-            ]
 
-            insights = ad_account.get_insights(fields=fields, params=params)
-            
-            results = []
-            for insight in insights:
-                result = {}
+    try:    
+        campaign_data = get_facebook_campaign_data(access_token, ad_account_list)
+        campaing_data = get_adset_data(access_token, campaign_data)
+        campaign_data = get_ads_creative_data(access_token,campaing_data)
+        campaign_data = get_facebook_campaign_statistics(access_token, campaign_data)
+        post_details_data = get_page_posts(access_token)
 
-                # Campaign details
-                campaign_id = insight['campaign_id']
-                campaign = Campaign(campaign_id).api_get(fields=[
-                    Campaign.Field.id, Campaign.Field.name, Campaign.Field.objective, Campaign.Field.status,
-                    Campaign.Field.effective_status, Campaign.Field.start_time, Campaign.Field.stop_time,
-                    Campaign.Field.daily_budget, Campaign.Field.lifetime_budget
-                ])
-                result['campaign'] = campaign
+        marketing_data = [campaign_data, post_details_data]
 
-                # AdSet details
-                adset_id = insight['adset_id']
-                adset = AdSet(adset_id).api_get(fields=[
-                    AdSet.Field.id, AdSet.Field.name, AdSet.Field.status, AdSet.Field.effective_status,
-                    AdSet.Field.billing_event, AdSet.Field.optimization_goal, AdSet.Field.targeting
-                ])
-                result['adset'] = adset
-
-                ad_id = insight['ad_id']
-                ad = Ad(ad_id).api_get(fields=[
-                    Ad.Field.id, Ad.Field.name, Ad.Field.status, Ad.Field.effective_status,
-                    Ad.Field.creative
-                ])
-                ad_creative = ad['creative']
-                ad_creative_details = Ad(ad_creative['id']).api_get(fields=[
-                    'body', 'title', 'image_url'
-                ])
-                ad['creative_details'] = ad_creative_details
-                result['ad'] = ad
-
-                audience_metrics = {
-                    'impressions': insight['impressions'],
-                    'reach': insight['reach'],
-                    'frequency': insight['frequency'],
-                    'unique_clicks': insight['unique_clicks'],
-                    'cpm': insight['cpm'],
-                    'cpp': insight['cpp'],
-                }
-                result['audience_metrics'] = audience_metrics
-
-                conversion_metrics = {
-                    'conversions': insight['conversions'],
-                    'cost_per_conversion': insight['cost_per_conversion'],
-                    'website_ctr': insight['website_ctr'],
-                }
-                result['conversion_metrics'] = conversion_metrics
-
-                engagement_metrics = {
-                    'clicks': insight['clicks'],
-                }
-                result['engagement_metrics'] = engagement_metrics
-
-                revenue_metrics = {
-                    'spend': insight['spend'],
-                    'purchase_roas': insight['purchase_roas'],
-                }
-                result['revenue_metrics'] = revenue_metrics
-
-                time_metrics = {
-                    'date_start': insight['date_start'],
-                    'date_stop': insight['date_stop'],
-                }
-                result['time_metrics'] = time_metrics
-
-                results.append(result)
-            marketing_data.append(results)
         return Response(
             marketing_data, status=status.HTTP_200_OK
         )
