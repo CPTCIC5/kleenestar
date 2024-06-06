@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
-from .rag import RagData
+from .sources.backup_without_selfqueryret import RagData
 #from .old_rag import RagData as RagData_2
 
 load_dotenv()
