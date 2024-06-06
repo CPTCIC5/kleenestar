@@ -79,11 +79,11 @@ class Channel(models.Model):
         return "xyz"
 
 COLOR_CHOICES = (
-    (1,"#90EE90"),
-    (2,"#FFCCCC"),
-    (3,"#D3D3D3"),
-    (4,"#E6E6FA"),
-    (5,"#ADD8E6")
+    ("9#0EE90","#90EE90"),
+    ("#FFCCCC","#FFCCCC"),
+    ("#D3D3D3","#D3D3D3"),
+    ("#E6E6FA","#E6E6FA"),
+    ("#ADD8E6","#ADD8E6")
 )
 
 
@@ -92,7 +92,7 @@ class Note(models.Model):
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
     note_text= models.CharField(max_length=100)
     created_at= models.DateTimeField(auto_now_add=True)
-    color = models.IntegerField(choices=COLOR_CHOICES)
+    color = models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
 
     def __str__(self):
         return str(self.blocknote)
