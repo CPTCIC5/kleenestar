@@ -53,7 +53,7 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Note
-        fields = ['note_text', 'created_at', 'color', 'prompt', 'blocknote']
+        fields = ['note_text', 'created_at', 'color', 'prompt', 'blocknote', 'id']
 
     def get_prompt(self, obj):
         return PromptSerializer(obj.prompt).data
@@ -71,8 +71,8 @@ class CreateBlockNoteSerializer(serializers.ModelSerializer):
         fields = ("title", "image")
 
 class BlockNoteSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    workspace = WorkSpaceSerializer()
+    #user = UserSerializer()
+    #workspace = WorkSpaceSerializer()
     notes= NoteSerializer(many=True,read_only=True,source='note')
     
     class Meta:
