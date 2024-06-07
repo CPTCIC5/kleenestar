@@ -11,7 +11,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_text_splitters import RecursiveJsonSplitter
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
 
 
