@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel, APICredentials
+from channels.models import APICredentials
 import hashlib
 import os
 import requests
@@ -11,40 +10,20 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from users.models import User
 from datetime import datetime, timedelta, timezone
 import json
+from oauth.helper import get_channel,create_channel
+from oauth.external_urls import reddit_token_url,reddit_api_url,reddit_redirect_uri,frontend_channel_url
+
 load_dotenv()
 
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
-"""
-APP - CONFIGURATIONS
-"""
-reddit_redirect_uri = 'http://127.0.0.1:8000/api/oauth/reddit-callback/'
+
 reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
 reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
-reddit_token_url = 'https://www.reddit.com/api/v1/access_token'
-reddit_api_url = "https://ads-api.reddit.com/api/v3"
 
 
 @api_view(("GET",))
@@ -119,9 +98,9 @@ def reddit_oauth_callback(request):
             print(access_token, refresh_token)
             
             try:
-                reddit_channel = get_channel(email=request.user.email, channel_type_num=1)
+                reddit_channel = get_channel(email=request.user.email, channel_type_num=6)
             except Exception:
-                reddit_channel = create_channel(email=request.user.email, channel_type_num=1)
+                reddit_channel = create_channel(email=request.user.email, channel_type_num=6)
             
             if reddit_channel.credentials is None:
                 credentials = APICredentials.objects.create(
@@ -135,7 +114,8 @@ def reddit_oauth_callback(request):
                 reddit_channel.credentials.save()
 
             reddit_channel.save()
-
+            return redirect(frontend_channel_url)
+        
         else:
             return Response(
             {"detail": f"Error: {response.content}"},

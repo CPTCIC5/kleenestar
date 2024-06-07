@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel,APICredentials
+from channels.models import APICredentials
 import hashlib
 import os
 import requests
@@ -11,28 +10,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from users.models import User
 import json
+from oauth.helper import create_channel,get_channel
+from oauth.external_urls import frontend_channel_url,tiktok_api_url,tiktok_sandbox_api_url,tiktok_token_url
+
 load_dotenv()
 
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
-    
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
@@ -41,11 +24,7 @@ APP - CONFIGURATIONS
 """
 tiktok_client_id = os.getenv('TIKTOK_CLIENT_ID')
 tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
-# configured in tiktok app (browser)
-# tiktok_redirect_uri = 'https://a7b1-2401-4900-57e1-6bfc-4182-80ff-5d55-cbdf.ngrok-free.app/api/oauth/tiktok-callback/'
-tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.3/oauth2/access_token/'
-tiktok_api_url = "https://business-api.tiktok.com/open_api"
-tiktok_sandbox_api_url = "https://sandbox-ads.tiktok.com/open_api"
+
 
 
 @api_view(("GET",))
@@ -117,7 +96,7 @@ def tiktok_oauth_callback(request):
             tiktok_channel.credentials.save()
 
         tiktok_channel.save()
-        return redirect("http://localhost:3001/channels/")
+        return redirect(frontend_channel_url)
     
     except Exception as e:
         print(f"Exception occurred: {str(e)}")

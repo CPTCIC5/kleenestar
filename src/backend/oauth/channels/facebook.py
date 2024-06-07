@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel, APICredentials
+from channels.models import APICredentials
 import hashlib
 import os
 from django.views.decorators.csrf import csrf_exempt
@@ -12,30 +11,11 @@ from requests_oauthlib import OAuth2Session
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from facebook_business.adobjects.user import User
-from users.models import User
 import requests
+from oauth.helper import create_channel,get_channel
+from oauth.external_urls import facebook_api_url,facebook_authorization_base_url,facebook_redirect_uri,facebook_token_url,frontend_channel_url
+
 load_dotenv()
-
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
-    
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -47,12 +27,11 @@ APP - CONFIGURATIONS
 #facebook
 facebook_client_id = os.getenv("FACEBOOK_CLIENT_ID")
 facebook_client_secret = os.getenv("FACEBOOK_CLIENT_SECRET")
-facebook_authorization_base_url = 'https://www.facebook.com/v20.0/dialog/oauth'
-facebook_redirect_uri = 'https://8736-2401-4900-57df-d281-2d0f-7537-44c8-f695.ngrok-free.app/api/oauth/facebook-callback/'
+
 facebook_scopes = ['ads_read','ads_management','public_profile','email','pages_show_list', 'pages_read_engagement', 'pages_read_user_content']  
 facebook = OAuth2Session(facebook_client_id, redirect_uri=facebook_redirect_uri, scope=facebook_scopes)
 facebook = facebook_compliance_fix(facebook)
-facebook_token_url = 'https://graph.facebook.com/v20.0/oauth/access_token'
+
 
 
 @api_view(("GET",))
@@ -108,7 +87,7 @@ def facebook_oauth_callback(request):
 
         facebook_channel.save()
 
-        return redirect("http://localhost:3001/channels/")
+        return redirect(frontend_channel_url)
 
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
@@ -118,8 +97,8 @@ def facebook_oauth_callback(request):
         )
 
 def get_facebook_data(access_token):
-    user_url = 'https://graph.facebook.com/v20.0/me'
-    ads_accounts_url = 'https://graph.facebook.com/v20.0/me/adaccounts'
+    user_url = '{facebook_api_url}/me'
+    ads_accounts_url = '{facebook_api_url}/me/adaccounts'
 
     user_params = {
         'fields': 'email',
@@ -158,7 +137,7 @@ def get_facebook_data(access_token):
 def get_facebook_campaign_data(access_token, account_list):
     campaign_account_list = []
     for account in account_list:
-        campaign_url = f"https://graph.facebook.com/v20.0/{account}/campaigns"
+        campaign_url = f"{facebook_api_url}/{account}/campaigns"
         campaign_params = {
             "access_token": access_token,
             "effective_status": '["ACTIVE"]',
@@ -180,7 +159,7 @@ def get_facebook_campaign_statistics(access_token, campaign_data):
                 'date_preset': 'last_7d',  # gets the insights for the last 7 days.
                 'fields': 'campaign_id,campaign_name,spend,impressions,clicks,reach,frequency,unique_clicks,cpm,cpp,cost_per_conversion,conversions,website_ctr'
             }
-            campaign_insights_url = f"https://graph.facebook.com/v20.0/{campaigns['id']}/insights"
+            campaign_insights_url = f"{facebook_api_url}/{campaigns['id']}/insights"
             response = requests.get(campaign_insights_url, params=campaign_insights_params)
 
             campaigns['insights'] = response.json()['data']
@@ -189,7 +168,7 @@ def get_facebook_campaign_statistics(access_token, campaign_data):
 
 def get_page_posts(access_token):
     
-    pages_url = f'https://graph.facebook.com/v20.0/me/accounts'
+    pages_url = f'{facebook_api_url}/me/accounts'
     
     pages_params = {
         'access_token': access_token
@@ -204,7 +183,7 @@ def get_page_posts(access_token):
         page_name = page['name']
         page_access_token = page['access_token']
         
-        posts_url = f'https://graph.facebook.com/v20.0/{page_id}/posts'
+        posts_url = f'{facebook_api_url}/{page_id}/posts'
         
         posts_params = {
             'fields': 'id,message,created_time,story,permalink_url,attachments{media_type,url,media,title},comments.summary(true),reactions.summary(true),shares',
@@ -239,7 +218,7 @@ def get_ads_creative_data(access_token, campaign_data):
             adsets_list = campaings['adsets']
             ads_data = []
             for adsets in adsets_list:
-                ad_set_url = f"https://graph.facebook.com/v20.0/{adsets['id']}/ads"
+                ad_set_url = f"{facebook_api_url}/{adsets['id']}/ads"
                 
                 ad_set_params = {
                     "access_token" : access_token,
@@ -251,7 +230,7 @@ def get_ads_creative_data(access_token, campaign_data):
                 ads_data = response.json()['data']
 
                 for ads in ads_data:
-                    creative_url = f"https://graph.facebook.com/v20.0/{ads['creative']['id']}"
+                    creative_url = f"{facebook_api_url}/{ads['creative']['id']}"
                     creative_params = {
                         'access_token' : access_token,
                         'fields': 'body,title,image_url'
@@ -272,7 +251,7 @@ def get_adset_data(access_token, campaing_data):
             adsets_list = campaings['adsets']
             adsets_data = []
             for adsets in adsets_list:
-                ad_set_url = f"https://graph.facebook.com/v20.0/{adsets['id']}"
+                ad_set_url = f"{facebook_api_url}/{adsets['id']}"
                 
                 ad_set_params = {
                     "access_token" : access_token,

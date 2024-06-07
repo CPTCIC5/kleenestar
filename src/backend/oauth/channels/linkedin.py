@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel, APICredentials
+from channels.models import APICredentials
 import hashlib
 import urllib.parse 
 import os
@@ -13,26 +12,10 @@ from rest_framework.decorators import permission_classes
 from requests_oauthlib import OAuth2Session
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from users.models import User
+from oauth.helper import get_channel,create_channel
+from oauth.external_urls import frontend_channel_url,linkedin_authorization_base_url,linkedin_redirect_uri,linkedin_token_url
 load_dotenv()
 
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -46,9 +29,6 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 linkedin_client_id = os.getenv('LINKEDIN_CLIENT_ID')
 linkedin_client_secret = os.getenv('LINKEDIN_CLIENT_SECRET')
 linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "email","openid","profile","r_organization_social"]
-linkedin_authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
-linkedin_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
-linkedin_redirect_uri = 'http://127.0.0.1:8000/api/oauth/linkedin-callback/'
 linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri, scope=linkedin_scope)
 
 
@@ -118,7 +98,7 @@ def linkedin_oauth_callback(request):
 
         linkedin_channel.save()
 
-        return redirect("http://localhost:3001/channels/")
+        return redirect(frontend_channel_url)
 
 
     except Exception as e:

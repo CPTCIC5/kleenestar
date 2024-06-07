@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel, APICredentials
+from channels.models import APICredentials
 import hashlib
 import os
 from google_auth_oauthlib.flow import Flow
@@ -14,26 +13,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from users.models import User
+from oauth.helper import create_channel,get_channel
+from oauth.external_urls import frontend_channel_url,google_apis_url,google_redirect_uri
+
 load_dotenv()
-
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -47,10 +30,10 @@ credentials = {
 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
 "use_proto_plus": "false"
 }
-google_redirect_uri = 'http://127.0.0.1:8000/api/oauth/google-callback/'
-google_scopes = ["openid","https://www.googleapis.com/auth/adwords" ,"https://www.googleapis.com/auth/userinfo.email" ,"https://www.googleapis.com/auth/userinfo.profile"]
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Adjusted to navigate to the project root
 google_client_secret_file = os.path.join(BASE_DIR, 'utils', 'XYZ.json')
+
+google_scopes = ["openid",f"{google_apis_url}/auth/adwords" ,f"{google_apis_url}/auth/userinfo.email" ,f"{google_apis_url}/auth/userinfo.profile"]
 flow = Flow.from_client_secrets_file(google_client_secret_file, scopes=google_scopes)
 flow.redirect_uri = google_redirect_uri
 
@@ -100,7 +83,7 @@ def google_oauth_callback(request):
         credentials["refresh_token"] = refresh_token
 
         response = requests.get(
-            'https://www.googleapis.com/oauth2/v1/userinfo',
+            f'{google_apis_url}/oauth2/v1/userinfo',
             headers={'Authorization': f'Bearer {access_token}'}
         )
         if response.status_code == 200:
@@ -181,7 +164,7 @@ def google_oauth_callback(request):
 
         google_channel.save()
 
-        return redirect("http://localhost:3001/channels/")
+        return redirect(frontend_channel_url)
 
     
     except Exception as e:

@@ -1,8 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel,APICredentials
+from channels.models import APICredentials
 import hashlib
 import os
 import requests
@@ -13,28 +12,11 @@ from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
 from requests_oauthlib import OAuth1Session, OAuth1
 from django.shortcuts import redirect
-from users.models import User
 from datetime import datetime, timedelta
+from oauth.external_urls import twitter_ads_api_url,twitter_authorization_base_url,twitter_redirect_uri,twitter_token_url,frontend_channel_url
+from oauth.helper import get_channel,create_channel
+
 load_dotenv()
-
-
-def get_channel(email,channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
-
-def create_channel(email, channel_type_num):
-    user = get_object_or_404(User,email=email)
-    workspace = user.workspace_set.all()[0]
-    try:
-        new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            workspace=workspace,
-        )
-        return new_channel
-    except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
-    
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -44,11 +26,7 @@ APP - CONFIGURATIONS
 """
 twitter_client_id = os.getenv("TWITTER_CLIENT_ID")
 twitter_client_secret = os.getenv("TWITTER_CLIENT_SECRET")
-twitter_redirect_uri = 'http://127.0.0.1:8000/api/oauth/twitter-callback/'
-twitter_authorization_base_url = "https://api.twitter.com/oauth/authenticate"
-twitter_token_url = "https://api.twitter.com/oauth/access_token"
 twitter_scopes = ["email", "ads_read", "ads_management"]
-twitter_ads_api_url = 'https://ads-api.twitter.com/'
 twitter_api_version = '11'
 resource_owner_key = ''
 resource_owner_secret = ''
@@ -60,11 +38,11 @@ def twitter_get_oauth_token(verifier, ro_key, ro_secret):
                                 client_secret=twitter_client_secret,
                                 resource_owner_key=ro_key,
                                 resource_owner_secret=ro_secret)
-    url = 'https://api.twitter.com/oauth/access_token'
     data = {"oauth_verifier": verifier}
-    access_token_data = oauth_token.post(url, data=data)
+    access_token_data = oauth_token.post(twitter_token_url, data=data)
     access_token_list = str.split(access_token_data.text, '&')
     return access_token_list
+
 
 def twitter_get_oauth_request_token():
     global resource_owner_key
@@ -89,7 +67,7 @@ def twitter_get_oauth_request_token():
 def twitter_oauth(request):
     try:
         twitter_get_oauth_request_token()
-        url = "https://api.twitter.com/oauth/authenticate?oauth_token=" + resource_owner_key
+        url = f"{twitter_authorization_base_url}?oauth_token=" + resource_owner_key
 
         print(url)
      
@@ -163,7 +141,7 @@ def twitter_oauth_callback(request):
             twitter_channel.credentials.save()
 
         twitter_channel.save()
-        return redirect("http://localhost:3001/channels/")
+        return redirect(frontend_channel_url)
 
     except Exception as e:
         print(f"Exception occurred: {e}")
