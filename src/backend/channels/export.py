@@ -84,17 +84,17 @@ def merge_json_files(request):
         if get_data_func:
             credentials = channel.credentials
             if channel.channel_type == 1:
-                data = get_data_func(credentials.key_1, credentials.key_3)
+                data = get_data_func(credentials.key_1, credentials.key_3, credentials.key_4)
             elif channel.channel_type == 2:
                 data = get_data_func(credentials.key_1, credentials.key_2)
             elif channel.channel_type == 3:
-                data = get_data_func(credentials.key_1, credentials.key_2, credentials.key_3, credentials.key_4)
+                data = get_data_func(credentials.key_3, credentials.key_4)
             elif channel.channel_type == 4:
                 data = get_data_func(credentials.key_1)
             elif channel.channel_type == 5:
                 data = get_data_func(credentials.key_1, credentials.key_2)
             elif channel.channel_type == 6:
-                data = get_data_func(credentials.key_1, credentials.key_2)
+                data = get_data_func(credentials.key_1)
             merged_data.append(data)
     
     logger.info(f"Merged data: {merged_data}")

@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel
+from channels.models import Channel, APICredentials
 import hashlib
 import os
 from google_auth_oauthlib.flow import Flow
@@ -23,6 +23,17 @@ def get_channel(email,channel_type_num):
     workspace = user.workspace_set.all()[0]
     return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
 
+def create_channel(email, channel_type_num):
+    user = get_object_or_404(User,email=email)
+    workspace = user.workspace_set.all()[0]
+    try:
+        new_channel = Channel.objects.create(
+            channel_type=channel_type_num, 
+            workspace=workspace,
+        )
+        return new_channel
+    except Exception:
+        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -148,19 +159,30 @@ def google_oauth_callback(request):
         along with the channel type
         
         """
-        google_channel = get_channel(
-            email=request.user.email,
-            channel_type_num=1
-        )
+        try:
+            google_channel = get_channel(email=request.user.email, channel_type_num=1)
+        except Exception:
+            google_channel = create_channel(email=request.user.email, channel_type_num=1)
         
-        google_channel.credentials.key_1 = refresh_token
-        google_channel.credentials.key_2 = access_token
-        google_channel.credentials.key_3 = manager_id
-        google_channel.credentials.key_4 = client_id_list
-        google_channel.credentials.save()
-        
-        
+        if google_channel.credentials is None:
+            credentials = APICredentials.objects.create(
+                key_1=refresh_token,
+                key_2=access_token,
+                key_3=manager_id,
+                key_4=client_id_list
+            )
+            google_channel.credentials = credentials
+        else:
+            google_channel.credentials.key_1 = refresh_token
+            google_channel.credentials.key_2 = access_token
+            google_channel.credentials.key_3 = manager_id
+            google_channel.credentials.key_4 = client_id_list
+            google_channel.credentials.save()
+
+        google_channel.save()
+
         return redirect("http://localhost:3001/channels/")
+
     
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
@@ -173,7 +195,7 @@ def google_oauth_callback(request):
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-def get_google_marketing_data(manager_id, client_id_list, refresh_token):
+def get_google_marketing_data(refresh_token,manager_id, client_id_list):
 
     credentials["refresh_token"] = refresh_token
     

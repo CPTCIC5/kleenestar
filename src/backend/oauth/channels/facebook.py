@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel
+from channels.models import Channel, APICredentials
 import hashlib
 import os
 from django.views.decorators.csrf import csrf_exempt
@@ -12,9 +12,7 @@ from requests_oauthlib import OAuth2Session
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
 from django.shortcuts import redirect
-from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.user import User
-from facebook_business.adobjects.adaccountuser import AdAccountUser as AdUser
 from users.models import User
 import requests
 load_dotenv()
@@ -26,8 +24,22 @@ def get_channel(email,channel_type_num):
     return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
 
 
+def create_channel(email, channel_type_num):
+    user = get_object_or_404(User,email=email)
+    workspace = user.workspace_set.all()[0]
+    try:
+        new_channel = Channel.objects.create(
+            channel_type=channel_type_num, 
+            workspace=workspace,
+        )
+        return new_channel
+    except Exception:
+        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
+    
+
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
+
 
 """
 APP - CONFIGURATIONS
@@ -35,20 +47,21 @@ APP - CONFIGURATIONS
 #facebook
 facebook_client_id = os.getenv("FACEBOOK_CLIENT_ID")
 facebook_client_secret = os.getenv("FACEBOOK_CLIENT_SECRET")
-facebook_authorization_base_url = 'https://www.facebook.com/dialog/oauth'
-facebook_redirect_uri = 'https://127.0.0.1:8000/api/oauth/facebook-callback/'
-facebook_scopes = ['ads_read','ads_management','public_profile','email']  
+facebook_authorization_base_url = 'https://www.facebook.com/v20.0/dialog/oauth'
+facebook_redirect_uri = 'https://8736-2401-4900-57df-d281-2d0f-7537-44c8-f695.ngrok-free.app/api/oauth/facebook-callback/'
+facebook_scopes = ['ads_read','ads_management','public_profile','email','pages_show_list', 'pages_read_engagement', 'pages_read_user_content']  
 facebook = OAuth2Session(facebook_client_id, redirect_uri=facebook_redirect_uri, scope=facebook_scopes)
 facebook = facebook_compliance_fix(facebook)
-facebook_token_url = 'https://graph.facebook.com/oauth/access_token'
+facebook_token_url = 'https://graph.facebook.com/v20.0/oauth/access_token'
 
 
 @api_view(("GET",))
 def facebook_oauth(request):
     try:
         authorization_url, state = facebook.authorization_url(url=facebook_authorization_base_url, state=passthrough_val)
+        
         return Response({
-            "url": authorization_url},
+            "url": authorization_url + f"&config_id={os.getenv('FACEBOOK_CONFIG_ID')}"},
             status=status.HTTP_200_OK
         )
     except Exception as e:
@@ -62,6 +75,7 @@ def facebook_oauth(request):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def facebook_oauth_callback(request):   
+
     redirect_response = request.build_absolute_uri()
     if request.query_params.get("state") != passthrough_val:
         return Response(
@@ -73,38 +87,74 @@ def facebook_oauth_callback(request):
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
                                      authorization_response=redirect_response) # access_token
 
-        access_token = token.get("access_token")
-        user_info_url = 'https://graph.facebook.com/v10.0/me?fields=id,name,email'
-        user_info_response = facebook.get(user_info_url)
-        email = user_info_response.json()['email']  # email
+        access_token =  token.get("access_token")
+        facebook_data = get_facebook_data(access_token)
 
-        FacebookAdsApi.init(access_token=access_token)
-        me = AdUser(fbid='me')
+        try:
+            facebook_channel = get_channel(email=request.user.email, channel_type_num=2)
+        except Exception:
+            facebook_channel = create_channel(email=request.user.email, channel_type_num=2)
         
-        ad_accounts = me.get_ad_accounts()
-        ad_accounts_list = []
-        for account in ad_accounts:
-            ad_accounts_list.append(account.get("id")) # account id list
-        
-        facebook_channel = get_channel(
-            email=request.user.email,
-            channel_type_num=2
-        )
+        if facebook_channel.credentials is None:
+            credentials = APICredentials.objects.create(
+                key_1=access_token,
+                key_2=facebook_data['ad_account_ids']
+            )
+            facebook_channel.credentials = credentials
+        else:
+            facebook_channel.credentials.key_1 = access_token
+            facebook_channel.credentials.key_2 = facebook_data['ad_account_ids']
+            facebook_channel.credentials.save()
 
-        facebook_channel.credentials.key_1 = access_token
-        facebook_channel.credentials.key_2 = ad_accounts_list
-        facebook_channel.credentials.save()
+        facebook_channel.save()
 
-        print(access_token, ad_accounts_list, "creds")
         return redirect("http://localhost:3001/channels/")
-    
+
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    
+
+def get_facebook_data(access_token):
+    user_url = 'https://graph.facebook.com/v20.0/me'
+    ads_accounts_url = 'https://graph.facebook.com/v20.0/me/adaccounts'
+
+    user_params = {
+        'fields': 'email',
+        'access_token': access_token
+    }
+
+    ads_params = {
+        'access_token': access_token
+    }
+    email = ""
+    ad_account_ids = []
+
+    user_response = requests.get(user_url, params=user_params)
+    if user_response.status_code == 200:
+        user_data = user_response.json()
+        email = user_data.get('email')
+    else:
+        print(f"Error fetching user email: {user_response.status_code}")
+        print(user_response.text)
+
+    ads_response = requests.get(ads_accounts_url, params=ads_params)
+    if ads_response.status_code == 200:
+        ads_data = ads_response.json()
+        ad_accounts = ads_data.get('data', [])
+        ad_account_ids = [account['id'] for account in ad_accounts]
+    else:
+        print(f"Error fetching ad account IDs: {ads_response.status_code}")
+        print(ads_response.text)
+
+    return {
+        'email': email,
+        'ad_account_ids': ad_account_ids
+    }
+
+
 def get_facebook_campaign_data(access_token, account_list):
     campaign_account_list = []
     for account in account_list:
@@ -123,7 +173,6 @@ def get_facebook_campaign_data(access_token, account_list):
     return campaign_account_list
 
 def get_facebook_campaign_statistics(access_token, campaign_data):
-    
     for account_campaings in campaign_data:
         for campaigns in account_campaings:
             campaign_insights_params = {

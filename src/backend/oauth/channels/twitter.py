@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel
+from channels.models import Channel,APICredentials
 import hashlib
 import os
 import requests
@@ -23,6 +23,18 @@ def get_channel(email,channel_type_num):
     workspace = user.workspace_set.all()[0]
     return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
 
+def create_channel(email, channel_type_num):
+    user = get_object_or_404(User,email=email)
+    workspace = user.workspace_set.all()[0]
+    try:
+        new_channel = Channel.objects.create(
+            channel_type=channel_type_num, 
+            workspace=workspace,
+        )
+        return new_channel
+    except Exception:
+        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
+    
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -128,20 +140,29 @@ def twitter_oauth_callback(request):
 
         print(email)
         print(resource_owner_key, resource_owner_secret, key, secret)
+        try:
+            twitter_channel = get_channel(email=request.user.email, channel_type_num=3)
+        except Exception:
+            twitter_channel = create_channel(email=request.user.email, channel_type_num=3)
+        
+        if twitter_channel.credentials is None:
+            credentials = APICredentials.objects.create(
+                key_1=resource_owner_key,
+                key_2=resource_owner_secret,
+                key_3=key,
+                key_4=secret,
+                key_5=email
+            )
+            twitter_channel.credentials = credentials
+        else:
+            twitter_channel.credentials.key_1= resource_owner_key
+            twitter_channel.credentials.key_2= resource_owner_secret
+            twitter_channel.credentials.key_3 = key
+            twitter_channel.credentials.key_4 = secret
+            twitter_channel.credentials.key_5 = email
+            twitter_channel.credentials.save()
 
-        twitter_channel = get_channel(
-            email=request.user.email,
-            channel_type_num=3
-        )
-
-
-        twitter_channel.credentials.key_1= resource_owner_key
-        twitter_channel.credentials.key_2= resource_owner_secret
-        twitter_channel.credentials.key_3 = key
-        twitter_channel.credentials.key_4 = secret
-        twitter_channel.credentials.key_5 = email
-        twitter_channel.credentials.save()
-
+        twitter_channel.save()
         return redirect("http://localhost:3001/channels/")
 
     except Exception as e:
@@ -373,7 +394,6 @@ def get_media_details(auth, account_id, account_media_ids):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def get_twitter_marketing_data(access_token, access_token_secret):
-# def get_twitter_marketing_data(request):
 
     auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
 

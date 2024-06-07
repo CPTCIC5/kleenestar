@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from channels.models import Channel
+from channels.models import Channel,APICredentials
 import hashlib
 import os
 import requests
@@ -21,7 +21,18 @@ def get_channel(email,channel_type_num):
     workspace = user.workspace_set.all()[0]
     return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
 
-
+def create_channel(email, channel_type_num):
+    user = get_object_or_404(User,email=email)
+    workspace = user.workspace_set.all()[0]
+    try:
+        new_channel = Channel.objects.create(
+            channel_type=channel_type_num, 
+            workspace=workspace,
+        )
+        return new_channel
+    except Exception:
+        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
+    
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
@@ -88,14 +99,24 @@ def tiktok_oauth_callback(request):
         
         access_token = response.json()['data']['access_token']  # does not expire
         advertiser_ids = response.json()['data']['advertiser_ids']
-        tiktok_channel = get_channel(  # stores the access token to model
-            email= request.user.email,
-            channel_type_num=5
-        )
 
-        tiktok_channel.credentials.key_1= access_token
-        tiktok_channel.credentials.key_2 = advertiser_ids 
-        tiktok_channel.credentials.save()
+        try:
+            tiktok_channel = get_channel(email=request.user.email, channel_type_num=5)
+        except Exception:
+            tiktok_channel = create_channel(email=request.user.email, channel_type_num=5)
+        
+        if tiktok_channel.credentials is None:
+            credentials = APICredentials.objects.create(
+                key_1=access_token,
+                key_2=advertiser_ids,
+            )
+            tiktok_channel.credentials = credentials
+        else:
+            tiktok_channel.credentials.key_1 = access_token
+            tiktok_channel.credentials.key_2 = advertiser_ids
+            tiktok_channel.credentials.save()
+
+        tiktok_channel.save()
         return redirect("http://localhost:3001/channels/")
     
     except Exception as e:
@@ -187,13 +208,8 @@ def get_tiktok_ultimate_report(access_token, advertiser_ids):
 @csrf_exempt
 @api_view(["GET"])
 @permission_classes([AllowAny]) 
-def get_tiktok_marketing_data(request):
+def get_tiktok_marketing_data(access_token, advertiser_ids):
     try:
-        # access_token = "a8017ab343d6b56eea3bd68ddfcad3bd3a483032"
-        access_token = "3c174dc93fb84d1f1d9f8b288941c0c6e668cd8f"
-        # advertiser_account_list = get_tiktok_advertiser_id(access_token)
-        advertiser_ids = ['7365545989899354113']
-
         campaign_data = get_tiktok_campaign_data(access_token, advertiser_ids)
         adgroup_data = get_tiktok_adgroup_data(access_token, advertiser_ids)
         ad_data = get_tiktok_ad_data(access_token, advertiser_ids)
