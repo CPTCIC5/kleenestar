@@ -23,7 +23,7 @@ class APICredentials(models.Model):
     key_6=models.CharField(max_length=255,blank=True,null = True)
 
     def __str__(self):
-        return "xyz"
+        return self.key_6
     
 
 class Channel(models.Model):
