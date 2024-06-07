@@ -23,7 +23,7 @@ class APICredentials(models.Model):
     key_6=models.CharField(max_length=255,blank=True,null = True)
 
     def __str__(self):
-        return self.key_6
+        return "xyz"
     
 
 class Channel(models.Model):
@@ -72,11 +72,11 @@ class Channel(models.Model):
         super().save(*args, **kwargs)
 
 
-    # class Meta:
-    #     unique_together = ["workspace", "channel_type"]
+    class Meta:
+        unique_together = ["workspace", "channel_type"]
 
     def __str__(self):
-        return 'op'
+        return 'xyz'
 
 COLOR_CHOICES = (
     ("9#0EE90","#90EE90"),

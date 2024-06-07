@@ -165,13 +165,13 @@ def google_oauth_callback(request):
             google_channel = create_channel(email=request.user.email, channel_type_num=1)
         
         if google_channel.credentials is None:
-            credentials = APICredentials.objects.create(
+            credentials_new = APICredentials.objects.create(
                 key_1=refresh_token,
                 key_2=access_token,
                 key_3=manager_id,
                 key_4=client_id_list
             )
-            google_channel.credentials = credentials
+            google_channel.credentials = credentials_new
         else:
             google_channel.credentials.key_1 = refresh_token
             google_channel.credentials.key_2 = access_token
