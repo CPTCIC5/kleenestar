@@ -228,7 +228,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     if type(assistant_response) == TextContentBlock:
         print('block-1')
-        return {'text': assistant_response.text.value, 'image': assistant_response}
+        return {'text': assistant_response.text.value}
     elif  type(assistant_response) == ImageFileContentBlock:
         print('block-2')
         if 'text' in assistant_response.type:
