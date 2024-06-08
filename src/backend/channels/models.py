@@ -6,6 +6,9 @@ from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from .sources.backup_without_selfqueryret import RagData
+from openai.types.beta.threads.text_content_block import TextContentBlock
+from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
+from openai.types.beta.threads.image_file_content_block import ImageFileContentBlock
 #from .old_rag import RagData as RagData_2
 
 load_dotenv()
@@ -191,11 +194,12 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         )
 
     # Posting RAG context as a message in the thread for the Assistant
-    rag_message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="assistant",
-        content=rag_context
-    )
+    for context in rag_context:
+        rag_message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="assistant",
+            content=context.page_content
+        )
 
     # Initiating a run
     run = client.beta.threads.runs.create(
@@ -220,13 +224,23 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     # Return the content of the first message added by the Assistant
     assistant_response= all_messages.data[0].content[0]
+    print(assistant_response)
 
-    if assistant_response.type == 'text':
-        return {'text': assistant_response.text.value, 'image': None}
-    elif assistant_response.type == 'image':
-        return {'text': assistant_response.text.value, 'image': assistant_response.image_file}
-
-
+    if type(assistant_response) == TextContentBlock:
+        print('block-1')
+        return {'text': assistant_response.text.value, 'image': assistant_response}
+    elif  type(assistant_response) == ImageFileContentBlock:
+        print('block-2')
+        if 'text' in assistant_response.type:
+            return {'text': assistant_response.text.value, 'image': assistant_response.file_id}
+        else:
+            return {'image': assistant_response.image_file.file_id}
+    
+    elif  type(assistant_response) == ImageURLContentBlock:
+        print('block-3')
+        print(assistant_response.image_url_content_block)
+        return {'image': assistant_response.image_file.image_url_content_block}
+        
     
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
