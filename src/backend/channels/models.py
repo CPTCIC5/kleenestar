@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
-from .sources.backup_without_selfqueryret import RagData
+from .rag import RagData
+
+
 from openai.types.beta.threads.text_content_block import TextContentBlock
 from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
 from openai.types.beta.threads.image_file_content_block import ImageFileContentBlock
