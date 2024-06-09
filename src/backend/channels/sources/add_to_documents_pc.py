@@ -3,6 +3,10 @@ from langchain_text_splitters import RecursiveJsonSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from dotenv import load_dotenv
+from langchain_community.retrievers import BM25Retriever
+from langchain_community.vectorstores import FAISS
+
+
 
 load_dotenv()
 
@@ -33,7 +37,19 @@ def add_to_pinecone_vectorestore_openai():
 
     return pinecone_vs 
 
+def get_FAISS_vectorstore(chunks):
+    embeddings = OpenAIEmbeddings(model='text-embedding-3-large')
+    faiss_vectorstore = FAISS.from_documents(chunks, embeddings)
 
+    return faiss_vectorstore
+
+
+def get_bm25_vectorstore(chunks):
+    bm25_retriever = BM25Retriever.from_documents(documents=chunks)
+    
+    bm25_retriever.k = 2
+
+    return bm25_retriever
 
 if __name__ == '__main__':
     pass

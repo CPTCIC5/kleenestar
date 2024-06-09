@@ -2,21 +2,21 @@ import json
 import requests
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma, FAISS
-from langchain_experimental.text_splitter import SemanticChunker
+#from langchain_experimental.text_splitter import SemanticChunker
 from langchain.schema.document import Document
 from langchain_community.retrievers import BM25Retriever
-from langchain_community.document_transformers import LongContextReorder
+#from langchain_community.document_transformers import LongContextReorder
 from langchain.retrievers import EnsembleRetriever
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+#from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_text_splitters import RecursiveJsonSplitter
 from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.chains.query_constructor.base import AttributeInfo
+#from langchain.chains.query_constructor.base import AttributeInfo
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI
 from langchain_community.document_transformers.openai_functions import (
     create_metadata_tagger,
 )
-from langchain_experimental.openai_assistant import OpenAIAssistantRunnable
+#from langchain_experimental.openai_assistant import OpenAIAssistantRunnable
 from dotenv import load_dotenv
 
 
@@ -50,12 +50,13 @@ def get_workspace():
 # Function to apply metadata filtering
 def get_pinecone_vectorestore(documents):
     embeddings= OpenAIEmbeddings('text-embedding-3-large')
+    #Creates a pinecone vector record
     pinecone_vs = PineconeVectorStore.from_documents(embedding=embeddings, index_name='kleenestar', documents=documents)
 
     return pinecone_vs
 
 def self_querying_retriever(vectorstore):
-    llm = ChatOpenAI(temperature=0)
+    llm = ChatOpenAI(temperature=0.1)
     metadata_field_info = []
     document_content_description = "marketing channel data in real-time"
     retriever = SelfQueryRetriever.from_llm(
@@ -66,6 +67,8 @@ def self_querying_retriever(vectorstore):
         )
     return retriever
 
+"""
+#NOT CALLING IT ANYWHERE--> USELESS
 def filter_by_metadata(documents, query):
     return sorted(documents, key=lambda x: x.metadata.get('relevance', 0), reverse=True)
 
@@ -80,7 +83,7 @@ def add_parent_child_chunks(documents):
                 if child_doc:
                     enhanced_docs.append(child_doc)
     return enhanced_docs
-
+"""
 # Function to reorder documents based on LongContextReorder
 
 
