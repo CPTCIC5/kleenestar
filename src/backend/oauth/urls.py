@@ -6,6 +6,7 @@ from .channels import twitter
 from .channels import linkedin
 from .channels import tiktok
 from .channels import reddit
+from .channels import shopify
 
 urlpatterns = [
     # /api/oauth/google/
@@ -31,5 +32,8 @@ urlpatterns = [
     
     path("reddit/", reddit.reddit_oauth),
     path("reddit-callback/", reddit.reddit_oauth_callback),
-    path("reddit_data/", reddit.get_reddit_marketing_data)
+    path("reddit_data/", reddit.get_reddit_marketing_data),
+
+    path("shopify/", shopify.shopify_oauth),
+    path("shopify-callback/", shopify.shopify_oauth_callback),
 ]
