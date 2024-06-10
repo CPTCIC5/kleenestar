@@ -76,7 +76,7 @@ def get_FAISS_vectorstore(chunks):
 def get_bm25_vectorstore(chunks):
     bm25_retriever = BM25Retriever.from_documents(documents=chunks)
 
-    bm25_retriever.k = 2
+    bm25_retriever.k = 5
 
     return bm25_retriever
 
