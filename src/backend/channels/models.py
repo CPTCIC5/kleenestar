@@ -40,7 +40,8 @@ class Channel(models.Model):
         (3, "X (Twitter)"),
         (4, "Linkedin"),
         (5, "TikTok"),
-        (6, 'Reddit')
+        (6, 'Reddit'),
+        (7, 'Shopify')
     )
     activated = models.BooleanField(default=True)
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
