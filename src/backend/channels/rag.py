@@ -7,9 +7,8 @@ from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveJsonSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import BM25Retriever
-
 import requests
-
+import json
 
 load_dotenv()
 
@@ -30,6 +29,14 @@ def get_workspace():
  
     text_splitter= RecursiveJsonSplitter(max_chunk_size=128)
     documents = text_splitter.create_documents(texts=response_data)
+
+    for i, document in enumerate(documents):
+        
+        if 'channel' in document.page_content:
+            document.metadata['channel'] = json.loads(document.page_content)['channel']
+
+        else:
+            document.metadata['channel'] = documents[i-1].metadata['channel']
 
     return documents
 
