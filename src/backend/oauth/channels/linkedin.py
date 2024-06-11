@@ -28,7 +28,7 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 linkedin_client_id = os.getenv('LINKEDIN_CLIENT_ID')
 linkedin_client_secret = os.getenv('LINKEDIN_CLIENT_SECRET')
-linkedin_scope = ["r_ads_reporting", "r_ads", "r_organization_admin", "email","openid","profile","r_organization_social"]
+linkedin_scope = ["r_ads_reporting", "r_ads","rw_ads","r_organization_admin", "email","openid","profile","r_organization_social"]
 linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri, scope=linkedin_scope)
 
 
@@ -208,31 +208,81 @@ def get_post_details(access_token, post_urn):
             "message": response.text
         }
     
-# def get_linkedin_ad_analytics(access_token, sponsoredaccount_id):
-#     url = (
-#         f"https://api.linkedin.com/v2/adAnalytics?q=statistics&dateRange=(start:(day:1,month:1,year:2024),end:(day:30,month:5,year:2024))&timeGranularity=ALL&accounts=List(urn%3Ali%3AsponsoredAccount%3A{sponsoredaccount_id})&pivots=List(CREATIVE,CAMPAIGN)&fields=impressions,clicks,totalEngagements,comments,shares,reactions,approximateUniqueImpressions,externalWebsiteConversions,externalWebsitePostClickConversions,externalWebsitePostViewConversions,conversionValueInLocalCurrency,oneClickLeads,pivot,pivotValues,pivotValue&projection=(*,elements*(*,pivotValues(*~sponsoredCampaign(id,name,type,objectiveType,status,campaignGroup~(id,name,status))~sponsoredCreative(status,type))))"
-#     )
+def get_linkedin_ad_analytics(access_token, sponsoredcampaign_id):
+    url = (
+        f"https://api.linkedin.com/v2/adAnalyticsV2?q=statistics&dateRange.start.day=1&dateRange.start.month=1&dateRange.start.year=2024&dateRange.end.day=10&dateRange.end.month=6&dateRange.end.year=2024&timeGranularity=MONTHLY&campaigns=urn:li:sponsoredCampaign:{sponsoredcampaign_id}&pivots=CAMPAIGN&fields=impressions,clicks,comments,shares,reactions,costInLocalCurrency,externalWebsiteConversions,approximateUniqueImpressions"
+    )
     
-#     headers = {
-#         'Authorization': f'Bearer {access_token}',
-#         'Content-Type': 'application/json',
-#         'LinkedIn-Version': '202401',
-#         'X-Restli-Protocol-Version': '2.0.0'
-#     }
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'X-Restli-Protocol-Version': '1.0.0'
+    }
 
-#     try:
-#         response = requests.get(url, headers=headers)
-#         response.raise_for_status()  
-#         return response.json() 
-#     except requests.exceptions.HTTPError as http_err:
-#         print(f"HTTP error occurred: {http_err}")
-#     except Exception as err:
-#         print(f"Other error occurred: {err}")
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  
+        return response.json()['elements']
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
+
+def get_organization_urns(access_token):
+    url = "https://api.linkedin.com/v2/organizationAcls?q=roleAssignee"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        organization_urns = [org['organization'] for org in data.get('elements', [])]
+        return organization_urns
+    else:
+        print(f"Failed to retrieve organizations: {response.status_code}")
+        print(response.json())
+        return []
+
+def get_posts_for_organization(access_token, organization_urn_list):
+    post_details_list = []
+
+    for element in organization_urn_list:
+
+        url = f"https://api.linkedin.com/v2/posts?author={element}&q=author"
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            post_data = data.get("elements", [])
+            for post in post_data:
+
+                insights_url = f"https://api.linkedin.com/v2/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity={element}&ugcPosts[0]={post['id']}"
+
+                response = requests.get(insights_url, headers=headers)
+
+                insights_data = response.json()
+
+
+                post_details_list.append({
+                    "id": post['id'],
+                    "content": post["content"],
+                    "commentary": post["commentary"],
+                    "insights": insights_data.get("elements", [])
+                })
+    return post_details_list
+
 
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def get_linkedin_marketing_data(access_token):
+    access_token = "AQWFHcanmGxeZ6XYZiew5LJRaVZHAE6N1HRcEuRMnK-pAGS5EWPyUWoAkNuCekYcjfIbd3MWag5-U8wjR6LGjby-iR7Zx1pdSDwySH2-nc3GkrOYg3ujnYN-cU1kjw3WqahmmjvjkDqx8dyK_FvBex6rUFo6og-39FmyvlDd_KvhFmpTv2l9RYjWetuk0NgaZo6ywnp3UaRZmXUYEMpMxxax9sUhZi_a1A5MqaZ1OAhBvwPOLO6M3aNl-J_TYPoAyz8NxHUGg3_fXHxW_8eYY8sNwTGWP6odkzdq8RnTDyS2WyxTyiBknbdq6f2jo7U3zwGYHrlmlxnwO0a11zNxYdLAzOm7wg"
     try:
         account_list = get_linkedin_ad_accounts(access_token)
         marketing_data = []
@@ -245,35 +295,38 @@ def get_linkedin_marketing_data(access_token):
                 "details": [],
                 "ad_creatives": {
                     "data": [],
-                    "analytics": [],
                     "statistics": [],
-                    "adbudgetstats":[]
                 }
             },
+            "post_data" : []
+
             }
 
             # add account related data
             account_data['account_id'] = account.get("account_id")
             account_data['account_name'] = account.get("account_name")
             
-            #add campaign related data
+            # add campaign related data
             account_data['campaign_data']['details'] = get_linkedin_campaigns(access_token, account.get("account_id"))
-            ad_creative_list = []
+     
             for campaign in account_data['campaign_data']['details']:
                 ad_creative = get_linkedin_ad_creatives(access_token, campaign.get('id') )
                 ad_creative['reference_content'] = get_post_details(access_token, ad_creative['reference'])
-                ad_creative_list.append(ad_creative)
-
-                # ad analytic endpoints are not configured (yet to be done)
-                # get_linkedin_ad_analytics(access_token, account.get("account_id") )
-
-            account_data['campaign_data']['data'] = ad_creative_list
+                account_data['campaign_data']['ad_creatives']['data'].append(ad_creative)
+                account_data['campaign_data']['ad_creatives']['statistics'].append(get_linkedin_ad_analytics(access_token,  campaign.get('id') )) 
             
             
             marketing_data.append(account_data)
 
-        print(marketing_data)
+        organization_list = get_organization_urns(access_token)
+        post_details = get_posts_for_organization(access_token, organization_list)
+
+        marketing_data.append({
+            "post_data": post_details
+        })
+
         return Response(
+            marketing_data,
         status=status.HTTP_200_OK
         )
     except Exception as e:
