@@ -282,7 +282,6 @@ def get_posts_for_organization(access_token, organization_urn_list):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def get_linkedin_marketing_data(access_token):
-    access_token = "AQWFHcanmGxeZ6XYZiew5LJRaVZHAE6N1HRcEuRMnK-pAGS5EWPyUWoAkNuCekYcjfIbd3MWag5-U8wjR6LGjby-iR7Zx1pdSDwySH2-nc3GkrOYg3ujnYN-cU1kjw3WqahmmjvjkDqx8dyK_FvBex6rUFo6og-39FmyvlDd_KvhFmpTv2l9RYjWetuk0NgaZo6ywnp3UaRZmXUYEMpMxxax9sUhZi_a1A5MqaZ1OAhBvwPOLO6M3aNl-J_TYPoAyz8NxHUGg3_fXHxW_8eYY8sNwTGWP6odkzdq8RnTDyS2WyxTyiBknbdq6f2jo7U3zwGYHrlmlxnwO0a11zNxYdLAzOm7wg"
     try:
         account_list = get_linkedin_ad_accounts(access_token)
         marketing_data = []
