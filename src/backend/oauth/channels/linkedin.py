@@ -14,7 +14,8 @@ from dotenv import load_dotenv
 from django.shortcuts import redirect
 from oauth.helper import get_channel,create_channel
 from oauth.external_urls import frontend_channel_url,linkedin_authorization_base_url,linkedin_redirect_uri,linkedin_token_url
-load_dotenv()
+load_dotenv(override=True)
+
 
 
 #state value for oauth request authentication

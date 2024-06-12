@@ -8,7 +8,6 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
-from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
 from requests_oauthlib import OAuth1Session, OAuth1
 from django.shortcuts import redirect
@@ -16,7 +15,7 @@ from datetime import datetime, timedelta
 from oauth.external_urls import twitter_ads_api_url,twitter_authorization_base_url,twitter_redirect_uri,twitter_token_url,frontend_channel_url
 from oauth.helper import get_channel,create_channel
 
-load_dotenv()
+load_dotenv(override=True)
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -65,6 +64,8 @@ def twitter_get_oauth_request_token():
 
 @api_view(("GET",))
 def twitter_oauth(request):
+    print(twitter_client_id)
+    print(twitter_client_secret)
     try:
         twitter_get_oauth_request_token()
         url = f"{twitter_authorization_base_url}?oauth_token=" + resource_owner_key

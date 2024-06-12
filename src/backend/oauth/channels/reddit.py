@@ -15,7 +15,8 @@ import json
 from oauth.helper import get_channel,create_channel
 from oauth.external_urls import reddit_token_url,reddit_api_url,reddit_redirect_uri,frontend_channel_url
 
-load_dotenv()
+load_dotenv(override=True)
+
 
 
 #state value for oauth request authentication

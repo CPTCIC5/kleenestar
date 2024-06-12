@@ -96,7 +96,7 @@ def merge_json_files(request):
             elif channel.channel_type == 6:
                 data = get_data_func(credentials.key_1)
             elif channel.channel_type == 7:
-                data = get_data_func(credentials.key_1)
+                data = get_data_func(credentials.key_1,credentials.key_2)
             merged_data.append(data)
     
     logger.info(f"Merged data: {merged_data}")

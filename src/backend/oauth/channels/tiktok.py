@@ -14,7 +14,8 @@ import json
 from oauth.helper import create_channel,get_channel
 from oauth.external_urls import frontend_channel_url,tiktok_api_url,tiktok_sandbox_api_url,tiktok_token_url
 
-load_dotenv()
+load_dotenv(override=True)
+
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()

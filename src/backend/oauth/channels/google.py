@@ -16,7 +16,8 @@ from django.shortcuts import redirect
 from oauth.helper import create_channel,get_channel
 from oauth.external_urls import frontend_channel_url,google_apis_url,google_redirect_uri
 
-load_dotenv()
+load_dotenv(override=True)
+
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()

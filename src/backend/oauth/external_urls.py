@@ -7,7 +7,7 @@ google_redirect_uri = 'http://127.0.0.1:8000/api/oauth/google-callback/'
 
 
 facebook_authorization_base_url = 'https://www.facebook.com/v20.0/dialog/oauth'
-facebook_redirect_uri = 'https://8736-2401-4900-57df-d281-2d0f-7537-44c8-f695.ngrok-free.app/api/oauth/facebook-callback/'
+facebook_redirect_uri = 'https://127.0.0.1:8000/api/oauth/facebook-callback/'
 facebook_api_url = "https://graph.facebook.com/v20.0"
 facebook_token_url = 'https://graph.facebook.com/v20.0/oauth/access_token'
 

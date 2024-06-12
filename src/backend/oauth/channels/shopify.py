@@ -13,11 +13,12 @@ from oauth.helper import get_channel,create_channel
 from dotenv import load_dotenv
 from channels.models import APICredentials
 
-load_dotenv()
+load_dotenv(override=True)
+
 
 shop = 'kleenestar'  
 shopify_client_id = os.getenv("SHOPIFY_CLIENT_ID")
-scopes = 'read_products,read_orders'
+scopes = 'read_products,read_orders,read_marketing_events,read_marketing_activity'
 
 
 @api_view(("GET",))
@@ -48,6 +49,7 @@ def shopify_oauth_callback(request):
         
         access_token = exchange_code_for_token(shop, code)
         print(access_token)
+        print(shop.split('.myshopify.com')[0])
 
         try:
             shopify_channel = get_channel(email=request.user.email, channel_type_num=7)
@@ -56,11 +58,13 @@ def shopify_oauth_callback(request):
         
         if shopify_channel.credentials is None:
             credentials = APICredentials.objects.create(
-                key_1=access_token
+                key_1=access_token,
+                key_2=shop
             )
             shopify_channel.credentials = credentials
         else:
             shopify_channel.credentials.key_1 = access_token
+            shopify_channel.credentials.key_2 = shop.split('.myshopify.com')[0]
             shopify_channel.credentials.save()
 
         shopify_channel.save()
@@ -86,3 +90,158 @@ def exchange_code_for_token(shop, code):
     response = requests.post(token_url, data=payload)
     access_token = response.json().get('access_token')
     return access_token
+
+
+
+def get_shopify_product_data(access_token, shop_name, api_version):
+    url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/products.json"
+    
+    headers = {
+        "X-Shopify-Access-Token": access_token
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    products_data = response.json().get('products', [])
+    product_lists = [{
+        "id": product['id'],
+        "title": product['title'],
+        "variants": [{
+            "price": variant['price'],
+            "inventory_quantity": variant['inventory_quantity']
+        } for variant in product['variants']]
+    } for product in products_data]
+    
+    return product_lists
+
+
+def get_shopify_product_analytics(access_token, shop_name, api_version, product):
+    url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/products/{product['id']}/metafields.json"
+    
+    headers = {
+        "X-Shopify-Access-Token": access_token
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    data = response.json().get('metafields', [])
+    
+    product_views = 0
+    add_to_cart = 0
+    purchases = 0
+    conversion_rate = 0.0
+    
+    for metafield in data:
+        if metafield['key'] == 'product_views':
+            product_views = int(metafield['value'])
+        elif metafield['key'] == 'add_to_cart':
+            add_to_cart = int(metafield['value'])
+        elif metafield['key'] == 'purchases':
+            purchases = int(metafield['value'])
+        elif metafield['key'] == 'conversion_rate':
+            conversion_rate = float(metafield['value'])
+    
+    product_analytics = {
+        'product_views': product_views,
+        'add_to_cart': add_to_cart,
+        'purchases': purchases,
+        'conversion_rate': conversion_rate
+    }
+    product['product_analytics'] = product_analytics
+    return product
+
+
+def get_shopify_order_statistics(access_token, shop_name, api_version):
+    url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/orders.json"
+    
+    headers = {
+        "X-Shopify-Access-Token": access_token
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    orders_data = response.json().get('orders', [])
+    
+    order_statistics = [{
+        'id': order['id'],
+        'created_at': order['created_at'],
+        'total_price': order['total_price'],
+        'line_items': [{
+            'quantity': item['quantity'],
+            'price': item['price']
+        } for item in order['line_items']],
+        'financial_status': order['financial_status'],
+        'fulfillment_status': order.get('fulfillment_status'),
+        'customer': {
+            'first_name': order['customer']['first_name'],
+            'last_name': order['customer']['last_name'],
+            'email': order['customer']['email']
+        },
+        'currency': order['currency']
+    } for order in orders_data]
+    
+    return order_statistics
+
+def get_shopify_marketing_events(access_token, shop_name, api_version):
+    url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/marketing_events.json"
+    
+    headers = {
+        "X-Shopify-Access-Token": access_token
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    marketing_events_data = response.json().get('marketing_events', [])
+    
+    marketing_events = [{
+        'id': event['id'],
+        'event_type': event['event_type'],
+        'remote_id': event['remote_id'],
+        'started_at': event['started_at'],
+        'budget': event['budget'],
+        'currency': event['currency'],
+        'marketing_channel': event['marketing_channel'],
+        'target_audience': event.get('target_audience', {}),
+        'engagement': {
+            'clicks': event.get('engagement', {}).get('clicks', 0),
+            'impressions': event.get('engagement', {}).get('impressions', 0),
+            'spend': event.get('engagement', {}).get('spend', 0.0),
+            'conversion_rate': event.get('engagement', {}).get('conversion_rate', 0.0)
+        }
+    } for event in marketing_events_data]
+    
+    return marketing_events
+    
+    
+@csrf_exempt
+@api_view(["GET"])
+@permission_classes([AllowAny]) 
+def get_shopify_data(access_token, shop_name):
+
+    api_version = '2024-01'
+    
+    try:
+        product_data = get_shopify_product_data(access_token, shop_name, api_version)
+        
+        for product in product_data:
+            product = get_shopify_product_analytics(access_token, shop_name, api_version, product)
+        
+        order_statistics = get_shopify_order_statistics(access_token, shop_name, api_version)
+        
+        marketing_events = get_shopify_marketing_events(access_token, shop_name, api_version)
+        
+        
+        shopify_data = {
+            'product_data': product_data,
+            'order_statistics': order_statistics,
+            'marketing_events': marketing_events,
+        }
+        
+        return Response(shopify_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(f"Error fetching Shopify data: {e}")
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

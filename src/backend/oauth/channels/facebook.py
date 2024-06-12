@@ -15,7 +15,8 @@ import requests
 from oauth.helper import create_channel,get_channel
 from oauth.external_urls import facebook_api_url,facebook_authorization_base_url,facebook_redirect_uri,facebook_token_url,frontend_channel_url
 
-load_dotenv()
+load_dotenv(override=True)
+
 
 #state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
@@ -36,6 +37,7 @@ facebook = facebook_compliance_fix(facebook)
 
 @api_view(("GET",))
 def facebook_oauth(request):
+    print(os.getenv("FACEBOOK_CONFIG_ID"))
     try:
         authorization_url, state = facebook.authorization_url(url=facebook_authorization_base_url, state=passthrough_val)
         

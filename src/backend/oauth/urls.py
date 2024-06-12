@@ -36,4 +36,5 @@ urlpatterns = [
 
     path("shopify/", shopify.shopify_oauth),
     path("shopify-callback/", shopify.shopify_oauth_callback),
+    path("shopify_data/",shopify.get_shopify_data)
 ]
