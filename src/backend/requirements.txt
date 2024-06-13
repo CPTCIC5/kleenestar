@@ -45,6 +45,8 @@ django-multiselectfield==0.1.12
 django-nvd3==0.10.1
 django-rest-passwordreset==1.4.0
 djangorestframework==3.14.0
+elastic-transport==8.13.1
+elasticsearch==8.14.0
 executing==2.0.1
 facebook_business==19.0.2
 faiss-cpu==1.8.0
@@ -91,6 +93,7 @@ langchain==0.2.1
 langchain-ai21==0.1.6
 langchain-community==0.2.1
 langchain-core==0.2.5
+langchain-elasticsearch==0.2.2
 langchain-experimental==0.0.59
 langchain-google-genai==1.0.6
 langchain-openai==0.1.8

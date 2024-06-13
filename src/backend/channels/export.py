@@ -11,7 +11,7 @@ import os
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny,IsAuthenticated
-from oauth.channels import google,facebook,twitter,linkedin,reddit,tiktok
+from oauth.channels import google,facebook,twitter,linkedin,reddit,tiktok,shopify
 from channels.models import Channel
 from django.shortcuts import get_object_or_404
 
@@ -46,6 +46,7 @@ def merge_json_files(request):
 
 
 """
+
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -74,7 +75,8 @@ def merge_json_files(request):
         3: twitter.get_twitter_marketing_data,
         4: linkedin.get_linkedin_marketing_data,
         5: tiktok.get_tiktok_marketing_data,
-        6: reddit.get_reddit_marketing_data
+        6: reddit.get_reddit_marketing_data,
+        7: shopify.get_shopify_data
     }
 
     channels = Channel.objects.filter(workspace=workspace)
