@@ -43,9 +43,7 @@ class Channel(models.Model):
         (6, 'Reddit'),
         (7, 'Shopify')
     )
-    activated = models.BooleanField(default=True)
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
-    connected = models.BooleanField(default=True)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,7 +51,6 @@ class Channel(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.credentials:
-
             self.credentials= APICredentials.objects.create(
                 key_1="",
                 key_2="",
@@ -62,6 +59,9 @@ class Channel(models.Model):
                 key_5="",
                 key_6=f"{self.workspace.business_name} - {self.channel_type}"
             )
+
+            #if self.credentials.key_1 == "" and self.credentials.key_2 == "" and self.credentials.key_3 == "" and self.credentials.key_4 == "" and self.credentials.key_5 == "":
+                #self.credentials.delete()
         super().save(*args, **kwargs)
 
         # Check the subscription type of the workspace

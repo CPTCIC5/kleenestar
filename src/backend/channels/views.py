@@ -37,9 +37,9 @@ class ChannelViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.activated = False
-        instance.save()
-        #self.perform_destroy(instance)
+        #instance.activated = False
+        #instance.save()
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
     
 

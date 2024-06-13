@@ -14,7 +14,7 @@ class ChannelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Channel
-        fields = ['activated', 'channel_type', 'connected', 'workspace', 'credentials', 'created_at']
+        fields = ['channel_type', 'workspace', 'credentials', 'created_at']
         read_only = ['workspace']
 
 class ChannelCreateSerializer(serializers.ModelSerializer):

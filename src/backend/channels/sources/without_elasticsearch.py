@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveJsonSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import BM25Retriever
-from langchain_elasticsearch import ElasticsearchStore
-import os
 import requests
 import json
 
@@ -89,33 +87,13 @@ def get_bm25_vectorstore(chunks):
 
     return bm25_retriever
 
-def get_es_vectorstore():
-    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
-    db = ElasticsearchStore(es_cloud_id=os.getenv('ELASTICSEARCH_CLOUD_ID'),
-    index_name="kleenestar",
-    es_api_key= os.getenv('ELASTICSEARCH_API_KEY'),
-    embedding=embeddings)
-    return db
-
-def add_documents_es(chunks):
-    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
-
-    elastic_vector_search = ElasticsearchStore.from_documents(documents=chunks,
-    es_cloud_id=os.getenv('ELASTICSEARCH_CLOUD_ID'),
-    index_name="kleenestar",
-    embedding=embeddings,
-    es_api_key= os.getenv('ELASTICSEARCH_API_KEY')
-    )
-
-
-
 def RagData(question): #only for retrieving 
     documents= get_workspace()
     pinecone_vs= add_to_pinecone_vectorestore_openai(documents)
     self_querying= self_querying_retriever(pinecone_vs)
-    add_documents_es(chunks=documents)
-    elastic_vs= get_es_vectorstore()
-    retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, elastic_vs.as_retriever()])
+    bm25_vs= get_bm25_vectorstore(documents)
+    faiss_vs= get_FAISS_vectorstore(documents)
+    retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, bm25_vs, faiss_vs.as_retriever()])
 
     documents = retriever.invoke(input=question)
     return documents
