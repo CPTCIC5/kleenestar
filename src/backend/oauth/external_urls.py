@@ -1,5 +1,5 @@
 
-frontend_channel_url = "http://localhost:3001/channels/"
+frontend_channel_url = "http://localhost:3000/channels/"
 
 
 google_apis_url = "https://www.googleapis.com"
@@ -26,7 +26,6 @@ linkedin_redirect_uri = 'http://127.0.0.1:8000/api/oauth/linkedin-callback/'
 tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.3/oauth2/access_token/'
 tiktok_api_url = "https://business-api.tiktok.com/open_api"
 tiktok_sandbox_api_url = "https://sandbox-ads.tiktok.com/open_api"
-
 
 
 reddit_token_url = 'https://www.reddit.com/api/v1/access_token'

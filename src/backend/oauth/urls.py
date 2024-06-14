@@ -13,6 +13,7 @@ urlpatterns = [
     path("google-callback/", google.google_oauth_callback),
     path("google/", google.google_oauth),
     path("google_data/", google.get_google_marketing_data),
+    path("google_analytics_data/", google.get_google_analytics_data),
 
     path("facebook/", facebook.facebook_oauth),
     path("facebook-callback/", facebook.facebook_oauth_callback),
@@ -37,4 +38,5 @@ urlpatterns = [
     path("shopify/", shopify.shopify_oauth),
     path("shopify-callback/", shopify.shopify_oauth_callback),
     path("shopify_data/",shopify.get_shopify_data)
+    
 ]

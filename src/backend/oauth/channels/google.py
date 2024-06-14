@@ -14,7 +14,15 @@ from rest_framework.decorators import permission_classes
 from dotenv import load_dotenv
 from django.shortcuts import redirect
 from oauth.helper import create_channel,get_channel
-from oauth.external_urls import frontend_channel_url,google_apis_url,google_redirect_uri
+from oauth.external_urls import frontend_channel_url,google_apis_url,google_redirect_uri                        
+from google.auth.transport.requests import Request
+from google.auth.exceptions import RefreshError, GoogleAuthError
+from googleapiclient.discovery import build
+from google.analytics.data_v1beta import BetaAnalyticsDataClient
+from google.analytics.data_v1beta.types import RunReportRequest, DateRange, Dimension, Metric
+from google.analytics.admin import AnalyticsAdminServiceClient
+from google.oauth2.credentials import Credentials
+from google.analytics.admin_v1alpha.types import ListPropertiesRequest
 
 load_dotenv(override=True)
 
@@ -25,16 +33,18 @@ passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 """
 APP - CONFIGURATIONS
 """
+
 credentials = {
 "developer_token": os.getenv("GOOGLE_DEVELOPER_TOKEN"),
 "client_id": os.getenv("GOOGLE_CLIENT_ID"),
 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
 "use_proto_plus": "false"
 }
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Adjusted to navigate to the project root
 google_client_secret_file = os.path.join(BASE_DIR, 'utils', 'XYZ.json')
 
-google_scopes = ["openid",f"{google_apis_url}/auth/adwords" ,f"{google_apis_url}/auth/userinfo.email" ,f"{google_apis_url}/auth/userinfo.profile"]
+google_scopes = ["openid",f"{google_apis_url}/auth/adwords" ,f"{google_apis_url}/auth/userinfo.email" ,f"{google_apis_url}/auth/userinfo.profile", f"{google_apis_url}/auth/analytics.readonly"]
 flow = Flow.from_client_secrets_file(google_client_secret_file, scopes=google_scopes)
 flow.redirect_uri = google_redirect_uri
 
@@ -82,7 +92,6 @@ def google_oauth_callback(request):
         access_token = flow.credentials.token
         refresh_token = flow.credentials.refresh_token
         credentials["refresh_token"] = refresh_token
-
         response = requests.get(
             f'{google_apis_url}/oauth2/v1/userinfo',
             headers={'Authorization': f'Bearer {access_token}'}
@@ -106,8 +115,8 @@ def google_oauth_callback(request):
                 {"detail": "Manager accounts not allowed"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-
         resource_names = accessible_customers.resource_names
+
         manager_id = resource_names[0].split('/')[1]
         
         client_id_list = []
@@ -128,6 +137,7 @@ def google_oauth_callback(request):
         google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
         google_ads_service = google_client.get_service("GoogleAdsService")
         response = google_ads_service.search(customer_id=manager_id, query=query)
+        
         for row in response:
             if(row.customer_client.id != int(manager_id)):
                 client_id_list.append(str(row.customer_client.id))
@@ -385,4 +395,184 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
             return Response(
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+
+##############################################GOOGLE ANALYTICS INFORMATION###################################################
+
+
+def get_user_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="activeUsers"),
+            Metric(name="newUsers"),
+            Metric(name="totalUsers"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_session_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="sessions"),
+            Metric(name="engagedSessions"),
+            Metric(name="sessionsPerUser"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_event_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="eventCount"),
+            Metric(name="eventValue"),
+            Metric(name="eventRevenue"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_ecommerce_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="purchaseRevenue"),
+            Metric(name="itemRevenue"),
+            Metric(name="transactions"),
+            Metric(name="purchaseQuantity"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_engagement_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="averageSessionDuration"),
+            Metric(name="bounceRate"),
+            Metric(name="engagementRate"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_ad_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="adClicks"),
+            Metric(name="adCost"),
+            Metric(name="adImpressions"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+
+def get_lifetime_value_metrics(client, property_id):
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=[
+            Metric(name="lifetimeValueRevenue"),
+            Metric(name="lifetimeValuePurchases"),
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    response = client.run_report(request)
+    return response
+
+def get_ga4_accounts(credentials):
+    client = AnalyticsAdminServiceClient(credentials=credentials)
+    try:
+        accountList = []
+        accounts = list(client.list_account_summaries().account_summaries)
+        for item in accounts:
+            accountList.append(item.account.split("accounts/")[1])
+        return accountList
+    except GoogleAuthError as e:
+        print(f"Authentication error: {e}")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+    
+
+def get_ga4_properties(credentials, accountList):
+    client = AnalyticsAdminServiceClient(credentials=credentials)
+    try:
+        propertiesList = []
+        for account_id in accountList:
+            properties = client.list_properties(
+            ListPropertiesRequest(filter=f"parent:accounts/{account_id}", show_deleted=True)
+            )
+            propertiesList.append(properties.name)
+        return propertiesList
+    except GoogleAuthError as e:
+        print(f"Authentication error: {e}")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+def get_google_analytics_data(request):
+    google_analytics_data = []
+    access_token = "ya29.a0AXooCgsfTsun0ynHeJNX8HlULBPOt3cykJpWYBOXd0Y-JEqf0smTCZfm8_U-nFQtBbHdaOrNhuK5ws_D_9REapcRaNebUCl1qZP0Dj7vmcaIx-m72lc4AzdlLnNied1DlasWULjTfKNwAmQUd4voq-JKpfcsv2Fyje9gaCgYKAQISARISFQHGX2MijpGQ1qGMjMviEzhFLxaWEQ0171"
+    try:
+        # Build the Admin API client to get the GA4 property ID
+        credentials = Credentials(token=access_token)
+        
+        accountList = get_ga4_accounts(credentials)
+        accountProperties = get_ga4_properties(credentials,accountList)
+        
+        # # Create the Data API client using the credentials
+        # data_api_client = BetaAnalyticsDataClient(credentials=credentials)
+        
+        # user_metrics = get_user_metrics(data_api_client, property_id)
+        # session_metrics = get_session_metrics(data_api_client, property_id)
+        # event_metrics = get_event_metrics(data_api_client, property_id)
+        # ecommerce_metrics = get_ecommerce_metrics(data_api_client, property_id)
+        # engagement_metrics = get_engagement_metrics(data_api_client, property_id)
+        # ad_metrics = get_ad_metrics(data_api_client, property_id)
+        # lifetime_value_metrics = get_lifetime_value_metrics(data_api_client, property_id)
+        
+        # # Return all metrics
+        # google_analytics_data =  {
+        #     "user_metrics": user_metrics,
+        #     "session_metrics": session_metrics,
+        #     "event_metrics": event_metrics,
+        #     "ecommerce_metrics": ecommerce_metrics,
+        #     "engagement_metrics": engagement_metrics,
+        #     "ad_metrics": ad_metrics,
+        #     "lifetime_value_metrics": lifetime_value_metrics,
+        # }
+        return Response(
+            google_analytics_data,
+            status=status.HTTP_200_OK
+        )
+    except Exception as e:
+        return Response(
+            str(e),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
