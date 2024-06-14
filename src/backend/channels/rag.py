@@ -5,7 +5,7 @@ from langchain_openai import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveJsonSplitter
-from langchain_elasticsearch import ElasticsearchStore
+#from langchain_elasticsearch import ElasticsearchStore
 from langchain.retrievers.multi_query import MultiQueryRetriever
 import os
 import requests
@@ -90,6 +90,8 @@ def get_retriver(retrivers):
     return ensemble_retriever
 
 
+"""
+
 def get_es_vectorstore():
     embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
     db = ElasticsearchStore(es_cloud_id=os.getenv('ELASTICSEARCH_CLOUD_ID'),
@@ -97,6 +99,7 @@ def get_es_vectorstore():
     es_api_key= os.getenv('ELASTICSEARCH_API_KEY'),
     embedding=embeddings)
     return db
+"""
 
 """
 def add_documents_es(chunks):
