@@ -120,7 +120,7 @@ def RagData(question): #only for retrieving
     pinecone_vs= add_to_pinecone_vectorestore_openai(documents)
     self_querying= self_querying_retriever(pinecone_vs)
     #add_documents_es(chunks=documents)
-    elastic_vs= get_es_vectorstore()
+    #elastic_vs= get_es_vectorstore()
     #elastic_vs.as_retriever()
     ensemble_retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, ])
 
