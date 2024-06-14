@@ -5,15 +5,13 @@ from langchain_openai import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveJsonSplitter
-from langchain_community.vectorstores import FAISS
-from langchain_community.retrievers import BM25Retriever
 from langchain_elasticsearch import ElasticsearchStore
+from langchain.retrievers.multi_query import MultiQueryRetriever
 import os
 import requests
 import json
 
 load_dotenv()
-
 
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
@@ -72,22 +70,25 @@ def self_querying_retriever(vectorstore):
         )
     return retriever
 
+def multi_query_retriever(retriever):
+    llm = ChatOpenAI(
+    temperature=0,
+    max_tokens=800,
+    model_kwargs={"top_p": 0, "frequency_penalty": 0, "presence_penalty": 0},
+    )
+
+
+    retriever = MultiQueryRetriever.from_llm(
+        retriever=retriever, llm=llm
+        )
+    
+    return retriever
+
+
 def get_retriver(retrivers):
     ensemble_retriever = EnsembleRetriever(retrievers=retrivers)
     return ensemble_retriever
 
-def get_FAISS_vectorstore(chunks):
-    embeddings = OpenAIEmbeddings(model='text-embedding-3-large')
-    faiss_vectorstore = FAISS.from_documents(chunks, embeddings)
-
-    return faiss_vectorstore
-
-def get_bm25_vectorstore(chunks):
-    bm25_retriever = BM25Retriever.from_documents(documents=chunks)
-
-    bm25_retriever.k = 5
-
-    return bm25_retriever
 
 def get_es_vectorstore():
     embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
@@ -97,6 +98,7 @@ def get_es_vectorstore():
     embedding=embeddings)
     return db
 
+"""
 def add_documents_es(chunks):
     embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
 
@@ -106,6 +108,7 @@ def add_documents_es(chunks):
     embedding=embeddings,
     es_api_key= os.getenv('ELASTICSEARCH_API_KEY')
     )
+"""
 
 
 
@@ -113,9 +116,12 @@ def RagData(question): #only for retrieving
     documents= get_workspace()
     pinecone_vs= add_to_pinecone_vectorestore_openai(documents)
     self_querying= self_querying_retriever(pinecone_vs)
-    add_documents_es(chunks=documents)
+    #add_documents_es(chunks=documents)
     elastic_vs= get_es_vectorstore()
-    retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, elastic_vs.as_retriever()])
+    #elastic_vs.as_retriever()
+    ensemble_retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, ])
 
+    retriever= multi_query_retriever(ensemble_retriever)
+    
     documents = retriever.invoke(input=question)
     return documents
