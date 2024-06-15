@@ -109,7 +109,7 @@ class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE, null=True, blank=True)
     title=  models.CharField(max_length=50)
-    image= models.CharField(max_length=50,blank=True)
+    image= models.CharField(max_length=500,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -141,7 +141,6 @@ class Convo(models.Model):
 
 
 def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
-
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
@@ -170,26 +169,25 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         
 
     if file is not None:
+        file.open()
 
-        """
         message_file = client.files.create(
-          file= open(file.path,"rb"), purpose="assistants"
+          file=file.file.file, purpose="assistants"
         )
-        """
+        file.close()
 
         message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=user_query
-        )
-        """
-        attachments=[
+        content=user_query,
+                attachments=[
             {
                 "file_id": message_file.id,
-                "tools": [{"type": "file_search"}, {"type":"retrieval"} ]
+                "tools": [{"type": "file_search"}, {"type":"code_interpreter"} ]
             }
         ]
-        """
+        )
+        
     else:
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
@@ -208,17 +206,13 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     # Initiating a run
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
-        assistant_id=get_convo.workspace.assistant_id
+        assistant_id=get_convo.workspace.assistant_id,
+        stream=True
     )
 
-    while run.status != "completed":
-        keep_retrieving_run = client.beta.threads.runs.retrieve(
-            thread_id=thread.id,
-            run_id=run.id
-        )
-        print(f"Run status: {keep_retrieving_run.status}")
-
-        if keep_retrieving_run.status == "completed":
+    for event in run:
+        # wait until the run is completed
+        if event.event == "thread.message.completed":
             break
 
     # Retrieve messages added by the Assistant to the thread
@@ -236,7 +230,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     elif  type(assistant_response) == ImageFileContentBlock:
         print('block-2')
         if 'text' in assistant_response.type:
-            return {'text': assistant_response.text.value, 'image': assistant_response.file_id}
+            return {'text': assistant_response.text.value, 'image': assistant_response.image_file}
         else:
             return {'image': assistant_response.image_file.file_id}
     
@@ -244,7 +238,10 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         print('block-3')
         print(assistant_response.image_url_content_block)
         return {'image': assistant_response.image_file.image_url_content_block}
-        
+
+def retrieve_file_content(file_id):
+    return client.files.content(file_id)
+
     
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
@@ -253,7 +250,7 @@ class Prompt(models.Model):
     text_query = models.TextField(max_length=10_000)
     file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
     
-    response_text=  models.TextField(max_length=10_000,blank=True)  #GPT generated response
+    response_text=  models.TextField(max_length=10_000,blank=True, null=True)  #GPT generated response
     response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
     #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
     #blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
@@ -265,12 +262,27 @@ class Prompt(models.Model):
 
 
     def save(self,*args,**kwargs):
-        # error is coming from here
-        response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
-        self.response_text = response_data.get('text')
-        self.response_image = response_data.get('image', None)
+
+        history_counts= self.convo.prompt_set.all().count()
+        if history_counts >= 1:
+            thread= client.beta.threads.retrieve(
+                thread_id=self.convo.thread_id
+            )
+
+        else:
+            thread = client.beta.threads.create()
+            self.convo.thread_id = thread.id
+            self.convo.save()
+
 
         super().save(*args, **kwargs)
+
+        # error is coming from here
+        response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query or None)
+        self.response_text = response_data.get('text', None)
+        self.response_image = response_data.get('image', None)
+
+        super().save()
     
     """
     def save(self, *args, **kwargs):

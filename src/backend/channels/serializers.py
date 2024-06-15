@@ -14,7 +14,7 @@ class ChannelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Channel
-        fields = ['channel_type', 'workspace', 'credentials', 'created_at']
+        fields = ['id', 'channel_type', 'workspace', 'credentials', 'created_at']
         read_only = ['workspace']
 
 class ChannelCreateSerializer(serializers.ModelSerializer):
@@ -92,7 +92,7 @@ class PromptCreateSerializer(serializers.ModelSerializer):
         fields = ("text_query", "file_query")
 
 class PromptSerializer(serializers.ModelSerializer):
-    convo= ConvoCreateSerializer()
+    convo= ConvoSerializer()
     class Meta:
         model = models.Prompt
         fields = ('id', 'convo', 'author', 'text_query', 'file_query', 'response_text', 'response_image', 'created_at')
