@@ -25,6 +25,7 @@ passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
 reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
 reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+user_agent = "Kleenestar/1.0 by Powerful-Parsley4755"
 
 
 @api_view(("GET",))
@@ -52,7 +53,7 @@ def reddit_refresh_token_exchange(refresh_token):
     }
 
     auth = requests.auth.HTTPBasicAuth(reddit_client_id, reddit_client_secret)
-    headers = {'User-Agent': 'YourApp/0.1'}
+    headers = {'User-Agent': user_agent}
     response = requests.post(reddit_token_url, auth=auth, data=data, headers=headers)
 
     if response.status_code == 200:
@@ -88,7 +89,7 @@ def reddit_oauth_callback(request):
         }
 
         auth = requests.auth.HTTPBasicAuth(reddit_client_id, reddit_client_secret)
-        headers = {'User-Agent': 'YourApp/0.1'}
+        headers = {'User-Agent': user_agent}
         response = requests.post(reddit_token_url, auth=auth, data=data, headers=headers)
 
         if response.status_code == 200:
@@ -135,6 +136,7 @@ def get_reddit_business_details(access_token):
 
     headers = {
         'Authorization': f'bearer {access_token}'
+         ,'User-Agent': user_agent
     }
 
     response = requests.get(business_url, headers=headers)
@@ -153,6 +155,7 @@ def get_reddit_ad_accounts(access_token, business_id):
     accounts_url = f"{reddit_api_url}/businesses/{business_id}/ad_accounts"
     headers = {
         'Authorization': f'bearer {access_token}'
+         ,'User-Agent': user_agent
     }
     response = requests.get(accounts_url, headers=headers)
     response.raise_for_status()
@@ -174,6 +177,7 @@ def get_reddit_ads(access_token, account_list):
         ads_url = f"{reddit_api_url}/ad_accounts/{account.get('id')}/ads"
         headers = {
             'Authorization': f'bearer {access_token}'
+             ,'User-Agent': user_agent
         }
         response = requests.get(ads_url, headers=headers)
         response.raise_for_status()
@@ -203,6 +207,7 @@ def get_reddit_ad_group(access_token, ads_list_account):
             ad_group_url = f"{reddit_api_url}/ad_groups/{ads.get('ad_group_id')}"
             headers = {
                 'Authorization': f'bearer {access_token}'
+                 ,'User-Agent': user_agent
             }
             response = requests.get(ad_group_url, headers=headers)
             response.raise_for_status()
@@ -254,6 +259,7 @@ def get_reddit_campaign(access_token, ad_group_account_list):
             campaign_url = f"{reddit_api_url}/campaigns/{ads['adaccountandcampaigndetails']['campaignid']}"
             headers = {
                 'Authorization': f'bearer {access_token}'
+                 ,'User-Agent': user_agent
             }
             response = requests.get(campaign_url, headers=headers)
             response.raise_for_status()
@@ -278,6 +284,7 @@ def get_reddit_post(access_token, ads_list_accounts):
             post_url = f"{reddit_api_url}/posts/{ads['post_id']}"
             headers = {
                 'Authorization': f'bearer {access_token}'
+                 ,'User-Agent': user_agent
             }
             response = requests.get(post_url, headers=headers)
             response.raise_for_status()
@@ -300,7 +307,8 @@ def get_reddit_report(access_token, account_list, start_date, end_date):
     for account in account_list:
         report_url = f"{reddit_api_url}/ad_accounts/{account['id']}/reports"
         headers = {
-            'Authorization': f'bearer {access_token}',
+            'Authorization': f'bearer {access_token}'
+             ,'User-Agent': user_agent,
             'Content-Type': 'application/json'  
         }
         config = {
