@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from channels.models import APICredentials
 import hashlib
 import os
+import json
 from google_auth_oauthlib.flow import Flow
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -19,7 +20,7 @@ from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError, GoogleAuthError
 from googleapiclient.discovery import build
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
-from google.analytics.data_v1beta.types import RunReportRequest, DateRange, Dimension, Metric
+from google.analytics.data_v1beta.types import RunReportRequest, DateRange, Dimension, Metric, Pivot, OrderBy, RunPivotReportRequest, RunRealtimeReportRequest
 from google.analytics.admin import AnalyticsAdminServiceClient
 from google.oauth2.credentials import Credentials
 from google.analytics.admin_v1alpha.types import ListPropertiesRequest
@@ -398,105 +399,222 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
 
 
 
-##############################################GOOGLE ANALYTICS INFORMATION###################################################
+#-----------------------------------------GOOGLE ANALYTICS INFORMATION-----------------------------------------------#
 
+
+def get_valid_metrics(client, property_id):
+    metadata = client.get_metadata(name=f"properties/{property_id}/metadata")
+    valid_metrics = {metric.api_name for metric in metadata.metrics}
+    return valid_metrics
+
+def filter_and_add_metrics(client, property_id, metrics):
+    valid_metrics = get_valid_metrics(client, property_id)
+    filtered_metrics = [metric for metric in metrics if metric.name in valid_metrics]
+    return filtered_metrics
+
+def run_pivot_report(client, property_id, metrics, dimensions, pivots, start_date="2023-01-01", end_date="today"):
+    request = RunPivotReportRequest(
+        property=f"properties/{property_id}",
+        metrics=metrics,
+        dimensions=dimensions,
+        pivots=pivots,
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)]
+    )
+
+    response = client.run_pivot_report(request)
+    response_list = []
+
+    dimension_headers = [header.name for header in response.dimension_headers]
+    metric_headers = [header.name for header in response.metric_headers]
+
+    for row in response.rows:
+        row_data = {}
+        for i, dimension_value in enumerate(row.dimension_values):
+            row_data[dimension_headers[i]] = dimension_value.value
+        for j, metric_value in enumerate(row.metric_values):
+            row_data[metric_headers[j]] = metric_value.value
+        response_list.append(row_data)
+
+    return response_list
+
+
+def run_realtime_report(client, property_id, metrics, dimensions=[Dimension(name="country")]):
+    request = RunRealtimeReportRequest(
+        property=f"properties/{property_id}",
+        metrics=metrics,
+        dimensions=dimensions
+    )
+
+    response = client.run_realtime_report(request)
+    response_list = []
+
+    dimension_headers = [header.name for header in response.dimension_headers]
+    metric_headers = [header.name for header in response.metric_headers]
+
+    for row in response.rows:
+        row_data = {}
+        for i, dimension_value in enumerate(row.dimension_values):
+            row_data[dimension_headers[i]] = dimension_value.value
+        for j, metric_value in enumerate(row.metric_values):
+            row_data[metric_headers[j]] = metric_value.value
+        response_list.append(row_data)
+
+    return response_list
+
+
+def run_report(client, property_id, metrics, dimensions=[Dimension(name="date")]):
+    print(filter_and_add_metrics(client, property_id, metrics))
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        metrics=filter_and_add_metrics(client, property_id, metrics),
+        dimensions=dimensions,
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    
+    response = client.run_report(request)
+    response_list = []
+
+    dimension_headers = [header.name for header in response.dimension_headers]
+    metric_headers = [header.name for header in response.metric_headers]
+
+    for row in response.rows:
+        row_data = {}
+        for i, dimension_value in enumerate(row.dimension_values):
+            row_data[dimension_headers[i]] = dimension_value.value
+        for j, metric_value in enumerate(row.metric_values):
+            row_data[metric_headers[j]] = metric_value.value
+        response_list.append(row_data)
+
+    return response_list
 
 def get_user_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="activeUsers"),
-            Metric(name="newUsers"),
-            Metric(name="totalUsers"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="activeUsers"),
+        Metric(name="newUsers"),
+        Metric(name="totalUsers"),
+        Metric(name="crashFreeUsersRate"),
+        Metric(name="crashAffectedUsers"),
+        Metric(name="userEngagementDuration"),
+        Metric(name="userStickiness"),
+        Metric(name="userRetention"),
+    ]
+    return run_report(client, property_id, metrics)
 
-
+# Session Metrics
 def get_session_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="sessions"),
-            Metric(name="engagedSessions"),
-            Metric(name="sessionsPerUser"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="sessions"),
+        Metric(name="engagedSessions"),
+        Metric(name="sessionsPerUser"),
+        Metric(name="averageSessionDuration"),
+        Metric(name="bounceRate"),
+        Metric(name="engagementRate"),
+        Metric(name="sessionDurationPerUser"),
+    ]
+    return run_report(client, property_id, metrics)
 
-
+# Event Metrics
 def get_event_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="eventCount"),
-            Metric(name="eventValue"),
-            Metric(name="eventRevenue"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="eventCount"),
+        Metric(name="eventValue"),
+        Metric(name="eventCountPerUser"),
+        Metric(name="eventsPerSession"),
+    ]
+    return run_report(client, property_id, metrics)
 
-
+# E-commerce Metrics
 def get_ecommerce_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="purchaseRevenue"),
-            Metric(name="itemRevenue"),
-            Metric(name="transactions"),
-            Metric(name="purchaseQuantity"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="purchaseRevenue"),
+        Metric(name="transactions"),
+        Metric(name="purchaserRate"),
+        Metric(name="averagePurchaseRevenue"),
+        Metric(name="refundAmount"),
+        Metric(name="averagePurchaseValue"),
+        Metric(name="ecommercePurchases"),
+    ]
+    return run_report(client, property_id, metrics)
 
-
+# Engagement Metrics
 def get_engagement_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="averageSessionDuration"),
-            Metric(name="bounceRate"),
-            Metric(name="engagementRate"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="averageSessionDuration"),
+        Metric(name="bounceRate"),
+        Metric(name="engagementRate"),
+        Metric(name="screenPageViews"),
+        Metric(name="engagedSessionsPerUser"),
+        Metric(name="userEngagementDuration"),
+        Metric(name="screenPageViewsPerSession"),
+    ]
+    return run_report(client, property_id, metrics)
 
-
+# Ad Metrics
 def get_ad_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="adClicks"),
-            Metric(name="adCost"),
-            Metric(name="adImpressions"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="adClicks"),
+        Metric(name="adCost"),
+        Metric(name="adImpressions"),
+        Metric(name="adRevenue"),
+        Metric(name="returnOnAdSpend"),
+        Metric(name="adCostPerClick"),
+        Metric(name="adClickThroughRate"),
+    ]
+    dimensions = [
+        Dimension(name="sessionCampaignName")
+    ]
+    return run_report(client, property_id, metrics, dimensions)
 
-
+# Lifetime Value Metrics
 def get_lifetime_value_metrics(client, property_id):
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        metrics=[
-            Metric(name="lifetimeValueRevenue"),
-            Metric(name="lifetimeValuePurchases"),
-        ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    return response
+    metrics = [
+        Metric(name="lifetimeValueRevenue"),
+        Metric(name="lifetimeValuePurchases"),
+        Metric(name="averageLifetimeValue"),
+        Metric(name="customerLifetimeValue"),
+    ]
+    return run_report(client, property_id, metrics)
+
+# Demographic Metrics
+def get_demographic_metrics(client, property_id):
+    metrics = [
+        Metric(name="country"),
+    ]
+    return run_report(client, property_id, metrics, dimensions=[Dimension(name="date"), Dimension(name="country")])
+
+# Technology Metrics
+def get_technology_metrics(client, property_id):
+    metrics = [
+        Metric(name="deviceCategory"),
+        Metric(name="operatingSystem"),
+        Metric(name="browser"),
+        Metric(name="screenResolution"),
+        Metric(name="appVersion"),
+        Metric(name="platform"),
+    ]
+    return run_report(client, property_id, metrics, dimensions=[Dimension(name="date"), Dimension(name="deviceCategory"), Dimension(name="operatingSystem"), Dimension(name="browser"), Dimension(name="screenResolution"), Dimension(name="appVersion"), Dimension(name="platform")])
+
+# Goal Metrics
+def get_goal_metrics(client, property_id):
+    metrics = [
+        Metric(name="goalCompletionsAll"),
+        Metric(name="goalConversionRateAll"),
+        Metric(name="goalValueAll"),
+        Metric(name="goalStartsAll"),
+    ]
+    return run_report(client, property_id, metrics)
+
+# Content Metrics
+def get_content_metrics(client, property_id):
+    metrics = [
+        Metric(name="pageviews"),
+        Metric(name="uniquePageviews"),
+        Metric(name="timeOnPage"),
+        Metric(name="entrances"),
+        Metric(name="pageValue"),
+        Metric(name="exitRate"),
+    ]
+    return run_report(client, property_id, metrics)
 
 def get_ga4_accounts(credentials):
     client = AnalyticsAdminServiceClient(credentials=credentials)
@@ -517,12 +635,13 @@ def get_ga4_accounts(credentials):
 def get_ga4_properties(credentials, accountList):
     client = AnalyticsAdminServiceClient(credentials=credentials)
     try:
-        propertiesList = []
         for account_id in accountList:
             properties = client.list_properties(
             ListPropertiesRequest(filter=f"parent:accounts/{account_id}", show_deleted=True)
             )
-            propertiesList.append(properties.name)
+            propertiesList = []
+            for property in properties:
+                propertiesList.append(property.name.split("properties/")[1])
         return propertiesList
     except GoogleAuthError as e:
         print(f"Authentication error: {e}")
@@ -532,40 +651,74 @@ def get_ga4_properties(credentials, accountList):
         return None
 
 
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
-def get_google_analytics_data(request):
+def get_google_analytics_data(access_token):
     google_analytics_data = []
-    access_token = "ya29.a0AXooCgsfTsun0ynHeJNX8HlULBPOt3cykJpWYBOXd0Y-JEqf0smTCZfm8_U-nFQtBbHdaOrNhuK5ws_D_9REapcRaNebUCl1qZP0Dj7vmcaIx-m72lc4AzdlLnNied1DlasWULjTfKNwAmQUd4voq-JKpfcsv2Fyje9gaCgYKAQISARISFQHGX2MijpGQ1qGMjMviEzhFLxaWEQ0171"
     try:
         # Build the Admin API client to get the GA4 property ID
         credentials = Credentials(token=access_token)
-        
+
         accountList = get_ga4_accounts(credentials)
         accountProperties = get_ga4_properties(credentials,accountList)
-        
+        print(accountList, accountProperties)
         # # Create the Data API client using the credentials
-        # data_api_client = BetaAnalyticsDataClient(credentials=credentials)
-        
-        # user_metrics = get_user_metrics(data_api_client, property_id)
-        # session_metrics = get_session_metrics(data_api_client, property_id)
-        # event_metrics = get_event_metrics(data_api_client, property_id)
-        # ecommerce_metrics = get_ecommerce_metrics(data_api_client, property_id)
-        # engagement_metrics = get_engagement_metrics(data_api_client, property_id)
-        # ad_metrics = get_ad_metrics(data_api_client, property_id)
-        # lifetime_value_metrics = get_lifetime_value_metrics(data_api_client, property_id)
-        
-        # # Return all metrics
-        # google_analytics_data =  {
-        #     "user_metrics": user_metrics,
-        #     "session_metrics": session_metrics,
-        #     "event_metrics": event_metrics,
-        #     "ecommerce_metrics": ecommerce_metrics,
-        #     "engagement_metrics": engagement_metrics,
-        #     "ad_metrics": ad_metrics,
-        #     "lifetime_value_metrics": lifetime_value_metrics,
-        # }
+        data_api_client = BetaAnalyticsDataClient(credentials=credentials)
+
+        property_id = accountProperties[0]
+
+        # Standard Metrics
+        user_metrics = get_user_metrics(data_api_client, property_id)
+        session_metrics = get_session_metrics(data_api_client, property_id)
+        event_metrics = get_event_metrics(data_api_client, property_id)
+        ecommerce_metrics = get_ecommerce_metrics(data_api_client, property_id)
+        engagement_metrics = get_engagement_metrics(data_api_client, property_id)
+        ad_metrics = get_ad_metrics(data_api_client, property_id)
+        lifetime_value_metrics = get_lifetime_value_metrics(data_api_client, property_id)
+        demographic_metrics = get_demographic_metrics(data_api_client, property_id)
+        technology_metrics = get_technology_metrics(data_api_client, property_id)
+        goal_metrics = get_goal_metrics(data_api_client, property_id)
+        content_metrics = get_content_metrics(data_api_client, property_id)
+
+        # Real-time Metrics
+        realtime_metrics = run_realtime_report(data_api_client, property_id, [
+            Metric(name="activeUsers"),
+            Metric(name="screenPageViews")
+        ], dimensions=[Dimension(name="country")])
+
+        # Pivot Report
+        pivots = [
+            Pivot(
+                field_names=["date", "country"],
+                order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"))],
+                offset=0,
+                limit=10
+            )
+        ]
+        pivot_metrics = run_pivot_report(data_api_client, property_id, [
+            Metric(name="sessions"),
+            Metric(name="bounceRate")
+        ], dimensions=[Dimension(name="date"), Dimension(name="country")], pivots=pivots)
+
+        # Return all metrics
+        google_analytics_data = {
+            "user_metrics": user_metrics,
+            "session_metrics": session_metrics,
+            "event_metrics": event_metrics,
+            "ecommerce_metrics": ecommerce_metrics,
+            "engagement_metrics": engagement_metrics,
+            "ad_metrics": ad_metrics,
+            "lifetime_value_metrics": lifetime_value_metrics,
+            "demographic_metrics": demographic_metrics,
+            "technology_metrics": technology_metrics,
+            "goal_metrics": goal_metrics,
+            "content_metrics": content_metrics,
+            "realtime_metrics": realtime_metrics,
+            "pivot_metrics": pivot_metrics,
+        }
+
         return Response(
             google_analytics_data,
             status=status.HTTP_200_OK
