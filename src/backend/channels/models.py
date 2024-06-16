@@ -43,7 +43,9 @@ class Channel(models.Model):
         (5, "TikTok"),
         (6, 'Reddit'),
         (7, 'Shopify'),
-        (8, 'Google-Analytics')
+        (8, 'Google-Analytics'),
+        (9, 'MailChimp'),
+        (10, 'Instagram')
     )
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
     workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
