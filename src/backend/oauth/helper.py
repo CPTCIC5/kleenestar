@@ -11,6 +11,7 @@ def get_channel(email,channel_type_num):
 def create_channel(email, channel_type_num):
     user = get_object_or_404(User,email=email)
     workspace = user.workspace_set.all()[0]
+
     try:
         new_channel = Channel.objects.create(
             channel_type=channel_type_num, 

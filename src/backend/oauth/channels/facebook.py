@@ -12,35 +12,37 @@ from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from dotenv import load_dotenv
 from django.shortcuts import redirect
 import requests
-from oauth.helper import create_channel,get_channel
-from oauth.external_urls import facebook_api_url,facebook_authorization_base_url,facebook_redirect_uri,facebook_token_url,frontend_channel_url
+from oauth.helper import create_channel, get_channel
+from oauth.external_urls import facebook_api_url, facebook_authorization_base_url, facebook_redirect_uri, facebook_token_url, frontend_channel_url
+
+import json
+import base64
 
 load_dotenv(override=True)
 
-
-#state value for oauth request authentication
+# state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
-
-"""
-APP - CONFIGURATIONS
-"""
-#facebook
+# APP - CONFIGURATIONS
+# facebook
 facebook_client_id = os.getenv("FACEBOOK_CLIENT_ID")
 facebook_client_secret = os.getenv("FACEBOOK_CLIENT_SECRET")
 
-facebook_scopes = ['ads_read','ads_management','public_profile','email','pages_show_list', 'pages_read_engagement', 'pages_read_user_content']  
+facebook_scopes = ['ads_read', 'ads_management', 'public_profile', 'email', 'pages_show_list', 'pages_read_engagement', 'pages_read_user_content']
 facebook = OAuth2Session(facebook_client_id, redirect_uri=facebook_redirect_uri, scope=facebook_scopes)
 facebook = facebook_compliance_fix(facebook)
 
-
-
 @api_view(("GET",))
 def facebook_oauth(request):
+    user_email = request.user.email
+    state_dict = {'email': user_email, 'passthrough_val': passthrough_val}
+    state_json = json.dumps(state_dict)
+    state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+
     print(os.getenv("FACEBOOK_CONFIG_ID"))
     try:
-        authorization_url, state = facebook.authorization_url(url=facebook_authorization_base_url, state=passthrough_val)
-        
+        authorization_url, state = facebook.authorization_url(url=facebook_authorization_base_url, state=state_encoded)
+
         return Response({
             "url": authorization_url + f"&config_id={os.getenv('FACEBOOK_CONFIG_ID')}"},
             status=status.HTTP_200_OK
@@ -51,31 +53,42 @@ def facebook_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+    
 
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def facebook_oauth_callback(request):   
-
-    redirect_response = request.build_absolute_uri()
-    if request.query_params.get("state") != passthrough_val:
-        return Response(
-            {"detail": "State token does not match the expected state."},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        )
-
     try:
+        state_encoded = request.query_params.get('state')
+        state_json = base64.urlsafe_b64decode(state_encoded).decode()
+        state_params = json.loads(state_json)
+
+        if state_params.get("passthrough_val") != passthrough_val:
+            return Response(
+                {"detail": "State token does not match the expected state."},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        user_email = state_params.get("email")
+        if not user_email:
+            return Response(
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        redirect_response = request.build_absolute_uri()
         token = facebook.fetch_token(token_url=facebook_token_url, client_secret=facebook_client_secret, # 60days validity
                                      authorization_response=redirect_response) # access_token
 
-        access_token =  token.get("access_token")
+        access_token = token.get("access_token")
         facebook_data = get_facebook_data(access_token)
 
         try:
-            facebook_channel = get_channel(email=request.user.email, channel_type_num=2)
+            facebook_channel = get_channel(email=user_email, channel_type_num=2)
         except Exception:
-            facebook_channel = create_channel(email=request.user.email, channel_type_num=2)
-        
+            facebook_channel = create_channel(email=user_email, channel_type_num=2)
+
         if facebook_channel.credentials is None:
             credentials = APICredentials.objects.create(
                 key_1=access_token,
@@ -92,11 +105,13 @@ def facebook_oauth_callback(request):
         return redirect(frontend_channel_url)
 
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        print(f"Exception occurred: {e}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
 
 def get_facebook_data(access_token):
     user_url = '{facebook_api_url}/me'

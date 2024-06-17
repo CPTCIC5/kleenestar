@@ -1,5 +1,5 @@
 import requests
-import urllib.parse
+from urllib.parse import urlencode, parse_qs, quote
 import os
 from rest_framework.decorators import api_view
 from django.shortcuts import redirect
@@ -23,8 +23,14 @@ scopes = 'read_products,read_orders,read_marketing_events,read_marketing_activit
 
 @api_view(("GET",))
 def shopify_oauth(request):
+    user_email = request.user.email
+    state = urlencode({'email': user_email})
+    
     try:
-        authorization_url = f"https://{shop}.myshopify.com/admin/oauth/authorize?client_id={shopify_client_id}&scope={scopes}&redirect_uri={urllib.parse.quote(shopify_redirect_uri)}"
+        authorization_url = (
+            f"https://{shop}.myshopify.com/admin/oauth/authorize"
+            f"?client_id={shopify_client_id}&scope={scopes}&redirect_uri={quote(shopify_redirect_uri)}&state={state}"
+        )
 
         return Response({
             "url": authorization_url},
@@ -37,6 +43,16 @@ def shopify_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+def exchange_code_for_token(shop, code):
+    url = f"https://{shop}/admin/oauth/access_token"
+    payload = {
+        'client_id': shopify_client_id,
+        'client_secret': os.getenv("SHOPIFY_CLIENT_SECRET"),
+        'code': code
+    }
+    response = requests.post(url, data=payload)
+    response_data = response.json()
+    return response_data['access_token']
 
 @csrf_exempt
 @api_view(("GET",))
@@ -46,15 +62,25 @@ def shopify_oauth_callback(request):
         code = request.query_params.get('code')
         shop = request.query_params.get('shop')
         hmac = request.query_params.get('hmac')
+        state = request.query_params.get('state')
+
+        state_params = parse_qs(state)
+        user_email = state_params.get('email', [None])[0]
         
         access_token = exchange_code_for_token(shop, code)
         print(access_token)
         print(shop.split('.myshopify.com')[0])
 
+        if not user_email:
+            return Response(
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
         try:
-            shopify_channel = get_channel(email=request.user.email, channel_type_num=7)
+            shopify_channel = get_channel(email=user_email, channel_type_num=7)
         except Exception:
-            shopify_channel = create_channel(email=request.user.email, channel_type_num=7)
+            shopify_channel = create_channel(email=user_email, channel_type_num=7)
         
         if shopify_channel.credentials is None:
             credentials = APICredentials.objects.create(
@@ -71,28 +97,11 @@ def shopify_oauth_callback(request):
         return redirect(frontend_channel_url)
     
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        print(f"Exception occurred: {e}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    
-
-def exchange_code_for_token(shop, code):
-    api_key = os.getenv("SHOPIFY_CLIENT_ID")
-    api_secret = os.getenv("SHOPIFY_CLIENT_SECRET")
-    token_url = f"https://{shop}/admin/oauth/access_token"
-    payload = {
-        'client_id': api_key,
-        'client_secret': api_secret,
-        'code': code
-    }
-    response = requests.post(token_url, data=payload)
-    access_token = response.json().get('access_token')
-    return access_token
-
-
-
 def get_shopify_product_data(access_token, shop_name, api_version):
     url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/products.json"
     

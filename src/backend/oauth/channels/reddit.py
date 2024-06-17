@@ -12,26 +12,34 @@ from dotenv import load_dotenv
 from django.shortcuts import redirect
 from datetime import datetime, timedelta, timezone
 import json
-from oauth.helper import get_channel,create_channel
-from oauth.external_urls import reddit_token_url,reddit_api_url,reddit_redirect_uri,frontend_channel_url
+import base64
+from oauth.helper import get_channel, create_channel
+from oauth.external_urls import reddit_token_url, reddit_api_url, reddit_redirect_uri, frontend_channel_url
+from urllib.parse import urlencode, parse_qs
+import requests.auth
 
 load_dotenv(override=True)
 
-
-
-#state value for oauth request authentication
+# State value for OAuth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
-
 
 reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
 reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
 user_agent = "Kleenestar/1.0 by Powerful-Parsley4755"
 
-
 @api_view(("GET",))
 def reddit_oauth(request):
+    user_email = request.user.email
+    state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
+    state_json = json.dumps(state_dict)
+    state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+
     try:  
-        authorization_url = f'https://www.reddit.com/api/v1/authorize?client_id={reddit_client_id}&response_type=code&state={passthrough_val}&redirect_uri={reddit_redirect_uri}&duration=permanent&scope=identity read account history mysubreddits adsread'
+        authorization_url = (
+            f'https://www.reddit.com/api/v1/authorize?client_id={reddit_client_id}'
+            f'&response_type=code&state={state_encoded}&redirect_uri={reddit_redirect_uri}'
+            f'&duration=permanent&scope=identity read account history mysubreddits adsread'
+        )
         
         return Response({
             "url": authorization_url},
@@ -44,7 +52,6 @@ def reddit_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
 
 def reddit_refresh_token_exchange(refresh_token):
     data = {
@@ -64,22 +71,32 @@ def reddit_refresh_token_exchange(refresh_token):
     else:
         return f"Error: {response.content}", response.status_code
 
-
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def reddit_oauth_callback(request):
     try:
-        if request.query_params.get("state") != passthrough_val:
+        state_encoded = request.query_params.get('state')
+        state_json = base64.urlsafe_b64decode(state_encoded).decode()
+        state_params = json.loads(state_json)
+
+        if state_params.get("passthrough_val", None) != passthrough_val:
             return Response(
-            {"detail": "State token does not match the expected state."},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                {"detail": "State token does not match the expected state."},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
-        code = request.query_params.get('code')
-        if code is None:
+        user_email = state_params.get("email", None)
+        if not user_email:
             return Response(
-            {"detail": "Code is missing in the redirect uri, Invalid request!"},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        code = request.query_params.get('code')
+        if not code:
+            return Response(
+                {"detail": "Code is missing in the redirect URI, invalid request!"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
         data = {
@@ -100,9 +117,9 @@ def reddit_oauth_callback(request):
             print(access_token, refresh_token)
             
             try:
-                reddit_channel = get_channel(email=request.user.email, channel_type_num=6)
+                reddit_channel = get_channel(email=user_email, channel_type_num=6)
             except Exception:
-                reddit_channel = create_channel(email=request.user.email, channel_type_num=6)
+                reddit_channel = create_channel(email=user_email, channel_type_num=6)
             
             if reddit_channel.credentials is None:
                 credentials = APICredentials.objects.create(
@@ -120,18 +137,19 @@ def reddit_oauth_callback(request):
         
         else:
             return Response(
-            {"detail": f"Error: {response.content}"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
+                {"detail": f"Error: {response.content}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
     
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        print(f"Exception occurred: {e}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 def get_reddit_business_details(access_token):
+
     business_url = f"{reddit_api_url}/me/businesses"
 
     headers = {

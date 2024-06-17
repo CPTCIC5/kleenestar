@@ -5,6 +5,7 @@ from channels.models import APICredentials
 import hashlib
 import os
 import json
+import base64
 from google_auth_oauthlib.flow import Flow
 import requests
 from google.ads.googleads.client import GoogleAdsClient
@@ -53,10 +54,15 @@ flow.redirect_uri = google_redirect_uri
 
 @api_view(("GET",))
 def google_oauth(request):
+
+    state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
+    state_json = json.dumps(state_dict)
+    state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+    
     try:
         authorization_url, state = flow.authorization_url(
             access_type="offline",
-            state=passthrough_val,
+            state=state_encoded,
             prompt="consent",
             include_granted_scopes="true",
         )
@@ -76,18 +82,28 @@ def google_oauth(request):
 @permission_classes([AllowAny]) 
 def google_oauth_callback(request):
     code = request.query_params.get("code")
+    state_encoded = request.query_params.get('state')
+    state_json = base64.urlsafe_b64decode(state_encoded).decode()
+    state_params = json.loads(state_json)
     if not code:
         return Response(
         {"detail": "something not working???"},
         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
-    elif request.query_params.get("state") != passthrough_val:
+    elif state_params.get("passthrough_val", None) != passthrough_val:
         return Response(
         {"detail": "State token does not match the expected state."},
         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
-
+    
+    user_email = state_params.get("email", None)
+    if not user_email:
+        return Response(
+            {"detail": "Unable to retrieve user email"},
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    
     try:
         flow.fetch_token(code=code)
         access_token = flow.credentials.token
@@ -155,9 +171,9 @@ def google_oauth_callback(request):
         
         """
         try:
-            google_channel = get_channel(email=request.user.email, channel_type_num=1)
+            google_channel = get_channel(email=user_email, channel_type_num=1)
         except Exception:
-            google_channel = create_channel(email=request.user.email, channel_type_num=1)
+            google_channel = create_channel(email=user_email, channel_type_num=1)
         
         if google_channel.credentials is None:
             credentials_new = APICredentials.objects.create(

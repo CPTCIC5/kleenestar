@@ -5,6 +5,8 @@ from channels.models import APICredentials
 import hashlib
 import urllib.parse 
 import os
+import json
+import base64
 import requests
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny
@@ -36,8 +38,12 @@ linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri,
 
 @api_view(("GET",))
 def linkedin_oauth(request):
+    state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
+    state_json = json.dumps(state_dict)
+    state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+
     try:
-        authorization_url, state = linkedin.authorization_url(url=linkedin_authorization_base_url, state=passthrough_val)
+        authorization_url, state = linkedin.authorization_url(url=linkedin_authorization_base_url, state=state_encoded)
         print(authorization_url)
         return Response({
             "url": authorization_url},
@@ -55,13 +61,25 @@ def linkedin_oauth(request):
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def linkedin_oauth_callback(request):
+
     try:
-        if request.query_params.get("state") != passthrough_val:
+        state_encoded = request.query_params.get('state')
+        state_json = base64.urlsafe_b64decode(state_encoded).decode()
+        state_params = json.loads(state_json)
+
+        if state_params.get("passthrough_val", None) != passthrough_val:
             return Response(
             {"detail": "State token does not match the expected state."},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
         redirect_response = request.build_absolute_uri()
+
+        user_email = state_params.get("email", None)
+        if not user_email:
+            return Response(
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
 
         token = linkedin.fetch_token(token_url=linkedin_token_url, client_secret=linkedin_client_secret,  #60 days validity
                              include_client_id=True,
@@ -82,9 +100,9 @@ def linkedin_oauth_callback(request):
 
         print(access_token, refresh_token, email)
         try:
-            linkedin_channel = get_channel(email=request.user.email, channel_type_num=4)
+            linkedin_channel = get_channel(email=user_email, channel_type_num=4)
         except Exception:
-            linkedin_channel = create_channel(email=request.user.email, channel_type_num=4)
+            linkedin_channel = create_channel(email=user_email, channel_type_num=4)
         
         if linkedin_channel.credentials is None:
             credentials = APICredentials.objects.create(

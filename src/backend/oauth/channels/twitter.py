@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from requests_oauthlib import OAuth1Session, OAuth1
 from django.shortcuts import redirect
 from datetime import datetime, timedelta
+from urllib.parse import parse_qs, urlencode
 from oauth.external_urls import twitter_ads_api_url,twitter_authorization_base_url,twitter_redirect_uri,twitter_token_url,frontend_channel_url
 from oauth.helper import get_channel,create_channel
 
@@ -43,10 +44,12 @@ def twitter_get_oauth_token(verifier, ro_key, ro_secret):
     return access_token_list
 
 
-def twitter_get_oauth_request_token():
+def twitter_get_oauth_request_token(user_email):
     global resource_owner_key
     global resource_owner_secret
-    request_token = OAuth1Session(client_key=twitter_client_id, client_secret=twitter_client_secret, callback_uri=twitter_redirect_uri)
+    
+    callback_with_state = f"{twitter_redirect_uri}?email={user_email}"
+    request_token = OAuth1Session(client_key=twitter_client_id, client_secret=twitter_client_secret, callback_uri=callback_with_state)
     url = 'https://api.twitter.com/oauth/request_token'
     data = request_token.get(url)
     data_token = str.split(data.text, '&')
@@ -60,18 +63,14 @@ def twitter_get_oauth_request_token():
             {"detail": "Unauthorized request error!!!"},
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
-    
+
 
 @api_view(("GET",))
 def twitter_oauth(request):
-    print(twitter_client_id)
-    print(twitter_client_secret)
+    user_email = request.user.email
     try:
-        twitter_get_oauth_request_token()
-        url = f"{twitter_authorization_base_url}?oauth_token=" + resource_owner_key
-
-        print(url)
-     
+        twitter_get_oauth_request_token(user_email)
+        url = f"{twitter_authorization_base_url}?oauth_token={resource_owner_key}"
         return Response({
             "url": url},
             status=status.HTTP_200_OK
@@ -83,47 +82,55 @@ def twitter_oauth(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
+
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes([AllowAny]) 
 def twitter_oauth_callback(request):
     try:
+        email = request.query_params.get('email')
+        print(email,"email")
         if not request.query_params.get("oauth_verifier"):
             return Response(
-                {"detail": "something not working???"},
+                {"detail": "OAuth verifier is missing"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 )
-        oauth_verifier  = request.query_params.get("oauth_verifier")
-        oauth_list = twitter_get_oauth_token(oauth_verifier,resource_owner_key,resource_owner_secret)
+
+        oauth_verifier = request.query_params.get("oauth_verifier")
+        oauth_list = twitter_get_oauth_token(oauth_verifier, resource_owner_key, resource_owner_secret)
         
         access_token = {}
-        print(oauth_list)
         for token in oauth_list:
             key, value = token.split('=')
             access_token[key] = value
 
-        key = access_token['oauth_token'] # life long validity until revoked
+        key = access_token['oauth_token']
         secret = access_token['oauth_token_secret']
         
-        # Create OAuth1Session with the obtained access token
         oauth_user = OAuth1Session(client_key=twitter_client_id,
-                                client_secret=twitter_client_secret,
-                                resource_owner_key=key,
-                                resource_owner_secret=secret)
+                                   client_secret=twitter_client_secret,
+                                   resource_owner_key=key,
+                                   resource_owner_secret=secret)
         
         url_user = 'https://api.twitter.com/1.1/account/verify_credentials.json'
         params = {"include_email": True}
         user_data = oauth_user.get(url_user, params=params)
         user_json = user_data.json()
-        email = user_json.get('email', None)  
+        twitter_email = user_json.get('email', None)  
 
-        print(email)
-        print(resource_owner_key, resource_owner_secret, key, secret)
-        try:
-            twitter_channel = get_channel(email=request.user.email, channel_type_num=3)
-        except Exception:
-            twitter_channel = create_channel(email=request.user.email, channel_type_num=3)
+        if not email:
+            return Response(
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                )
         
+        try:
+            twitter_channel = get_channel(email=email, channel_type_num=3)
+        except Exception:
+            twitter_channel = create_channel(email=email, channel_type_num=3)
+            print(twitter_channel)
+
         if twitter_channel.credentials is None:
             credentials = APICredentials.objects.create(
                 key_1=resource_owner_key,
@@ -134,8 +141,8 @@ def twitter_oauth_callback(request):
             )
             twitter_channel.credentials = credentials
         else:
-            twitter_channel.credentials.key_1= resource_owner_key
-            twitter_channel.credentials.key_2= resource_owner_secret
+            twitter_channel.credentials.key_1 = resource_owner_key
+            twitter_channel.credentials.key_2 = resource_owner_secret
             twitter_channel.credentials.key_3 = key
             twitter_channel.credentials.key_4 = secret
             twitter_channel.credentials.key_5 = email
@@ -150,6 +157,7 @@ def twitter_oauth_callback(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
 
 def get_twitter_ad_accounts(auth):
     url = f'{twitter_ads_api_url}{twitter_api_version}/accounts'

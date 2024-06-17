@@ -11,13 +11,15 @@ from rest_framework.decorators import permission_classes
 from dotenv import load_dotenv
 from django.shortcuts import redirect
 import json
-from oauth.helper import create_channel,get_channel
-from oauth.external_urls import frontend_channel_url,tiktok_api_url,tiktok_sandbox_api_url,tiktok_token_url
+from oauth.helper import create_channel, get_channel
+from oauth.external_urls import frontend_channel_url, tiktok_api_url, tiktok_sandbox_api_url, tiktok_token_url, tiktok_redirect_uri
+from urllib.parse import quote
+import json
+import base64
 
 load_dotenv(override=True)
 
-
-#state value for oauth request authentication
+# state value for oauth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
 """
@@ -26,18 +28,21 @@ APP - CONFIGURATIONS
 tiktok_client_id = os.getenv('TIKTOK_CLIENT_ID')
 tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
 
-
-
 @api_view(("GET",))
 def tiktok_oauth(request):
+    user_email = request.user.email
+    state_dict = {'email': user_email, 'passthrough_val': passthrough_val}
+    state_json = json.dumps(state_dict)
+    state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+
     try:
-        authorization_url = f"https://business-api.tiktok.com/portal/auth?app_id={tiktok_client_id}&state={passthrough_val}&redirect_uri=https%3A%2F%2F5842-2401-4900-57d2-3eb7-6416-dc3-8af0-6e4f.ngrok-free.app%2Fapi%2Foauth%2Ftiktok-callback%2F"
+        authorization_url = f"https://business-api.tiktok.com/portal/auth?app_id={tiktok_client_id}&state={state_encoded}&redirect_uri={quote(tiktok_redirect_uri)}"
 
         return Response({
             "url": authorization_url},
             status=status.HTTP_200_OK
         )
-    
+
     except Exception as e:
         print(f"Exception occurred: {str(e)}")
         return Response(
@@ -47,26 +52,39 @@ def tiktok_oauth(request):
 
 @csrf_exempt
 @api_view(("GET",))
-@permission_classes([AllowAny]) 
+@permission_classes([AllowAny])
 def tiktok_oauth_callback(request):
     try:
-        if request.query_params.get("state") != passthrough_val:
+        state_encoded = request.query_params.get('state')
+        state_json = base64.urlsafe_b64decode(state_encoded).decode()
+        state_params = json.loads(state_json)
+
+        if state_params.get("passthrough_val") != passthrough_val:
             return Response(
-            {"detail": "State token does not match the expected state."},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                {"detail": "State token does not match the expected state."},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+
+        user_email = state_params.get("email")
+        if not user_email:
+            return Response(
+                {"detail": "Unable to retrieve user email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
         code = request.query_params.get("auth_code")
-        if  code == None:
+        if code is None:
             return Response(
-            {"detail": "code not found, invalid request."},
-            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                {"detail": "code not found, invalid request."},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+
         headers = {
             'Content-Type': 'application/json',
         }
         data = {
             "app_id": tiktok_client_id,
-            "auth_code":  code,
+            "auth_code": code,
             "secret": tiktok_client_secret,
         }
         response = requests.post(tiktok_token_url, headers=headers, data=json.dumps(data))
@@ -76,15 +94,15 @@ def tiktok_oauth_callback(request):
                 {"detail": "An error occurred during the OAuth process: " + response.text},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        
+
         access_token = response.json()['data']['access_token']  # does not expire
         advertiser_ids = response.json()['data']['advertiser_ids']
 
         try:
-            tiktok_channel = get_channel(email=request.user.email, channel_type_num=5)
+            tiktok_channel = get_channel(email=user_email, channel_type_num=5)
         except Exception:
-            tiktok_channel = create_channel(email=request.user.email, channel_type_num=5)
-        
+            tiktok_channel = create_channel(email=user_email, channel_type_num=5)
+
         if tiktok_channel.credentials is None:
             credentials = APICredentials.objects.create(
                 key_1=access_token,
@@ -98,9 +116,9 @@ def tiktok_oauth_callback(request):
 
         tiktok_channel.save()
         return redirect(frontend_channel_url)
-    
+
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")
+        print(f"Exception occurred: {e}")
         return Response(
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,

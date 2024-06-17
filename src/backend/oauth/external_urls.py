@@ -22,11 +22,10 @@ linkedin_redirect_uri = 'http://127.0.0.1:8000/api/oauth/linkedin-callback/'
 
 
 # configured in tiktok app (browser)
-# tiktok_redirect_uri = 'https://a7b1-2401-4900-57e1-6bfc-4182-80ff-5d55-cbdf.ngrok-free.app/api/oauth/tiktok-callback/'
+tiktok_redirect_uri = 'https://a7b1-2401-4900-57e1-6bfc-4182-80ff-5d55-cbdf.ngrok-free.app/api/oauth/tiktok-callback/'
 tiktok_token_url = 'https://business-api.tiktok.com/open_api/v1.3/oauth2/access_token/'
 tiktok_api_url = "https://business-api.tiktok.com/open_api"
 tiktok_sandbox_api_url = "https://sandbox-ads.tiktok.com/open_api"
-
 
 reddit_token_url = 'https://www.reddit.com/api/v1/access_token'
 reddit_api_url = "https://ads-api.reddit.com/api/v3"
