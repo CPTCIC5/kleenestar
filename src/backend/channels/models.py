@@ -89,7 +89,7 @@ class Channel(models.Model):
         return 'xyz'
 
 COLOR_CHOICES = (
-    ("9#0EE90","#90EE90"),
+    ("#90EE90","#90EE90"),
     ("#FFCCCC","#FFCCCC"),
     ("#D3D3D3","#D3D3D3"),
     ("#E6E6FA","#E6E6FA"),
@@ -100,7 +100,7 @@ COLOR_CHOICES = (
 class Note(models.Model):
     prompt = models.ForeignKey("Prompt",on_delete= models.CASCADE)
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
-    note_text= models.CharField(max_length=100)
+    note_text= models.CharField(max_length=500)
     created_at= models.DateTimeField(auto_now_add=True)
     color = models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
 
