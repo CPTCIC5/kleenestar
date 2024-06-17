@@ -16,16 +16,15 @@ from channels.models import APICredentials
 load_dotenv(override=True)
 
 
-shop = 'kleenestar'  
 shopify_client_id = os.getenv("SHOPIFY_CLIENT_ID")
 scopes = 'read_products,read_orders,read_marketing_events,read_marketing_activity'
 
 
 @api_view(("GET",))
 def shopify_oauth(request):
+    shop = request.query_params.get("shop")
     user_email = request.user.email
     state = urlencode({'email': user_email})
-    
     try:
         authorization_url = (
             f"https://{shop}.myshopify.com/admin/oauth/authorize"

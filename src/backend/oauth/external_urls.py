@@ -3,7 +3,7 @@ frontend_channel_url = "http://localhost:3000/channels/"
 
 production = False
 
-if production:
+if not production:
     backend_url =  "http://127.0.0.1:8000/"
 else:
     backend_url = "https://polite-awake-bobcat.ngrok-free.app/"
