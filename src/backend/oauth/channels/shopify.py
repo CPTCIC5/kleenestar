@@ -43,6 +43,9 @@ def shopify_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+    
+
+    
 def exchange_code_for_token(shop, code):
     url = f"https://{shop}/admin/oauth/access_token"
     payload = {
@@ -102,6 +105,8 @@ def shopify_oauth_callback(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+    
+
 def get_shopify_product_data(access_token, shop_name, api_version):
     url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/products.json"
     
