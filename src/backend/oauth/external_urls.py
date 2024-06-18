@@ -1,13 +1,11 @@
-
-frontend_channel_url = "http://localhost:3000/channels/"
-
-production = False
+production = True
 
 if not production:
     backend_url =  "http://127.0.0.1:8000/"
+    frontend_channel_url = "http://localhost:3000/channels/"
 else:
     backend_url = "https://polite-awake-bobcat.ngrok-free.app/"
-
+    frontend_channel_url = "https://kleenestar.vercel.app/channels/"
 
 google_apis_url = "https://www.googleapis.com"
 google_redirect_uri = f'{backend_url}api/oauth/google-callback/'
@@ -20,8 +18,8 @@ facebook_token_url = 'https://graph.facebook.com/v20.0/oauth/access_token'
 
 twitter_ads_api_url = 'https://ads-api.twitter.com/'
 twitter_redirect_uri = f'{backend_url}api/oauth/twitter-callback/'
-twitter_authorization_base_url = "https://api.twitter.com/oauth/authenticate"
-twitter_token_url = "https://api.twitter.com/oauth/access_token"
+twitter_authorization_base_url = "https://twitter.com/oauth/authorize"
+twitter_token_url = "https://twitter.com/oauth/access_token"
 
 linkedin_authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
 linkedin_token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
