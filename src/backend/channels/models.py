@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from .rag import RagData
 import re
-
+from django.core.files.base import ContentFile
+import uuid
 
 from openai.types.beta.threads.text_content_block import TextContentBlock
 from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
@@ -232,20 +233,20 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         return {'text': assistant_response.text.value}
     elif  type(assistant_response) == ImageFileContentBlock:
         print('block-2')
+        file_content = client.files.content(assistant_response.image_file.file_id).content
+        image_file = ContentFile(file_content, name=f"{uuid.uuid4()}.png")
         if 'text' in assistant_response.type:
-            return {'text': assistant_response.text.value, 'image': assistant_response.image_file}
+            return {'text': assistant_response.text.value, 'image': image_file}
         else:
-            return {'image': assistant_response.image_file.file_id}
+            return {'image': image_file}
     
     elif  type(assistant_response) == ImageURLContentBlock:
-        print('block-3')
-        print(assistant_response.image_url_content_block)
-        return {'image': assistant_response.image_file.image_url_content_block}
+        raise Exception("received ImageURLContentBlock, unable to process this...")
+        # print('block-3')
+        # print(assistant_response.image_url_content_block)
+        # return {'image': assistant_response.image_file.image_url_content_block}
 
-def retrieve_file_content(file_id):
-    return client.files.content(file_id)
 
-    
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
