@@ -142,6 +142,13 @@ class Convo(models.Model):
     class Meta:
         ordering = ['-created_at']
     
+    @property
+    def all_notes(self):
+        # Fetch all Prompts related to the Convo
+        prompts = self.prompt_set.all()
+        # Fetch all Notes related to the Prompts
+        notes = Note.objects.filter(prompt__in=prompts)
+        return notes
 
 
 def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
