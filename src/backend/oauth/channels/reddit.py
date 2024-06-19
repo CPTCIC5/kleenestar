@@ -15,7 +15,6 @@ import json
 import base64
 from oauth.helper import get_channel, create_channel
 from oauth.external_urls import reddit_token_url, reddit_api_url, reddit_redirect_uri, frontend_channel_url
-from urllib.parse import urlencode, parse_qs
 import requests.auth
 
 load_dotenv(override=True)
@@ -353,33 +352,26 @@ def get_reddit_report(access_token, account_list, start_date, end_date):
     return campaign_insight_account_list
 
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny])
+
 def get_reddit_marketing_data(access_token):
 
-    marketing_data = {
-        "business_details": {},
-        "marketing_data": []
-    }
     try:
-        marketing_data['business_details'] = get_reddit_business_details(access_token)
-        marketing_data_list = []
-        marketing_data_dict = {
-        }
-        account_list = get_reddit_ad_accounts(access_token,marketing_data['business_details']['id'])
+        business_details = get_reddit_business_details(access_token)
+        
+        account_list = get_reddit_ad_accounts(access_token,business_details['id'])
         ads_list = get_reddit_ads(access_token, account_list)
         ad_group_list = get_reddit_ad_group(access_token, ads_list)
         campaign_list = get_reddit_campaign(access_token, ad_group_list)
         post_list = get_reddit_post(access_token, ads_list)
-        print(len(ads_list), len(ad_group_list), len(campaign_list))
         # Retrive metrics for only 7 days
         start_date = (datetime.now(timezone.utc) - timedelta(days=7)).replace(minute=0, second=0, microsecond=0).strftime('%Y-%m-%dT%H:00:00Z')
         end_date = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0).strftime('%Y-%m-%dT%H:00:00Z')
 
         campaign_report_list = get_reddit_report(access_token, account_list, start_date, end_date)
+        marketing_data_list = []
         
         for item in range(len(account_list)):
+            marketing_data_dict = {}
             marketing_data_dict["account_data"] = account_list[item]
             marketing_data_dict["ad_group_data"] = ad_group_list[item]
             marketing_data_dict["ads_data"] = ads_list[item]
@@ -388,12 +380,16 @@ def get_reddit_marketing_data(access_token):
             marketing_data_dict["metrics_data"] = campaign_report_list[item]
             marketing_data_list.append(marketing_data_dict)
 
-        marketing_data["marketing_data"] = marketing_data_list
 
-        return Response(
-            marketing_data,
-            status=status.HTTP_200_OK
-        )
+        reddit_marketing_data = {
+            "channel_type": "Reddit Channel",
+            "business_details": business_details,
+            "marketing_detials": marketing_data_list
+        }
 
+        print(reddit_marketing_data)
+        return reddit_marketing_data
+    
     except Exception as e:
-        return Response(f"Error in api: {e}",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("Error in Fetching Reddit Channel Data:" + str(e))
+        return None

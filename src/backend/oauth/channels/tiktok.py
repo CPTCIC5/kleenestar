@@ -203,9 +203,7 @@ def get_tiktok_ultimate_report(access_token, advertiser_ids):
             ultimate_report_data.extend(report_data['data']['list'])
     return ultimate_report_data
 
-@csrf_exempt
-@api_view(["GET"])
-@permission_classes([AllowAny]) 
+
 def get_tiktok_marketing_data(access_token, advertiser_ids):
     try:
         campaign_data = get_tiktok_campaign_data(access_token, advertiser_ids)
@@ -216,7 +214,8 @@ def get_tiktok_marketing_data(access_token, advertiser_ids):
         instant_page_metrics = get_tiktok_creative_metrics(access_token, advertiser_ids, "INSTANT_PAGE")
         ultimate_report = get_tiktok_ultimate_report(access_token, advertiser_ids)
 
-        final_data = {
+        marketing_data = {
+            "channel_type" : "Tiktok Channel",
             "campaign_data": campaign_data,
             "adgroup_data": adgroup_data,
             "ad_data": ad_data,
@@ -226,7 +225,8 @@ def get_tiktok_marketing_data(access_token, advertiser_ids):
             "ultimate_report": ultimate_report
         }
 
-        return Response(final_data, status=status.HTTP_200_OK)
+        return Response(marketing_data, status=status.HTTP_200_OK)
+    
     except Exception as e:
         return Response(f"Error in API: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

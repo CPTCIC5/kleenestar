@@ -17,9 +17,7 @@ from dotenv import load_dotenv
 from django.shortcuts import redirect
 from oauth.helper import create_channel,get_channel
 from oauth.external_urls import frontend_channel_url,google_apis_url,google_redirect_uri                        
-from google.auth.transport.requests import Request
-from google.auth.exceptions import RefreshError, GoogleAuthError
-from googleapiclient.discovery import build
+from google.auth.exceptions import GoogleAuthError
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import RunReportRequest, DateRange, Dimension, Metric, Pivot, OrderBy, RunPivotReportRequest, RunRealtimeReportRequest
 from google.analytics.admin import AnalyticsAdminServiceClient
@@ -43,7 +41,7 @@ credentials = {
 "use_proto_plus": "false"
 }
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Adjusted to navigate to the project root
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
 google_client_secret_file = os.path.join(BASE_DIR, 'utils', 'XYZ.json')
 
 google_scopes = ["openid",f"{google_apis_url}/auth/adwords" ,f"{google_apis_url}/auth/userinfo.email" ,f"{google_apis_url}/auth/userinfo.profile", f"{google_apis_url}/auth/analytics.readonly"]
@@ -203,10 +201,9 @@ def google_oauth_callback(request):
         )
 
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
+
 def get_google_marketing_data(refresh_token,manager_id, client_id_list):
+
 
     credentials["refresh_token"] = refresh_token
     
@@ -214,8 +211,9 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
 
     google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
     marketing_data = []
-    for id in client_id_list:
-        
+
+    for id in eval(client_id_list):
+
         # end_date = datetime.now().date()
         # start_date = end_date - timedelta(days=30)
         ga_service = google_client.get_service("GoogleAdsService")
@@ -325,6 +323,7 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                         "conversions_from_interactions_rate": ad_group_row.metrics.conversions_from_interactions_rate
                     }
                 })
+            
 
             for ad_group_ad_row in ad_group_ad_response:
                 ad_group_ad_data.append({
@@ -333,7 +332,7 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                     "campaign_name": ad_group_ad_row.campaign.name,
                     "ad_group_name": ad_group_ad_row.ad_group.name,
                     "ad_status": ad_group_ad_row.ad_group_ad.status,
-                    "final_urls": ad_group_ad_row.ad_group_ad.ad.final_urls,
+                    "final_urls": list(ad_group_ad_row.ad_group_ad.ad.final_urls),
                     "description1": ad_group_ad_row.ad_group_ad.ad.text_ad.description1,
                     "description2": ad_group_ad_row.ad_group_ad.ad.text_ad.description2,
                     "ad_type": ad_group_ad_row.ad_group_ad.ad.type_,
@@ -367,9 +366,10 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                 keyword_response = ga_service.search(customer_id=id, query=get_keyword_query)
                 for response in keyword_response:
                     keyword = response.ad_group_criterion.keyword
-                    print(keyword)
                     return [keyword.text, keyword.match_type]
                 
+
+        
             for keyword_view_row in keyword_view_response:
                 keyword_view_data.append({
                     "resource_name": keyword_view_row.keyword_view.resource_name,
@@ -393,14 +393,15 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                         "conversions_from_interactions_rate": keyword_view_row.metrics.conversions_from_interactions_rate
                     }
                 })
-
+            results["channel_type"] = "Google Channel"
             results["keyword_views"] = keyword_view_data
             results["ad_group_ads"] = ad_group_ad_data
             results["ad_groups"] = ad_group_data
             results["campaigns"] = campaign_data
             marketing_data.append(results)
 
-            return Response(marketing_data,status=status.HTTP_200_OK)
+            return marketing_data
+        
         except GoogleAdsException as ex:
             print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
             for error in ex.failure.errors:
@@ -408,13 +409,8 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                 if error.location:
                     for field_path_element in error.location.field_path_elements:
                         print(f"\t\tOn field: {field_path_element.field_name}")
-
-            return Response(
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-
+            return None
+            
 #-----------------------------------------GOOGLE ANALYTICS INFORMATION-----------------------------------------------#
 
 
@@ -479,7 +475,6 @@ def run_realtime_report(client, property_id, metrics, dimensions=[Dimension(name
 
 
 def run_report(client, property_id, metrics, dimensions=[Dimension(name="date")]):
-    print(filter_and_add_metrics(client, property_id, metrics))
     request = RunReportRequest(
         property=f"properties/{property_id}",
         metrics=filter_and_add_metrics(client, property_id, metrics),
@@ -657,8 +652,21 @@ def get_ga4_properties(credentials, accountList):
             )
             propertiesList = []
             for property in properties:
-                propertiesList.append(property.name.split("properties/")[1])
+
+                propertiesList.append({
+                    "id": property.name.split("properties/")[1],
+                    "create_time": property.create_time,
+                    "parent": property.parent,
+                    "display_name":property.display_name,
+                    "industry_category": property.industry_category,
+                    "time_zone": property.time_zone,
+                    "currency_code": property.currency_code,
+                    "service_level":property.service_level,
+                    "account_id": property.account
+                })
+
         return propertiesList
+    
     except GoogleAuthError as e:
         print(f"Authentication error: {e}")
         return None
@@ -668,80 +676,74 @@ def get_ga4_properties(credentials, accountList):
 
 
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
 def get_google_analytics_data(access_token):
-    google_analytics_data = []
+
+    google_analytics_data = [{"channel_type": "Google Analytics"}]
     try:
         # Build the Admin API client to get the GA4 property ID
         credentials = Credentials(token=access_token)
 
         accountList = get_ga4_accounts(credentials)
         accountProperties = get_ga4_properties(credentials,accountList)
-        print(accountList, accountProperties)
         # # Create the Data API client using the credentials
         data_api_client = BetaAnalyticsDataClient(credentials=credentials)
 
-        property_id = accountProperties[0]
+        for property in accountProperties:
+            # Standard Metrics
+            user_metrics = get_user_metrics(data_api_client, property['id'])
+            session_metrics = get_session_metrics(data_api_client, property['id'])
+            event_metrics = get_event_metrics(data_api_client, property['id'])
+            ecommerce_metrics = get_ecommerce_metrics(data_api_client, property['id'])
+            engagement_metrics = get_engagement_metrics(data_api_client, property['id'])
+            ad_metrics = get_ad_metrics(data_api_client, property['id'])
+            lifetime_value_metrics = get_lifetime_value_metrics(data_api_client, property['id'])
+            demographic_metrics = get_demographic_metrics(data_api_client, property['id'])
+            technology_metrics = get_technology_metrics(data_api_client, property['id'])
+            goal_metrics = get_goal_metrics(data_api_client, property['id'])
+            content_metrics = get_content_metrics(data_api_client, property['id'])
 
-        # Standard Metrics
-        user_metrics = get_user_metrics(data_api_client, property_id)
-        session_metrics = get_session_metrics(data_api_client, property_id)
-        event_metrics = get_event_metrics(data_api_client, property_id)
-        ecommerce_metrics = get_ecommerce_metrics(data_api_client, property_id)
-        engagement_metrics = get_engagement_metrics(data_api_client, property_id)
-        ad_metrics = get_ad_metrics(data_api_client, property_id)
-        lifetime_value_metrics = get_lifetime_value_metrics(data_api_client, property_id)
-        demographic_metrics = get_demographic_metrics(data_api_client, property_id)
-        technology_metrics = get_technology_metrics(data_api_client, property_id)
-        goal_metrics = get_goal_metrics(data_api_client, property_id)
-        content_metrics = get_content_metrics(data_api_client, property_id)
+            # Real-time Metrics
+            realtime_metrics = run_realtime_report(data_api_client, property['id'], [
+                Metric(name="activeUsers"),
+                Metric(name="screenPageViews")
+            ], dimensions=[Dimension(name="country")])
 
-        # Real-time Metrics
-        realtime_metrics = run_realtime_report(data_api_client, property_id, [
-            Metric(name="activeUsers"),
-            Metric(name="screenPageViews")
-        ], dimensions=[Dimension(name="country")])
+            # Pivot Report
+            pivots = [
+                Pivot(
+                    field_names=["date", "country"],
+                    order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"))],
+                    offset=0,
+                    limit=10
+                )
+            ]
+            pivot_metrics = run_pivot_report(data_api_client, property['id'], [
+                Metric(name="sessions"),
+                Metric(name="bounceRate")
+            ], dimensions=[Dimension(name="date"), Dimension(name="country")], pivots=pivots)
 
-        # Pivot Report
-        pivots = [
-            Pivot(
-                field_names=["date", "country"],
-                order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"))],
-                offset=0,
-                limit=10
-            )
-        ]
-        pivot_metrics = run_pivot_report(data_api_client, property_id, [
-            Metric(name="sessions"),
-            Metric(name="bounceRate")
-        ], dimensions=[Dimension(name="date"), Dimension(name="country")], pivots=pivots)
-
-        # Return all metrics
-        google_analytics_data = {
-            "user_metrics": user_metrics,
-            "session_metrics": session_metrics,
-            "event_metrics": event_metrics,
-            "ecommerce_metrics": ecommerce_metrics,
-            "engagement_metrics": engagement_metrics,
-            "ad_metrics": ad_metrics,
-            "lifetime_value_metrics": lifetime_value_metrics,
-            "demographic_metrics": demographic_metrics,
-            "technology_metrics": technology_metrics,
-            "goal_metrics": goal_metrics,
-            "content_metrics": content_metrics,
-            "realtime_metrics": realtime_metrics,
-            "pivot_metrics": pivot_metrics,
-        }
-
-        return Response(
-            google_analytics_data,
-            status=status.HTTP_200_OK
-        )
+            # Return all metrics
+            analytics_data = {
+                "property_details": property,
+                "user_metrics": user_metrics,
+                "session_metrics": session_metrics,
+                "event_metrics": event_metrics,
+                "ecommerce_metrics": ecommerce_metrics,
+                "engagement_metrics": engagement_metrics,
+                "ad_metrics": ad_metrics,
+                "lifetime_value_metrics": lifetime_value_metrics,
+                "demographic_metrics": demographic_metrics,
+                "technology_metrics": technology_metrics,
+                "goal_metrics": goal_metrics,
+                "content_metrics": content_metrics,
+                "realtime_metrics": realtime_metrics,
+                "pivot_metrics": pivot_metrics,
+            }
+            google_analytics_data.append(analytics_data)
+        
+        return google_analytics_data
+    
     except Exception as e:
-        return Response(
-            str(e),
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        print("Error in Fetching Google Analytics Channel Data:" + str(e))
+        return None
 

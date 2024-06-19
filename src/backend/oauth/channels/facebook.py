@@ -284,12 +284,10 @@ def get_adset_data(access_token, campaing_data):
 
     return campaing_data
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
+
 def get_facebook_marketing_data(access_token, ad_account_list):
     marketing_data = []
-
+    
     try:    
         campaign_data = get_facebook_campaign_data(access_token, ad_account_list)
         campaing_data = get_adset_data(access_token, campaign_data)
@@ -297,11 +295,12 @@ def get_facebook_marketing_data(access_token, ad_account_list):
         campaign_data = get_facebook_campaign_statistics(access_token, campaign_data)
         post_details_data = get_page_posts(access_token)
 
-        marketing_data = [campaign_data, post_details_data]
+        marketing_data = [{"channel_type": "Meta Channel"},campaign_data, post_details_data]
 
         return Response(
             marketing_data, status=status.HTTP_200_OK
         )
+    
     except Exception as e:
         print(f"Error with message {e}.")
         return Response(

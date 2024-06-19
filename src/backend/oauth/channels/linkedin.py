@@ -35,7 +35,6 @@ linkedin_scope = ["r_ads_reporting", "r_ads","rw_ads","r_organization_admin", "e
 linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri, scope=linkedin_scope)
 
 
-
 @api_view(("GET",))
 def linkedin_oauth(request):
     state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
@@ -44,7 +43,6 @@ def linkedin_oauth(request):
 
     try:
         authorization_url, state = linkedin.authorization_url(url=linkedin_authorization_base_url, state=state_encoded)
-        print(authorization_url)
         return Response({
             "url": authorization_url},
             status=status.HTTP_200_OK
@@ -175,7 +173,6 @@ def get_linkedin_campaigns(access_token, account_id):
         print("Failed to fetch campaigns", response.status_code, response.text)
 
 def get_linkedin_ad_creatives(access_token, campaign_id):
-    print(campaign_id)
     campaign_urn = f'urn:li:sponsoredCampaign:{campaign_id}'
     url = f"https://api.linkedin.com/v2/adCreativesV2?q=search&search.campaign.values[0]={campaign_urn}"
     headers = {
@@ -187,19 +184,21 @@ def get_linkedin_ad_creatives(access_token, campaign_id):
     
     if response.status_code == 200:
         ad_creatives = response.json()
-        creative = ad_creatives['elements'][0]
-        ad_creatives_dict = {
-                "id": creative.get('id'),
-                "status": creative.get('status'),
-                "type": creative.get('type'),
-                "campaign": creative.get('campaign'),
-                "created": creative['changeAuditStamps']['created']['time'],
-                "lastModified": creative['changeAuditStamps']['lastModified']['time'],
-                "variables": creative.get('variables'),
-                "reference": creative.get('reference'),
-                "reference_content": [],   
-            }
-        return ad_creatives_dict
+        creatives = ad_creatives['elements']
+        creatives_list = []
+        for creative in creatives:
+            creatives_list.append({
+                    "id": creative.get('id'),
+                    "status": creative.get('status'),
+                    "type": creative.get('type'),
+                    "campaign": creative.get('campaign'),
+                    "created": creative['changeAuditStamps']['created']['time'],
+                    "lastModified": creative['changeAuditStamps']['lastModified']['time'],
+                    "variables": creative.get('variables'),
+                    "reference": creative.get('reference'),
+                    "reference_content": [],   
+                })
+        return creatives_list
     else:
         return {'error': response.json()}
 
@@ -240,7 +239,7 @@ def get_linkedin_ad_analytics(access_token, sponsoredcampaign_id):
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  
-        return response.json()['elements']
+        return response.json().get("elements", [])
     except requests.exceptions.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
     except Exception as err:
@@ -261,7 +260,6 @@ def get_organization_urns(access_token):
         return organization_urns
     else:
         print(f"Failed to retrieve organizations: {response.status_code}")
-        print(response.json())
         return []
 
 def get_posts_for_organization(access_token, organization_urn_list):
@@ -297,13 +295,11 @@ def get_posts_for_organization(access_token, organization_urn_list):
     return post_details_list
 
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
+
 def get_linkedin_marketing_data(access_token):
     try:
+        marketing_data = [{"channel_type": "LinkedIn Channel"}]
         account_list = get_linkedin_ad_accounts(access_token)
-        marketing_data = []
         for account in account_list:
             # marketing data dictionary (structure)
             account_data = {
@@ -311,10 +307,7 @@ def get_linkedin_marketing_data(access_token):
             'account_name':"",
             'campaign_data': {
                 "details": [],
-                "ad_creatives": {
-                    "data": [],
-                    "statistics": [],
-                }
+                "ad_creatives": []
             },
             "post_data" : []
 
@@ -326,14 +319,17 @@ def get_linkedin_marketing_data(access_token):
             
             # add campaign related data
             account_data['campaign_data']['details'] = get_linkedin_campaigns(access_token, account.get("account_id"))
-     
+            
             for campaign in account_data['campaign_data']['details']:
-                ad_creative = get_linkedin_ad_creatives(access_token, campaign.get('id') )
-                ad_creative['reference_content'] = get_post_details(access_token, ad_creative['reference'])
-                account_data['campaign_data']['ad_creatives']['data'].append(ad_creative)
-                account_data['campaign_data']['ad_creatives']['statistics'].append(get_linkedin_ad_analytics(access_token,  campaign.get('id') )) 
-            
-            
+                ad_creatives = get_linkedin_ad_creatives(access_token, campaign.get('id') )
+                ad_creative_list = []
+                for ad_creative in ad_creatives:
+                    ad_creative_dict = {}
+                    ad_creative_dict['reference_content'] = get_post_details(access_token, ad_creative['reference'])
+                    ad_creative_dict['data'].append(ad_creative)
+                    ad_creative_dict['statistics'].append(get_linkedin_ad_analytics(access_token,  campaign.get('id') ))
+                    ad_creative_list.append(ad_creative_dict)
+                account_data["campaign_data"]["ad_creatives"] = ad_creative_list
             marketing_data.append(account_data)
 
         organization_list = get_organization_urns(access_token)
@@ -343,12 +339,8 @@ def get_linkedin_marketing_data(access_token):
             "post_data": post_details
         })
 
-        return Response(
-            marketing_data,
-        status=status.HTTP_200_OK
-        )
+        return marketing_data
+    
     except Exception as e:
-        print(f"Exception found: {e}")
-        return Response(
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        print("Error in Fetching Linkedin Channel Data:" + str(e))
+        return None

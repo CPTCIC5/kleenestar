@@ -3,8 +3,9 @@ from google.oauth2.credentials import Credentials
 from google.auth.exceptions import RefreshError
 import os
 import requests
-from requests.auth import HTTPBasicAuth
+from requests_oauthlib import OAuth1Session
 from requests.exceptions import RequestException
+from oauth.exceptions import RefreshException
 """
 This file is to refresh all the credentials 
 
@@ -25,27 +26,32 @@ shopify - access token has no expiry, it is expired after the user uninstalls th
 *tiktok - expires in few hours (yet to figure out refresh token)
 
 """
-
-def check_update_google_credentials(access_token, refresh_token):
+#done
+def check_update_google_credentials(refresh_token,access_token):
     credentials = Credentials(
     token=access_token,
     refresh_token=refresh_token,
-    token_uri="https://oauth2.googleapis.com/token",
+    token_uri="https://accounts.google.com/o/oauth2/token",
     client_id= os.getenv("GOOGLE_CLIENT_ID"),
     client_secret= os.getenv("GOOGLE_CLIENT_SECRET")
     )
 
     try:
-        if credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request())
-            return True, credentials.token
+        url = "https://oauth2.googleapis.com/tokeninfo"
+        params = {'access_token': access_token}
+        response = requests.get(url, params=params)
+        print(response)
+        if response.status_code == 200:
+            return False, ""
         else:
-            return False
+            credentials.refresh(Request())
+            print("updated access token - google")
+            return True, credentials.token
         
     except RefreshError as e:
-            raise Exception("Failed to refresh token.")
+            raise RefreshException("Invalid Credentials")
 
-
+#not-done
 def check_update_facebook_credentials(access_token):
     debug_token_url = "https://graph.facebook.com/debug_token"
     app_id = os.getenv("FACEBOOK_CLIENT_ID")
@@ -64,47 +70,44 @@ def check_update_facebook_credentials(access_token):
         if response.status_code == 200 and 'data' in response_data:
             data = response_data['data']
             if data['is_valid']:
-                return True, access_token
+                return True
             else:
-                raise Exception("Facebook access token is invalid or expired.")
+                raise RefreshException("Invalid Credentials")
         else:
-            raise Exception("Failed to validate Facebook access token.")
+            raise RefreshException("Invalid Credentials")
     
     except requests.exceptions.RequestException as e:
-        raise Exception(f"Failed to check Facebook access token: {e}")
+        raise RefreshException("Invalid Credentials")
     
-
+#done
 def check_update_twitter_credentials(access_token, access_token_secret):
-    verify_credentials_url = "https://api.twitter.com/1.1/account/verify_credentials.json"
     consumer_key = os.getenv("TWITTER_CLIENT_ID")
     consumer_secret = os.getenv("TWITTER_CLIENT_SECRET")
 
     try:
-        response = requests.get(
-            verify_credentials_url,
-            auth=HTTPBasicAuth(consumer_key, consumer_secret),
-            headers={
-                'Authorization': f'Bearer {access_token}',
-                'oauth_token': access_token,
-                'oauth_token_secret': access_token_secret
-            }
-        )
-        
-        if response.status_code == 200:
-            return True, access_token
-        else:
-            raise Exception("Twitter access token is invalid or expired.")
-    
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"Failed to check Twitter access token: {e}")
-    
+        url = "https://api.twitter.com/1.1/account/verify_credentials.json"
+        auth = OAuth1Session(client_key=consumer_key,
+                                   client_secret=consumer_secret,
+                                   resource_owner_key=access_token,
+                                   resource_owner_secret=access_token_secret)
 
+        response = auth.get(url)
+        print(response)
+        if response.status_code == 200:
+            return True
+        else:
+            raise RefreshException("Invalid Credentials")
+        
+    except requests.exceptions.RequestException as e:
+        print(str(e))
+        raise RefreshException("Invalid Credentials")
+
+#done
 def check_update_linkedin_credentials(access_token, refresh_token):
-    verify_credentials_url = "https://api.linkedin.com/v2/me"
+    verify_credentials_url = "https://api.linkedin.com/v2/userinfo"
     refresh_token_url = "https://www.linkedin.com/oauth/v2/accessToken"
     client_id = os.getenv("LINKEDIN_CLIENT_ID")
     client_secret = os.getenv("LINKEDIN_CLIENT_SECRET")
-
     try:
         response = requests.get(
             verify_credentials_url,
@@ -113,8 +116,10 @@ def check_update_linkedin_credentials(access_token, refresh_token):
             }
         )
 
+        print(response)
+        response.raise_for_status()
         if response.status_code == 200:
-            return True, access_token
+            return False, ""
         else:
             refresh_response = requests.post(
                 refresh_token_url,
@@ -130,16 +135,18 @@ def check_update_linkedin_credentials(access_token, refresh_token):
                 new_token_data = refresh_response.json()
                 new_access_token = new_token_data.get('access_token')
                 if new_access_token:
+                    print("updated access token - linkedin")
                     return True, new_access_token
                 else:
-                    raise Exception("Failed to obtain new access token from refresh response.")
+                    raise RefreshException("Invalid Credentials")
             else:
-                raise Exception("Failed to refresh LinkedIn access token.")
+                raise RefreshException("Invalid Credentials")
     
     except RequestException as e:
-        raise Exception(f"Failed to check LinkedIn access token: {e}")
+        print(str(e))
+        raise RefreshException("Invalid Credentials")
     
-
+#not-done
 def check_update_tiktok_credentials(access_token):
     verify_credentials_url = "https://open-api.tiktok.com/oauth/userinfo/"
     try:
@@ -151,14 +158,14 @@ def check_update_tiktok_credentials(access_token):
             }
         )
         if response.status_code == 200:
-            return True, access_token
+            return True
         else:
-            raise Exception("TikTok access token is invalid or expired.")
+            raise RefreshException("Invalid Credentials")
     
     except RequestException as e:
-        raise Exception(f"Failed to check TikTok access token: {e}")
+        raise RefreshException("Invalid Credentials")
 
-
+#done
 def check_update_reddit_credentials(access_token, refresh_token):
     verify_credentials_url = "https://oauth.reddit.com/api/v1/me"
     refresh_token_url = "https://www.reddit.com/api/v1/access_token"
@@ -174,9 +181,9 @@ def check_update_reddit_credentials(access_token, refresh_token):
                 'User-Agent': user_agent
             }
         )
-
+        print(response)
         if response.status_code == 200:
-            return True, access_token
+            return False, ""
         else:
             auth = requests.auth.HTTPBasicAuth(client_id, client_secret)
             refresh_response = requests.post(
@@ -195,18 +202,19 @@ def check_update_reddit_credentials(access_token, refresh_token):
                 new_token_data = refresh_response.json()
                 new_access_token = new_token_data.get('access_token')
                 if new_access_token:
+                    print("updated access token - reddit")
                     return True, new_access_token
                 else:
-                    raise Exception("Failed to obtain new access token from refresh response.")
+                    raise RefreshException("Invalid Credentials")
             else:
-                raise Exception("Failed to refresh Reddit access token.")
+                raise RefreshException("Invalid Credentials")
     
     except RequestException as e:
-        raise Exception(f"Failed to check Reddit access token: {e}")
+        raise RefreshException("Invalid Credentials")
 
-
+#done
 def check_update_shopify_credentials(access_token, shop_name):
-    shop_name = 'kleenestar'  
+
     api_version = "2024-01"
     verify_credentials_url = f"https://{shop_name}.myshopify.com/admin/api/{api_version}/shop.json"
 
@@ -217,10 +225,11 @@ def check_update_shopify_credentials(access_token, shop_name):
                 'X-Shopify-Access-Token': access_token,
             }
         )
+        print(response)
         if response.status_code == 200:
-            return True, access_token
+            return True
         else:
-            raise Exception("Shopify access token is invalid or expired.")
+            raise RefreshException("Invalid Credentials")
     
     except RequestException as e:
-        raise Exception(f"Failed to check Shopify access token: {e}")
+        raise RefreshException("Invalid Credentials")

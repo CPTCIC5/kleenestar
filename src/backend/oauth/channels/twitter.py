@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from requests_oauthlib import OAuth1Session, OAuth1
 from django.shortcuts import redirect
 from datetime import datetime, timedelta
-from urllib.parse import parse_qs, urlencode
 from oauth.external_urls import twitter_ads_api_url,twitter_authorization_base_url,twitter_redirect_uri,twitter_token_url,frontend_channel_url
 from oauth.helper import get_channel,create_channel
 
@@ -81,7 +80,6 @@ def twitter_oauth(request):
             {"detail": "An error occurred during the OAuth process"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
 
 
 @csrf_exempt
@@ -377,17 +375,14 @@ def get_media_details(auth, account_id, account_media_ids):
     return media_details['data']
 
 
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes([AllowAny]) 
+
 def get_twitter_marketing_data(access_token, access_token_secret):
 
-    auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
-
-
-    accounts = get_twitter_ad_accounts(auth)
-    marketing_data = []
     try:    
+        auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
+
+        accounts = get_twitter_ad_accounts(auth)
+        marketing_data = []
         for account_id in accounts:
             campaigns_data = get_twitter_campaign_data(auth, account_id)
 
@@ -406,6 +401,7 @@ def get_twitter_marketing_data(access_token, access_token_secret):
             media_details = get_media_details(auth, account_id, account_media_ids)
             
             marketing_data_dict = {
+                "channel_type": "Twitter/X Channel",
                 "account_id": account_id,
                 "campaigns_data": campaigns_data,
                 "line_items_data": line_items_data,
@@ -416,13 +412,8 @@ def get_twitter_marketing_data(access_token, access_token_secret):
 
             marketing_data.append(marketing_data_dict)
         
-        return Response(
-            marketing_data,
-            status=status.HTTP_200_OK
-        )
+        return marketing_data
 
     except Exception as e:
-        print("Error :", e)
-        return Response(
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        print("Error in Fetching Twitter Channel Data:" + str(e))
+        return None

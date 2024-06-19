@@ -44,7 +44,6 @@ def shopify_oauth(request):
         )
     
 
-    
 def exchange_code_for_token(shop, code):
     url = f"https://{shop}/admin/oauth/access_token"
     payload = {
@@ -55,6 +54,7 @@ def exchange_code_for_token(shop, code):
     response = requests.post(url, data=payload)
     response_data = response.json()
     return response_data['access_token']
+
 
 @csrf_exempt
 @api_view(("GET",))
@@ -97,6 +97,7 @@ def shopify_oauth_callback(request):
 
         shopify_channel.save()
         return redirect(frontend_channel_url)
+
     
     except Exception as e:
         print(f"Exception occurred: {e}")
@@ -229,10 +230,7 @@ def get_shopify_marketing_events(access_token, shop_name, api_version):
     
     return marketing_events
     
-    
-@csrf_exempt
-@api_view(["GET"])
-@permission_classes([AllowAny]) 
+
 def get_shopify_data(access_token, shop_name):
 
     api_version = '2024-01'
@@ -249,12 +247,14 @@ def get_shopify_data(access_token, shop_name):
         
         
         shopify_data = {
+            "channel_type": "Shopify Channel",
             'product_data': product_data,
             'order_statistics': order_statistics,
             'marketing_events': marketing_events,
         }
         
-        return Response(shopify_data, status=status.HTTP_200_OK)
+        return shopify_data
+    
     except Exception as e:
         print(f"Error fetching Shopify data: {e}")
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return None
