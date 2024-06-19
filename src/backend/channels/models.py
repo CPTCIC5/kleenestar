@@ -13,6 +13,8 @@ import uuid
 from openai.types.beta.threads.text_content_block import TextContentBlock
 from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
 from openai.types.beta.threads.image_file_content_block import ImageFileContentBlock
+from typing_extensions import override
+from openai import AssistantEventHandler
 #from .old_rag import RagData as RagData_2
 
 load_dotenv()
@@ -149,7 +151,7 @@ class Convo(models.Model):
         # Fetch all Notes related to the Prompts
         notes = Note.objects.filter(prompt__in=prompts)
         return notes
-
+    
 
 def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     get_convo = get_object_or_404(Convo, id=convo)
@@ -252,6 +254,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         # print('block-3')
         # print(assistant_response.image_url_content_block)
         # return {'image': assistant_response.image_file.image_url_content_block}
+    
 
 
 class Prompt(models.Model):
