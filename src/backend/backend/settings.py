@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "daphne",
+    #"daphne",
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
     "channels.apps.ChannelsConfig",
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'django_admin_logs',
     "debug_toolbar",
-    "django_eventstream",
+    #"django_eventstream",
 ]
 
 DJANGO_ADMIN_LOGS_DELETABLE = False
