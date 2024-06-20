@@ -40,15 +40,17 @@ print(xd)
 
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 import logging
 from .models import Channel
 from oauth.channels import google, facebook, twitter, linkedin, tiktok, reddit, shopify
+from rest_framework.permissions import IsAuthenticated
 from oauth.helper import refresh_credentials
 logger = logging.getLogger(__name__)
 
 
+@permission_classes([IsAuthenticated])
 @api_view(("GET",))
 def merge_json_files(request):
     print(request.user.email)
