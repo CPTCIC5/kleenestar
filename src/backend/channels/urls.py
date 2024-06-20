@@ -20,6 +20,7 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet, KnowledgeBaseView
 from channels.export import merge_json_files
+from channels.add_data import get_channels
 
 router = DefaultRouter()
 # Register viewsets with the router
@@ -34,6 +35,7 @@ router.register(r'', ChannelViewSet, basename='channels')
 # Define urlpatterns including the router's URLs
 urlpatterns = [
     path('xyz/', merge_json_files),
+    path('xyz2/', get_channels),
     path('prompts/<int:pk>/feedback/', PromptViewSet.as_view({'post': 'prompt_feedback_upload'}), name='prompt-feedback-upload'),
     path('prompts/<int:pk>/create-note/', PromptViewSet.as_view({'post': 'create_note'}), name='create-note'),
     # then the below is not needed

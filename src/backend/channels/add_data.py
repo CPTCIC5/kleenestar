@@ -58,6 +58,7 @@ def add_to_pinecone_vectorestore_openai(documents, namespace):
 @permission_classes([IsAuthenticated])
 def get_channels(request):
     namespace = request.user.workspace_set.first().pinecone_namespace
+    print(namespace)
     documents= get_workspace()
     if namespace in stats()['namespaces']:
         print('block-1')
@@ -66,4 +67,8 @@ def get_channels(request):
     else:
         print('block-2')
         add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
+    
+    pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index= pc.Index("kleenestar")
 
+    return  index.describe_index_stats()[namespace]
