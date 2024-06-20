@@ -1,10 +1,13 @@
 from langchain_text_splitters import RecursiveJsonSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from pinecone.grpc import PineconeGRPC as Pinecone
+from pinecone import Pinecone
 import requests
 import json
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
@@ -33,8 +36,30 @@ def get_workspace():
 
     return documents
 
-def add_to_pinecone_vectorestore_openai(documents): 
-    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
-    pinecone_vs = PineconeVectorStore.from_documents(embedding=embeddings, index_name='kleenestar', documents=documents)
+def stats():
+    pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index= pc.Index("kleenestar")
+    return index.describe_index_stats()
 
-    return pinecone_vs 
+def delete_vectores(namespace):
+    pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index= pc.Index("kleenestar")
+    index.delete(delete_all=True, namespace=namespace)
+
+def add_to_pinecone_vectorestore_openai(documents, namespace):
+    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
+    pinecone_vs = PineconeVectorStore.from_documents(embedding=embeddings, index_name='kleenestar', namespace=namespace, documents=documents)
+
+def get_channels(namespace):
+    documents= get_workspace()
+    if namespace in stats()['namespaces']:
+        print('block-1')
+        delete_vectores(namespace=namespace)
+        add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
+    else:
+        print('block-2')
+        add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
+
+
+def call_the_workspace():
+    pass
