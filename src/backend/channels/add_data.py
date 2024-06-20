@@ -4,6 +4,9 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
 import requests
 import json
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes,api_view
+
 from dotenv import load_dotenv
 import os
 
@@ -36,6 +39,7 @@ def get_workspace():
 
     return documents
 
+
 def stats():
     pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
     index= pc.Index("kleenestar")
@@ -50,7 +54,10 @@ def add_to_pinecone_vectorestore_openai(documents, namespace):
     embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
     pinecone_vs = PineconeVectorStore.from_documents(embedding=embeddings, index_name='kleenestar', namespace=namespace, documents=documents)
 
-def get_channels(namespace):
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_channels(request):
+    namespace = request.user.workspace_set.first().pinecone_namespace
     documents= get_workspace()
     if namespace in stats()['namespaces']:
         print('block-1')
@@ -60,6 +67,3 @@ def get_channels(namespace):
         print('block-2')
         add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
 
-
-def call_the_workspace():
-    pass
