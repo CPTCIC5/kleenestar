@@ -21,6 +21,29 @@ load_dotenv()
 
 client = OpenAI()
 
+class EventHandler(AssistantEventHandler):    
+  @override
+  def on_text_created(self, text) -> None:
+    print(f"\nassistant > ", end="", flush=True)
+      
+  @override
+  def on_text_delta(self, delta, snapshot):
+    print(delta.value, end="", flush=True)
+      
+  def on_tool_call_created(self, tool_call):
+    print(f"\nassistant > {tool_call.type}\n", flush=True)
+  
+  def on_tool_call_delta(self, delta, snapshot):
+    if delta.type == 'code_interpreter':
+      if delta.code_interpreter.input:
+        print(delta.code_interpreter.input, end="", flush=True)
+      if delta.code_interpreter.outputs:
+        print(f"\n\noutput >", flush=True)
+        for output in delta.code_interpreter.outputs:
+          if output.type == "logs":
+            print(f"\n{output.logs}", flush=True)
+
+
 #from channels.ai import generate_insights_with_gpt4
 
 class APICredentials(models.Model):
@@ -217,7 +240,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
         )
 
     # Initiating a run
-    run = client.beta.threads.runs.create(
+    '''run = client.beta.threads.runs.create(
         thread_id=thread.id,
         assistant_id=get_convo.workspace.assistant_id,
         stream=True
@@ -226,7 +249,14 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
     for event in run:
         # wait until the run is completed
         if event.event == "thread.message.completed":
-            break
+            break'''
+
+    with client.beta.threads.runs.stream(
+    thread_id=thread.id,
+    assistant_id=get_convo.workspace.assistant_id,
+    event_handler=EventHandler(),
+    ) as stream:
+        stream.until_done()
 
     # Retrieve messages added by the Assistant to the thread
     all_messages = client.beta.threads.messages.list(
