@@ -6,6 +6,7 @@ import requests
 import json
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes,api_view
+from rest_framework.response import Response
 
 from dotenv import load_dotenv
 import os
@@ -71,4 +72,4 @@ def get_channels(request):
     pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
     index= pc.Index("kleenestar")
 
-    return  index.describe_index_stats()[namespace]
+    return  Response({'detail':'xyz'})

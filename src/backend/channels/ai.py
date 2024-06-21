@@ -68,7 +68,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     
 
     # Call RagData function with the user query to get RAG context
-    rag_context = RagData(user_query)
+    rag_context = RagData(user_query, 'KRmPlTxd9W')
     print('this-is-rag-contextttt',rag_context)
 
 
@@ -136,7 +136,8 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         assistant_response= stream
     print(assistant_response)
 
-    if type(assistant_response) == TextContentBlock:
+
+    '''if type(assistant_response) == TextContentBlock:
         print('block-1')
         return {'text': assistant_response.text.value}
     elif  type(assistant_response) == ImageFileContentBlock:
@@ -152,4 +153,4 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         raise Exception("received ImageURLContentBlock, unable to process this...")
         # print('block-3')
         # print(assistant_response.image_url_content_block)
-        # return {'image': assistant_response.image_file.image_url_content_block}
+        # return {'image': assistant_response.image_file.image_url_content_block}'''

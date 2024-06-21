@@ -153,7 +153,7 @@ class Convo(models.Model):
         return notes
     
 
-def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
+def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=None):
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
@@ -161,7 +161,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
     
 
     # Call RagData function with the user query to get RAG context
-    rag_context = RagData(user_query)
+    rag_context = RagData(user_query, namespace) #we need to pass namespaces into this function how can we do it?
     print('this-is-rag-contextttt',rag_context)
 
 
@@ -292,7 +292,12 @@ class Prompt(models.Model):
         super().save(*args, **kwargs)
 
         # error is coming from here
-        response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query or None)
+        print('namespace',self.author.workspace_set.first().pinecone_namespace)
+        response_data = generate_insights_with_gpt4(user_query=self.text_query, 
+                                                    convo=self.convo.id, 
+                                                    file=self.file_query or None, 
+                                                    namespace=self.author.workspace_set.first().pinecone_namespace
+                                                    )
         self.response_text = response_data.get('text', None)
         self.response_image = response_data.get('image', None)
 
