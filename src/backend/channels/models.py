@@ -295,14 +295,11 @@ class Prompt(models.Model):
     file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
     
     response_text=  models.TextField(max_length=10_000,blank=True, null=True)  #GPT generated response
-    response_image = models.ImageField(upload_to='Response-Image/',blank= True, null=True) # gpt generated image
+    response_file = models.FileField(upload_to='Response-File/',blank= True, null= True) # gpt generated file
     #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
     #blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-
-    chart_data = models.JSONField(blank=True, null=True)
-    table_data= models.JSONField(null=True, blank=True)
 
 
     def save(self,*args,**kwargs):
@@ -329,7 +326,7 @@ class Prompt(models.Model):
                                                     namespace=self.author.workspace_set.first().pinecone_namespace
                                                     )
         self.response_text = response_data.get('text', None)
-        self.response_image = response_data.get('image', None)
+        self.response_file = response_data.get('image', None)
 
         super().save()
     
