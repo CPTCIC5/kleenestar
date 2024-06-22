@@ -265,7 +265,9 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
 
     # Return the content of the first message added by the Assistant
     assistant_response= all_messages.data[0].content[0]
-    print(assistant_response)
+    assistant_response1= all_messages.data[1].content[0]
+    print(type(assistant_response), 'this is the type of assistant response')
+    print(type(assistant_response1), 'this is the type of assistant response1')
 
     if type(assistant_response) == TextContentBlock:
         print('block-1')
