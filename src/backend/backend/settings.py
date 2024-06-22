@@ -182,9 +182,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-from django.contrib.auth.models import User
-AUTH_USER_MODEL = "User"
-#"users.User"
+AUTH_USER_MODEL= "users.User"
 # Email settings
 
 EMAIL_HOST = os.environ["EMAIL_HOST"]
