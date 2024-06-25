@@ -180,6 +180,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
+    all_notes= get_convo.all_notes
 
     
 
