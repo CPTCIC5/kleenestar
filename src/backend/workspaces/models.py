@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from openai import OpenAI
-
+from django_countries.fields import CountryField
 
 client = OpenAI()
 
@@ -160,3 +160,17 @@ class WorkSpaceInvite(models.Model):
 
     def __str__(self):
         return str(self.workspace)
+
+class SubSpace(models.Model):
+    workspace= models.ForeignKey(WorkSpace,on_delete=models.CASCADE)
+    name= models.CharField(max_length=100)
+    country= CountryField()
+    industry= models.CharField(max_length=80, choices=INDUSTRIES)
+    pinecone_namespace= models.CharField(max_length=11,default=create_namespace_id)
+    created_at= models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f" {str(self.workspace)}-  {self.name}"
+    
+    class Meta:
+        ordering=['workspace','id']
