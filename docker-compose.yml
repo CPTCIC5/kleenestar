@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+  web:
+    build: . 
+    volumes: 
+      - .:/src/backend/
+    ports:
+      - "8000:8000"
