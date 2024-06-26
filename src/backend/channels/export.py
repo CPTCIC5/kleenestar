@@ -47,7 +47,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 import logging
 from .models import Channel
-from oauth.channels import google, facebook, twitter, linkedin, tiktok, reddit, shopify
+from oauth.channels import google, facebook, twitter, linkedin, tiktok, reddit, shopify, google_analytics, mailchimp
 from rest_framework.permissions import IsAuthenticated
 from oauth.helper import refresh_credentials
 logger = logging.getLogger(__name__)
@@ -66,13 +66,15 @@ def merge_json_files(request):
     merged_data = []
     
     channel_types = {
-        1: [google.get_google_marketing_data, google.get_google_analytics_data],
+        1: google.get_google_marketing_data,
         2: facebook.get_facebook_marketing_data,
         3: twitter.get_twitter_marketing_data,
         4: linkedin.get_linkedin_marketing_data,
         5: tiktok.get_tiktok_marketing_data,
         6: reddit.get_reddit_marketing_data,
-        7: shopify.get_shopify_data
+        7: shopify.get_shopify_data,
+        8: google_analytics.get_google_analytics_data,
+        9: mailchimp.get_mailchimp_data
     }
 
     try:
@@ -87,7 +89,7 @@ def merge_json_files(request):
             if get_data_func:
                 credentials = channel.credentials
                 if channel.channel_type == 1:
-                    data = [get_data_func[0](credentials.key_1, credentials.key_3, credentials.key_4), get_data_func[1](credentials.key_2)]
+                    data = get_data_func(credentials.key_1, credentials.key_3, credentials.key_4)
                 elif channel.channel_type == 2: #not-finished
                     data = get_data_func(credentials.key_1, credentials.key_2)
                 elif channel.channel_type == 3:
@@ -99,6 +101,10 @@ def merge_json_files(request):
                 elif channel.channel_type == 6:
                     data = get_data_func(credentials.key_1)
                 elif channel.channel_type == 7:
+                    data = get_data_func(credentials.key_1,credentials.key_2)
+                elif channel.channel_type == 8:
+                    data = get_data_func(credentials.key_2)
+                elif channel.channel_type == 9:
                     data = get_data_func(credentials.key_1,credentials.key_2)
                 merged_data.append(data)
         

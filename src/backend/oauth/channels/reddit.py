@@ -22,13 +22,12 @@ load_dotenv(override=True)
 # State value for OAuth request authentication
 passthrough_val = hashlib.sha256(os.urandom(1024)).hexdigest()
 
-reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
-reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+reddit_client_id = os.getenv("REDDIT_CLIENT_ID_TEST")
+reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET_TEST")
 user_agent = "Kleenestar/1.0 by Powerful-Parsley4755"
 
 @api_view(("GET",))
 def reddit_oauth(request):
-    user_email = request.user.email
     state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
     state_json = json.dumps(state_dict)
     state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
@@ -387,7 +386,6 @@ def get_reddit_marketing_data(access_token):
             "marketing_detials": marketing_data_list
         }
 
-        print(reddit_marketing_data)
         return reddit_marketing_data
     
     except Exception as e:

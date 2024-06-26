@@ -1,19 +1,16 @@
 from django.urls import path
 
-from .channels import google
-from .channels import facebook
-from .channels import twitter
-from .channels import linkedin
-from .channels import tiktok
-from .channels import reddit
-from .channels import shopify
+from .channels import google, facebook, twitter, linkedin, reddit,tiktok, shopify, mailchimp, google_analytics
 
 urlpatterns = [
-    # /api/oauth/google/
     path("google-callback/", google.google_oauth_callback),
     path("google/", google.google_oauth),
     path("google_data/", google.get_google_marketing_data),
-    path("google_analytics_data/", google.get_google_analytics_data),
+
+
+    path("google-analytics-callback/", google_analytics.google_analytics_oauth_callback),
+    path("google-analytics/", google_analytics.google_analytics_oauth),
+    path("google_analytics_data/", google_analytics.get_google_analytics_data),
 
     path("facebook/", facebook.facebook_oauth),
     path("facebook-callback/", facebook.facebook_oauth_callback),
@@ -37,6 +34,10 @@ urlpatterns = [
 
     path("shopify/", shopify.shopify_oauth),
     path("shopify-callback/", shopify.shopify_oauth_callback),
-    path("shopify_data/",shopify.get_shopify_data)
+    path("shopify_data/",shopify.get_shopify_data),
+
+    path("mailchimp/", mailchimp.mailchimp_oauth),
+    path("mailchimp-callback/", mailchimp.mailchimp_oauth_callback),
+    path("mailchimp_data/",mailchimp.get_mailchimp_data)
     
 ]

@@ -36,7 +36,9 @@ def refresh_credentials(channel):
         4: check_refresh.check_update_linkedin_credentials,
         5: check_refresh.check_update_tiktok_credentials,
         6: check_refresh.check_update_reddit_credentials,
-        7: check_refresh.check_update_shopify_credentials
+        7: check_refresh.check_update_shopify_credentials,
+        8: check_refresh.check_update_google_credentials,
+        9: check_refresh.check_update_mailchimp_credentials
     }
 
     try:
@@ -72,7 +74,15 @@ def refresh_credentials(channel):
                 
                 elif channel.channel_type == 7: # No Refresh token passed
                     get_refresh_function(credentials.key_1,credentials.key_2)
-
+                
+                elif channel.channel_type == 8:
+                    data = get_refresh_function(credentials.key_1, credentials.key_2)
+                    if(data[0]): # Update Access token If the new access token is generated
+                        channel.credentials.key_2 = data[1]
+                        
+                elif channel.channel_type == 9: # No Refresh token passed
+                    get_refresh_function(credentials.key_1,credentials.key_2)
+                    
                 channel.credentials.save()
             
             channel.save()

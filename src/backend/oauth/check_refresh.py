@@ -233,3 +233,21 @@ def check_update_shopify_credentials(access_token, shop_name):
     
     except RequestException as e:
         raise RefreshException("Invalid Credentials")
+    
+
+def check_update_mailchimp_credentials(api_key, server_prefix):
+    verify_credentials_url = f"https://{server_prefix}.api.mailchimp.com/3.0/"
+
+    try:
+        response = requests.get(
+            verify_credentials_url,
+            auth=('anystring', api_key)
+        )
+        print(response)
+        if response.status_code == 200:
+            return True
+        else:
+            raise RefreshException("Invalid Credentials")
+    
+    except RequestException as e:
+        raise RefreshException("Invalid Credentials")
