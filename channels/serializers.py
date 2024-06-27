@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from workspaces.serializers import WorkSpaceSerializer
+from workspaces.serializers import WorkSpaceSerializer,SubspaceSerializer
 from users.serializers import UserSerializer
 from . import models
 
@@ -9,13 +9,13 @@ class APICredentialsSerializer(serializers.ModelSerializer):
         fields = ['key_1', 'key_2', 'key_3', 'key_4', 'key_5']
 
 class ChannelSerializer(serializers.ModelSerializer):
-    workspace = WorkSpaceSerializer()
+    subspace = SubspaceSerializer()
     credentials = APICredentialsSerializer()
 
     class Meta:
         model = models.Channel
-        fields = ['id', 'channel_type', 'workspace', 'credentials', 'created_at']
-        read_only = ['workspace']
+        fields = ['id', 'channel_type', 'subspace', 'credentials', 'created_at']
+        read_only = ['subspace']
 
 class ChannelCreateSerializer(serializers.ModelSerializer):
     credentials = APICredentialsSerializer()
@@ -33,11 +33,11 @@ class ConvoCreateSerializer(serializers.ModelSerializer):
         fields = ['title', 'archived']
 
 class ConvoSerializer(serializers.ModelSerializer):
-    workspace = WorkSpaceSerializer()
+    subspace = SubspaceSerializer()
 
     class Meta:
         model = models.Convo
-        fields = ('id', 'thread_id', 'workspace', 'title', 'archived', 'created_at')
+        fields = ('id', 'thread_id', 'subspace', 'title', 'archived', 'created_at')
 
 
 
@@ -77,7 +77,7 @@ class BlockNoteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.BlockNote
-        fields = ("user", "workspace", "title", "image", "id", "created_at","notes")
+        fields = ("user", "subspace", "title", "image", "id", "created_at","notes")
 
     
 
@@ -116,11 +116,11 @@ class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
 
 class KnowlodgeBaseSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    workspace = WorkSpaceSerializer()
+    subspace = SubspaceSerializer()
 
     class Meta:
         model = models.KnowledgeBase
-        fields = ("user", "workspace", "file", "title", "id", "created_at")
+        fields = ("user", "subspace", "file", "title", "id", "created_at")
 
 
         
