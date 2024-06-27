@@ -45,6 +45,7 @@ class SubSpaceCreateSerializer(serializers.ModelSerializer):
         fields= ['name', 'country', 'industry']
 
 class SubspaceSerializer(serializers.ModelSerializer):
-    workspace= Workspa
+    workspace= WorkSpaceSerializer()
     class Meta:
         model= SubSpace
+        fields= ['id', 'workspace', 'name', 'country', 'industry', 'created_at']
