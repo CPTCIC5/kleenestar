@@ -1,5 +1,5 @@
 from django.db import models
-from workspaces.models import WorkSpace,SubSpace
+from workspaces.models import WorkSpace
 from django.conf import settings
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -73,10 +73,10 @@ class Channel(models.Model):
         (9, 'MailChimp'),
         (10, 'Instagram')
     )
-    channel_type= models.IntegerField(choices=CHANNEL_TYPES)
-    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
-    credentials= models.ForeignKey(APICredentials, on_delete=models.CASCADE,null=True, blank=True)
-    created_at= models.DateTimeField(auto_now_add=True)
+    channel_type = models.IntegerField(choices=CHANNEL_TYPES)
+    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
+    credentials = models.ForeignKey(APICredentials, on_delete=models.CASCADE,null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     def save(self, *args, **kwargs):
@@ -87,15 +87,13 @@ class Channel(models.Model):
                 key_3="",
                 key_4="",
                 key_5="",
-                key_6=f"xyz - {self.channel_type}"
+                key_6=f"{self.workspace.business_name} - {self.channel_type}"
             )
 
             #if self.credentials.key_1 == "" and self.credentials.key_2 == "" and self.credentials.key_3 == "" and self.credentials.key_4 == "" and self.credentials.key_5 == "":
                 #self.credentials.delete()
         super().save(*args, **kwargs)
 
-        """
-        
         # Check the subscription type of the workspace
         if self.workspace.subscription_type == 1:  # Pro
             # Check if the workspace already has 3 channels
@@ -108,11 +106,10 @@ class Channel(models.Model):
                 raise ValidationError("Scale workspace can have only up to 5 channels.")
         # Call the superclass save method if no validation error is raised
         super().save(*args, **kwargs)
-        """
 
 
     class Meta:
-        unique_together = ["subspace", "channel_type"]
+        unique_together = ["workspace", "channel_type"]
 
     def __str__(self):
         return 'xyz'
@@ -131,7 +128,7 @@ class Note(models.Model):
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
     note_text= models.CharField(max_length=500)
     created_at= models.DateTimeField(auto_now_add=True)
-    color= models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
+    color = models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
 
     def __str__(self):
         return str(self.blocknote)
@@ -139,7 +136,7 @@ class Note(models.Model):
 
 class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE, null=True, blank=True)
+    workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE, null=True, blank=True)
     title=  models.CharField(max_length=50)
     image= models.CharField(max_length=500,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
@@ -159,7 +156,7 @@ class Folder(models.Model):
 class Convo(models.Model):
     #folder= models.ForeignKey(Folder, on_delete=models.PROTECT, blank=True, null=True)
     thread_id = models.CharField(max_length=100,blank=True,null=True)
-    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
+    workspace = models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     title = models.CharField(max_length=100,default= 'New Chat')
     archived =  models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -293,7 +290,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
 
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
-    author= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     text_query = models.TextField(max_length=10_000)
     file_query = models.FileField(upload_to='Prompts-File/', blank=True,null=True)
@@ -392,7 +389,7 @@ class PromptFeedback(models.Model):
 
 class KnowledgeBase(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
+    workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
     file=  models.FileField(upload_to='Knowledge-Base')
     title= models.CharField(max_length=80)
     created_at=  models.DateTimeField(auto_now_add=True)
@@ -401,5 +398,5 @@ class KnowledgeBase(models.Model):
         return self.title
     
     class Meta:
-        ordering= ['subspace','user','-created_at']
+        ordering= ['workspace','user','-created_at']
         verbose_name_plural = 'KnowledgeBase'

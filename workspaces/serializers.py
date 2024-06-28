@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.serializers import UserSerializer
-from .models import WorkSpace,WorkSpaceInvite,SubSpace
+from .models import WorkSpace,WorkSpaceInvite
 
 
 class WorkSpaceCreateSerializer(serializers.ModelSerializer):
@@ -38,14 +38,3 @@ class WorkSpaceInviteSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkSpaceInvite
         fields= ["workspace","invite_code","email","accepted","created_at"]
-
-class SubSpaceCreateSerializer(serializers.ModelSerializer):    
-    class Meta:
-        model= SubSpace
-        fields= ['name', 'country', 'industry']
-
-class SubspaceSerializer(serializers.ModelSerializer):
-    workspace= WorkSpaceSerializer()
-    class Meta:
-        model= SubSpace
-        fields= ['id', 'workspace', 'name', 'country', 'industry', 'created_at']
