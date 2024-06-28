@@ -1,0 +1,157 @@
+{
+  "channel": "Meta Ads (Facebook)",
+  "campaigns": [
+    {
+      "campaign_id": "MA001",
+      "name": "Awareness Campaign",
+      "impressions": 60000,
+      "clicks": 2500,
+      "conversions": 200,
+      "cost": 9000,
+      "ctr": 4.17,
+      "conversion_rate": 8.0
+    },
+    {
+      "campaign_id": "MA002",
+      "name": "Engagement Campaign",
+      "impressions": 45000,
+      "clicks": 1800,
+      "conversions": 150,
+      "cost": 7000,
+      "ctr": 4.0,
+      "conversion_rate": 8.33
+    },
+    {
+      "campaign_id": "MA003",
+      "name": "Conversion Campaign",
+      "impressions": 70000,
+      "clicks": 3000,
+      "conversions": 250,
+      "cost": 10000,
+      "ctr": 4.29,
+      "conversion_rate": 8.33
+    },
+    {
+      "campaign_id": "MA004",
+      "name": "Traffic Campaign",
+      "impressions": 80000,
+      "clicks": 3200,
+      "conversions": 300,
+      "cost": 11000,
+      "ctr": 4.0,
+      "conversion_rate": 9.38
+    },
+    {
+      "campaign_id": "MA005",
+      "name": "Lead Generation Campaign",
+      "impressions": 65000,
+      "clicks": 2700,
+      "conversions": 220,
+      "cost": 9500,
+      "ctr": 4.15,
+      "conversion_rate": 8.15
+    },
+    {
+      "campaign_id": "MA006",
+      "name": "App Installs Campaign",
+      "impressions": 90000,
+      "clicks": 3600,
+      "conversions": 350,
+      "cost": 12000,
+      "ctr": 4.0,
+      "conversion_rate": 9.72
+    },
+    {
+      "campaign_id": "MA007",
+      "name": "Video Views Campaign",
+      "impressions": 75000,
+      "clicks": 3100,
+      "conversions": 280,
+      "cost": 10500,
+      "ctr": 4.13,
+      "conversion_rate": 9.03
+    },
+    {
+      "campaign_id": "MA008",
+      "name": "Brand Awareness Campaign",
+      "impressions": 80000,
+      "clicks": 3300,
+      "conversions": 310,
+      "cost": 11500,
+      "ctr": 4.13,
+      "conversion_rate": 9.39
+    },
+    {
+      "campaign_id": "MA009",
+      "name": "Reach Campaign",
+      "impressions": 90000,
+      "clicks": 3700,
+      "conversions": 340,
+      "cost": 13000,
+      "ctr": 4.11,
+      "conversion_rate": 9.19
+    },
+    {
+      "campaign_id": "MA010",
+      "name": "Event Promotion Campaign",
+      "impressions": 95000,
+      "clicks": 4000,
+      "conversions": 380,
+      "cost": 14000,
+      "ctr": 4.21,
+      "conversion_rate": 9.5
+    }
+  ],
+  "top_locations": {
+    "United States": {
+      "impressions": 40000,
+      "clicks": 1600,
+      "conversions": 120
+    },
+    "Canada": {
+      "impressions": 15000,
+      "clicks": 700,
+      "conversions": 50
+    },
+    "United Kingdom": {
+      "impressions": 10000,
+      "clicks": 500,
+      "conversions": 30
+    },
+    "Australia": {
+      "impressions": 8000,
+      "clicks": 400,
+      "conversions": 25
+    },
+    "Germany": {
+      "impressions": 12000,
+      "clicks": 600,
+      "conversions": 45
+    },
+    "France": {
+      "impressions": 9000,
+      "clicks": 450,
+      "conversions": 35
+    },
+    "India": {
+      "impressions": 11000,
+      "clicks": 550,
+      "conversions": 40
+    },
+    "Japan": {
+      "impressions": 7000,
+      "clicks": 350,
+      "conversions": 20
+    },
+    "Brazil": {
+      "impressions": 10000,
+      "clicks": 500,
+      "conversions": 30
+    },
+    "South Africa": {
+      "impressions": 6000,
+      "clicks": 300,
+      "conversions": 15
+    }
+  }
+}
