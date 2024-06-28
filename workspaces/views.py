@@ -8,7 +8,7 @@ from .permissions import WorkSpaceViewSetPermissions
 
 # from . import permissions
 from rest_framework import permissions
-from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpaceInviteCreateSerializer
+from .serializers import WorkSpaceSerializer, WorkSpaceCreateSerializer,WorkSpaceInviteCreateSerializer,SubspaceSerializer,SubSpaceCreateSerializer
 
 
 class WorkSpacesViewSet(viewsets.ModelViewSet):
@@ -86,3 +86,31 @@ class WorkSpacesViewSet(viewsets.ModelViewSet):
         )
         
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+    
+class SubSpaceViewSet(viewsets.ModelViewSet): 
+    permission_classes= [permissions.IsAuthenticated]
+    serializer_class= SubspaceSerializer
+
+    def get_queryset(self):
+        workspace= self.request.user.workspace_set.first()
+        return workspace.subspace_set.all()
+    
+    def create(self, request, *args, **kwargs):
+        serializer= SubSpaceCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(workspace= self.request.user.workspace_set.first())
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self,request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer= SubspaceSerializer(instance=instance,
+                                       data=request.data,
+                                       partial=partial)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance= self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_200_OK)
