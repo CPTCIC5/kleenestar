@@ -95,7 +95,7 @@ class PromptSerializer(serializers.ModelSerializer):
     convo= ConvoSerializer()
     class Meta:
         model = models.Prompt
-        fields = ('id', 'convo', 'author', 'text_query', 'file_query', 'response_text', 'response_image', 'created_at')
+        fields = ('id', 'convo', 'author', 'text_query', 'file_query', 'response_text', 'response_file', 'created_at')
 
 
 
