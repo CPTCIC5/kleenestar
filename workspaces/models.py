@@ -164,7 +164,7 @@ class WorkSpaceInvite(models.Model):
 class SubSpace(models.Model):
     workspace= models.ForeignKey(WorkSpace,on_delete=models.CASCADE)
     name= models.CharField(max_length=100)
-    country= CountryField()
+    country= models.CharField(choices=CountryField().choices, max_length=50)
     industry= models.CharField(max_length=80, choices=INDUSTRIES)
     pinecone_namespace= models.CharField(max_length=11,default=create_namespace_id)
     created_at= models.DateTimeField(auto_now_add=True)
