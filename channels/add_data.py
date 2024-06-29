@@ -27,7 +27,7 @@ def get_workspace():
         return response.raise_for_status()
 
  
-    text_splitter= RecursiveJsonSplitter(max_chunk_size=128)
+    text_splitter= RecursiveJsonSplitter(max_chunk_size=80)
     documents = text_splitter.create_documents(texts=response_data)
 
     for i, document in enumerate(documents):

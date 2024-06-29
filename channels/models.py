@@ -389,8 +389,10 @@ class PromptFeedback(models.Model):
 
 class KnowledgeSource(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    text_data=models.TextField(blank=True,null=True)
-    file_data=models.FileField(upload_to='Knowledge-Source',blank=True,null=True)
+    text_data=models.TextField(blank=False,null=False)
+
+    def __str__(self):
+        return self.text_data
     
 
 
