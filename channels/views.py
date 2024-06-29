@@ -17,13 +17,13 @@ class ChannelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Customize queryset based on the request or user
         user = self.request.user
-        return models.Channel.objects.filter(workspace=user.workspace_set.all()[0])
+        return models.Channel.objects.filter(subspace__workspace=user.workspace_set.all()[0])
     
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.ChannelCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(workspace=request.user.workspace_set.all()[0])
+        serializer.save()
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -51,7 +51,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         workspace = self.request.user.workspace_set.all()[0]
-        return models.Convo.objects.filter(workspace=workspace)
+        return models.Convo.objects.filter(subspace__workspace=workspace)
     
 
     def create(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(workspace=self.request.user.workspace_set.all()[0])
+        serializer.save()
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     
     

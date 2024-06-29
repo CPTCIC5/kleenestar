@@ -6,7 +6,7 @@ from . import models
 class APICredentialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.APICredentials
-        fields = ['key_1', 'key_2', 'key_3', 'key_4', 'key_5']
+        fields = ['key_1', 'key_2', 'key_3', 'key_4', 'key_5', 'key_6']
 
 class ChannelSerializer(serializers.ModelSerializer):
     subspace = SubspaceSerializer()
@@ -22,7 +22,7 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Channel
-        fields = ["channel_type", "credentials"]
+        fields = ["channel_type", "subspace", "credentials"]
 
 
 
@@ -30,7 +30,7 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 class ConvoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Convo
-        fields = ['title', 'archived']
+        fields = ['title', 'archived', 'subspace']
 
 class ConvoSerializer(serializers.ModelSerializer):
     subspace = SubspaceSerializer()
@@ -68,7 +68,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BlockNote
-        fields = ("title", "image")
+        fields = ("title", "image", "subspace")
 
 class BlockNoteSerializer(serializers.ModelSerializer):
     #user = UserSerializer()
@@ -112,7 +112,7 @@ class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
 class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.KnowledgeBase
-        fields = ("file", "title")
+        fields = ("file", "title", "subspace")
 
 class KnowlodgeBaseSerializer(serializers.ModelSerializer):
     user = UserSerializer()
