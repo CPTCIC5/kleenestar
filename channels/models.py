@@ -257,7 +257,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
 
     with client.beta.threads.runs.stream(
     thread_id=thread.id,
-    assistant_id=get_convo.workspace.assistant_id,
+    assistant_id=get_convo.subspace.workspace.assistant_id,
     event_handler=EventHandler(),
     ) as stream:
         stream.until_done()
