@@ -387,16 +387,21 @@ class PromptFeedback(models.Model):
         return str(self.user)
     
 
-class KnowledgeBase(models.Model):
+class KnowledgeSource(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    workspace= models.ForeignKey(WorkSpace, on_delete=models.CASCADE)
-    file=  models.FileField(upload_to='Knowledge-Base')
-    title= models.CharField(max_length=80)
+    text_data=models.TextField(blank=True,null=True)
+    file_data=models.FileField(upload_to='Knowledge-Source',blank=True,null=True)
+    
+
+
+class KnowledgeBase(models.Model):
+    workspace= models.OneToOneField(WorkSpace, on_delete=models.CASCADE)
+    knowledge_source= models.ManyToManyField(KnowledgeSource,null=True,blank=True)
     created_at=  models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return str(self.workspace)
     
     class Meta:
-        ordering= ['workspace','user','-created_at']
+        ordering= ['workspace' , '-created_at']
         verbose_name_plural = 'KnowledgeBase'
