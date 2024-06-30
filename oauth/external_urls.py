@@ -42,3 +42,6 @@ google_analytics_redirect_uri = f'{backend_url}api/oauth/google-analytics-callba
 mailchimp_redirect_uri = f"{backend_url}api/oauth/mailchimp-callback/"
 mailchimp_token_uri = "https://login.mailchimp.com/oauth2/token"
 mailchimp_metadata_uri = "https://login.mailchimp.com/oauth2/metadata"
+
+instagram_authorization_base_url = "https://api.instagram.com/oauth/authorize"
+instagram_redirect_uri = f"{backend_url}api/oauth/instagram-callback/"
