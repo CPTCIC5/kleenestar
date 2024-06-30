@@ -191,18 +191,35 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
 
 
     # Creating a new conversation thread
-    if all_prompts >= 1:
+    if all_prompts >= 2: #system prompt counts as a prompt 
         thread = client.beta.threads.retrieve(
             thread_id=get_convo.thread_id
         )
-
+        knowledge_base=get_convo.workspace.knowledgebase.knowledge_source.all()
+        for knowledge in knowledge_base:
+            
+            if knowledge.created_at > get_convo.created_at:
+                knowledge_message = client.beta.threads.messages.create(
+                    thread_id=thread.id,
+                    role="assistant",
+                    content=knowledge.text_data,
+                    metadata={'mesasage_type': 'this is for knowledgebase'}
+                )
+            else:
+                continue
     else:
         thread = client.beta.threads.create()
         get_convo.thread_id = thread.id
         get_convo.save()
         #convo.assistant_id = thread
-
-
+        knowledge_base=get_convo.workspace.knowledgebase.knowledge_source.all()
+        for knowledge in knowledge_base:
+            knowledge_message = client.beta.threads.messages.create(
+                thread_id=thread.id,
+                role="assistant",
+                content=knowledge.text_data,
+                metadata={'mesasage_type': 'this is for knowledgebase'}
+            )
         
 
     if file is not None:
@@ -390,6 +407,7 @@ class PromptFeedback(models.Model):
 class KnowledgeSource(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text_data=models.TextField(blank=False,null=False)
+    created_at= models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.text_data
