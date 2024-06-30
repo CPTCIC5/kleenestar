@@ -17,8 +17,9 @@ urlpatterns = [
 """
 
 from rest_framework.routers import DefaultRouter
+#from rest_framework_nested import routers
 from django.urls import path, include
-from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet, KnowledgeBaseView
+from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet, KnowledgeBaseView, SubspaceViewSet
 from channels.export import merge_json_files
 from channels.add_data import get_channels
 
@@ -30,6 +31,7 @@ router.register(r'blocknotes', BlockNoteViewSet, basename='blocknote')
 router.register(r'convos', ConvoViewSet, basename='convos')
 router.register(r'promptinputs', PromptViewSet, basename='prompt') # If this is here
 router.register(r'knowledgebase', KnowledgeBaseView, basename='knowledgebase')
+router.register(r'subspaces', SubspaceViewSet, basename='subspaces')
 router.register(r'', ChannelViewSet, basename='channels')
 
 # Define urlpatterns including the router's URLs

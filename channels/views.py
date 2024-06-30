@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from . import models, serializers
 from rest_framework.decorators import action
 
+from workspaces.serializers import SubSpaceCreateSerializer
+
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 10
 
@@ -41,7 +43,12 @@ class ChannelViewSet(viewsets.ModelViewSet):
         #instance.save()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
-    
+
+    @action(methods=("GET",), detail=True, url_path="subspace-channels")
+    def get_subspace_channels(self, request, pk):
+        return Response(serializers.ChannelSerializer(models.Channel.objects.filter(subspace_id=int(pk)), many=True).data)
+
+
 
 class ConvoViewSet(viewsets.ModelViewSet):
     queryset = models.Convo.objects.all()
@@ -76,12 +83,15 @@ class ConvoViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        subspace = instance.subspace
+        # should work ig idk test and see
+
         self.perform_destroy(instance)
         workspace = self.request.user.workspace_set.all()[0]
 
-        if models.Convo.objects.filter(workspace=workspace).count() < 1:
+        if models.Convo.objects.filter(subspace=subspace).count() < 1:
             models.Convo.objects.create(
-                workspace= workspace,
+                subspace=subspace,
                 
             )
             
@@ -180,7 +190,6 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(
             user=request.user,
-            workspace= request.user.workspace_set.all()[0]  
                         )
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data,headers=headers)
@@ -209,7 +218,7 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return models.KnowledgeBase.objects.filter(workspace=user.workspace_set.all()[0])
+        return models.KnowledgeBase.objects.filter(subspace__workspace=user.workspace_set.all()[0])
     
     def create(self, request, *args, **kwargs):
         serializer = serializers.CreateKnowledgeBaseSerializer(
@@ -237,3 +246,31 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
+
+
+class SubspaceViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.SubspaceSerializer
+    
+    def get_queryset(self):
+        return models.SubSpace.objects.filter(workspace=self.request.user.workspace_set.all()[0])
+
+    
+    def create(self, request, *args, **kwargs):
+        serializer = SubSpaceCreateSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = serializers.CreateKnowledgeBaseSerializer(
+            instance,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

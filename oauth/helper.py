@@ -10,7 +10,8 @@ from oauth.exceptions import RefreshException
 def get_channel(email,channel_type_num):
     user = get_object_or_404(User,email=email)
     workspace = user.workspace_set.first()
-    return get_object_or_404(Channel, channel_type=channel_type_num, workspace=workspace)
+    # here you have to replace the workspace=... to subspace=... i dont know what do change it to
+    return get_object_or_404(Channel, channel_type=channel_type_num, subspace=...)
 
 def create_channel(email, channel_type_num):
     user = get_object_or_404(User,email=email)
@@ -23,7 +24,8 @@ def create_channel(email, channel_type_num):
         )
         return new_channel
     except Exception:
-        return Channel.objects.get(channel_type=channel_type_num, workspace=workspace,)
+        # same here....
+        return Channel.objects.get(channel_type=channel_type_num, subspace=...,)
     
 
 def refresh_credentials(channel):
