@@ -175,6 +175,12 @@ class Convo(models.Model):
         notes = Note.objects.filter(prompt__in=prompts)
         return notes
     
+def add_knowledge(convo: int , user:int, knowledge: str ) -> None:
+    ''' use this function when user gives a  spesific information and it's better to remember the knowledge'''
+    get_convo = get_object_or_404(Convo, id=1)
+    workspace_knowledge= get_convo.workspace.knowledgebase
+    workspace_knowledge.knowledge_source.create(user= user, text_data=knowledge)
+
 
 def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=None):
     get_convo = get_object_or_404(Convo, id=convo)
