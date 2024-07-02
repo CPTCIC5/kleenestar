@@ -15,6 +15,7 @@ class ChannelViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = models.Channel.objects.all()
     serializer_class = serializers.ChannelSerializer
+    filterset_fields = ('subspace',)
 
     def get_queryset(self):
         # Customize queryset based on the request or user
@@ -44,9 +45,9 @@ class ChannelViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
 
-    @action(methods=("GET",), detail=True, url_path="subspace-channels")
-    def get_subspace_channels(self, request, pk):
-        return Response(serializers.ChannelSerializer(models.Channel.objects.filter(subspace_id=int(pk)), many=True).data)
+    # @action(methods=("GET",), detail=True, url_path="subspace-channels")
+    # def get_subspace_channels(self, request, pk):
+    #     return Response(serializers.ChannelSerializer(models.Channel.objects.filter(subspace_id=int(pk)), many=True).data)
 
 
 
@@ -55,6 +56,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.ConvoSerializer
     pagination_class = CustomPagination
+    filterset_fields = ('subspace',)
 
     def get_queryset(self):
         workspace = self.request.user.workspace_set.all()[0]
@@ -172,6 +174,7 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
     queryset = models.BlockNote.objects.all()
     serializer_class = serializers.BlockNoteSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    filterset_fields = ('subspace',)
 
     def get_queryset(self):
         filter = models.BlockNote.objects.filter(user=self.request.user)
@@ -218,6 +221,7 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
     queryset = models.KnowledgeBase.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.KnowlodgeBaseSerializer
+    filterset_fields = ('subspace',)
 
     def get_queryset(self):
         user = self.request.user
