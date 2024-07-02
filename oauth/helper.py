@@ -4,9 +4,6 @@ from users.models import User
 from oauth import check_refresh
 from oauth.exceptions import RefreshException
 
-
-
-
 def get_channel(email,channel_type_num):
     user = get_object_or_404(User,email=email)
     workspace = user.workspace_set.first()

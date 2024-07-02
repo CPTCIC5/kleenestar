@@ -43,5 +43,6 @@ mailchimp_redirect_uri = f"{backend_url}api/oauth/mailchimp-callback/"
 mailchimp_token_uri = "https://login.mailchimp.com/oauth2/token"
 mailchimp_metadata_uri = "https://login.mailchimp.com/oauth2/metadata"
 
-instagram_authorization_base_url = "https://api.instagram.com/oauth/authorize"
-instagram_redirect_uri = f"{backend_url}api/oauth/instagram-callback/"
+instagram_authorization_base_url = "https://www.facebook.com/v20.0/dialog/oauth"
+instagram_redirect_uri = f"https://127.0.0.1:8000/api/oauth/instagram-callback/"
+instagram_token_url = "https://graph.facebook.com/v20.0/oauth/access_token"
