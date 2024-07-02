@@ -37,7 +37,7 @@ linkedin = OAuth2Session(linkedin_client_id, redirect_uri=linkedin_redirect_uri,
 
 @api_view(("GET",))
 def linkedin_oauth(request):
-    state_dict = {'email': request.user.email, 'passthrough_val': passthrough_val}
+    state_dict = {'subspace_id': request.query_params.get("subspace_id"), 'passthrough_val': passthrough_val}
     state_json = json.dumps(state_dict)
     state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
 
@@ -72,10 +72,10 @@ def linkedin_oauth_callback(request):
             )
         redirect_response = request.build_absolute_uri()
 
-        user_email = state_params.get("email", None)
-        if not user_email:
+        subspace_id = state_params.get("subspace_id", None)
+        if not subspace_id:
             return Response(
-                {"detail": "Unable to retrieve user email"},
+                {"detail": "Unable to retrieve subspace of the user"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -98,9 +98,9 @@ def linkedin_oauth_callback(request):
 
         print(access_token, refresh_token, email)
         try:
-            linkedin_channel = get_channel(email=user_email, channel_type_num=4)
+            linkedin_channel = get_channel(subspace_id=subspace_id, channel_type_num=4)
         except Exception:
-            linkedin_channel = create_channel(email=user_email, channel_type_num=4)
+            linkedin_channel = create_channel(subspace_id=subspace_id, channel_type_num=4)
         
         if linkedin_channel.credentials is None:
             credentials = APICredentials.objects.create(

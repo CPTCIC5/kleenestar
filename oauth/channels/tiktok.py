@@ -30,8 +30,8 @@ tiktok_client_secret = os.getenv('TIKTOK_CLIENT_SECRET')
 
 @api_view(("GET",))
 def tiktok_oauth(request):
-    user_email = request.user.email
-    state_dict = {'email': user_email, 'passthrough_val': passthrough_val}
+    subspace_id = request.query_params.get("subspace_id")
+    state_dict = {'subspace_id': subspace_id, 'passthrough_val': passthrough_val}
     state_json = json.dumps(state_dict)
     state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
 
@@ -65,10 +65,10 @@ def tiktok_oauth_callback(request):
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
-        user_email = state_params.get("email")
-        if not user_email:
+        subspace_id = state_params.get("subspace_id")
+        if not subspace_id:
             return Response(
-                {"detail": "Unable to retrieve user email"},
+                {"detail": "Unable to retrieve subspace of the user"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -99,9 +99,9 @@ def tiktok_oauth_callback(request):
         advertiser_ids = response.json()['data']['advertiser_ids']
 
         try:
-            tiktok_channel = get_channel(email=user_email, channel_type_num=5)
+            tiktok_channel = get_channel(subspace_id=subspace_id, channel_type_num=5)
         except Exception:
-            tiktok_channel = create_channel(email=user_email, channel_type_num=5)
+            tiktok_channel = create_channel(subspace_id=subspace_id, channel_type_num=5)
 
         if tiktok_channel.credentials is None:
             credentials = APICredentials.objects.create(

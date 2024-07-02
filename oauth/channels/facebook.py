@@ -34,8 +34,8 @@ facebook = facebook_compliance_fix(facebook)
 
 @api_view(("GET",))
 def facebook_oauth(request):
-    user_email = request.user.email
-    state_dict = {'email': user_email, 'passthrough_val': passthrough_val}
+    subspace_id = request.query_params.get("subspace_id")
+    state_dict = {'subspace_id': subspace_id, 'passthrough_val': passthrough_val}
     state_json = json.dumps(state_dict)
     state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
 
@@ -70,10 +70,10 @@ def facebook_oauth_callback(request):
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
-        user_email = state_params.get("email")
-        if not user_email:
+        subspace_id = state_params.get("subspace_id")
+        if not subspace_id:
             return Response(
-                {"detail": "Unable to retrieve user email"},
+                {"detail": "Unable to retrieve subspace of the user"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -85,9 +85,9 @@ def facebook_oauth_callback(request):
         facebook_data = get_facebook_data(access_token)
 
         try:
-            facebook_channel = get_channel(email=user_email, channel_type_num=2)
+            facebook_channel = get_channel(subspace_id=subspace_id, channel_type_num=2)
         except Exception:
-            facebook_channel = create_channel(email=user_email, channel_type_num=2)
+            facebook_channel = create_channel(subspace_id=subspace_id, channel_type_num=2)
 
         if facebook_channel.credentials is None:
             credentials = APICredentials.objects.create(

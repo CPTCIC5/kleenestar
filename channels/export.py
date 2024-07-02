@@ -3,7 +3,6 @@ import rag
 xd = rag.RagData("What is my avatar?", "xyz@gmail.com", "123")
 print(xd)
 """
-
 import json
 import os
 from rest_framework.decorators import permission_classes,api_view
@@ -40,7 +39,6 @@ def merge_json_files(request):
         merged_data.append(file_data)
 
     return Response(merged_data)
-
 """
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -55,13 +53,10 @@ logger = logging.getLogger(__name__)
 
 @permission_classes([IsAuthenticated])
 @api_view(("GET",))
-def merge_json_files(request):
-    print(request.user.email)
-    user = request.user
-    workspace = user.workspace_set.first() # Use first() instead of all()[0] for better practice
+def merge_json_files(subspace_id):
 
-    if not workspace:
-        return Response({"error": "No workspace found for the user"}, status=400)
+    if not subspace_id:
+        return Response({"error": "No subspace found for the user"}, status=400)
 
     merged_data = []
     
@@ -78,7 +73,7 @@ def merge_json_files(request):
     }
 
     try:
-        channels = Channel.objects.filter(workspace=workspace)
+        channels = Channel.objects.filter(subspace_id=subspace_id)
 
         for channel in channels:
             print(channel.channel_type)

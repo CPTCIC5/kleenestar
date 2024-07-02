@@ -43,11 +43,11 @@ def twitter_get_oauth_token(verifier, ro_key, ro_secret):
     return access_token_list
 
 
-def twitter_get_oauth_request_token(user_email):
+def twitter_get_oauth_request_token(subspace_id):
     global resource_owner_key
     global resource_owner_secret
     
-    callback_with_state = f"{twitter_redirect_uri}?email={user_email}"
+    callback_with_state = f"{twitter_redirect_uri}?subspace_id={subspace_id}"
     request_token = OAuth1Session(client_key=twitter_client_id, client_secret=twitter_client_secret, callback_uri=callback_with_state)
     url = 'https://api.twitter.com/oauth/request_token'
     data = request_token.get(url)
@@ -66,9 +66,9 @@ def twitter_get_oauth_request_token(user_email):
 
 @api_view(("GET",))
 def twitter_oauth(request):
-    user_email = request.user.email
+    subspace_id = request.query_params.get("subspace_id")
     try:
-        twitter_get_oauth_request_token(user_email)
+        twitter_get_oauth_request_token(subspace_id)
         url = f"{twitter_authorization_base_url}?oauth_token={resource_owner_key}"
         return Response({
             "url": url},
@@ -87,8 +87,8 @@ def twitter_oauth(request):
 @permission_classes([AllowAny]) 
 def twitter_oauth_callback(request):
     try:
-        email = request.query_params.get('email')
-        print(email,"email")
+        subspace_id = request.query_params.get('subspace_id')
+        print(subspace_id,"subspace_id")
         if not request.query_params.get("oauth_verifier"):
             return Response(
                 {"detail": "OAuth verifier is missing"},
@@ -117,16 +117,16 @@ def twitter_oauth_callback(request):
         user_json = user_data.json()
         twitter_email = user_json.get('email', None)  
 
-        if not email:
+        if not subspace_id:
             return Response(
-                {"detail": "Unable to retrieve user email"},
+                {"detail": "Unable to retrieve subspace of the user"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 )
         
         try:
-            twitter_channel = get_channel(email=email, channel_type_num=3)
+            twitter_channel = get_channel(subspace_id=subspace_id, channel_type_num=3)
         except Exception:
-            twitter_channel = create_channel(email=email, channel_type_num=3)
+            twitter_channel = create_channel(subspace_id=subspace_id, channel_type_num=3)
             print(twitter_channel)
 
         if twitter_channel.credentials is None:
@@ -135,7 +135,7 @@ def twitter_oauth_callback(request):
                 key_2=resource_owner_secret,
                 key_3=key,
                 key_4=secret,
-                key_5=email
+                key_5=twitter_email
             )
             twitter_channel.credentials = credentials
         else:
@@ -143,7 +143,7 @@ def twitter_oauth_callback(request):
             twitter_channel.credentials.key_2 = resource_owner_secret
             twitter_channel.credentials.key_3 = key
             twitter_channel.credentials.key_4 = secret
-            twitter_channel.credentials.key_5 = email
+            twitter_channel.credentials.key_5 = twitter_email
             twitter_channel.credentials.save()
 
         twitter_channel.save()

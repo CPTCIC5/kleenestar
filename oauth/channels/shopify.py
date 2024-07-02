@@ -23,8 +23,8 @@ scopes = 'read_products,read_orders,read_marketing_events,read_marketing_activit
 @api_view(("GET",))
 def shopify_oauth(request):
     shop = request.query_params.get("shop")
-    user_email = request.user.email
-    state = urlencode({'email': user_email})
+    subspace_id = request.query_params.get("subspace_id")
+    state = urlencode({'subspace_id': subspace_id})
     try:
         authorization_url = (
             f"https://{shop}.myshopify.com/admin/oauth/authorize"
@@ -67,22 +67,22 @@ def shopify_oauth_callback(request):
         state = request.query_params.get('state')
 
         state_params = parse_qs(state)
-        user_email = state_params.get('email', [None])[0]
+        subspace_id = state_params.get('subspace_id', [None])[0]
         
         access_token = exchange_code_for_token(shop, code)
         print(access_token)
         print(shop.split('.myshopify.com')[0])
 
-        if not user_email:
+        if not subspace_id:
             return Response(
-                {"detail": "Unable to retrieve user email"},
+                {"detail": "Unable to retrieve subspace of the user"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
         try:
-            shopify_channel = get_channel(email=user_email, channel_type_num=7)
+            shopify_channel = get_channel(subspace_id=subspace_id, channel_type_num=7)
         except Exception:
-            shopify_channel = create_channel(email=user_email, channel_type_num=7)
+            shopify_channel = create_channel(subspace_id=subspace_id, channel_type_num=7)
         
         if shopify_channel.credentials is None:
             credentials = APICredentials.objects.create(
