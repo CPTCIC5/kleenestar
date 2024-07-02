@@ -80,7 +80,6 @@ class ConvoViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         subspace = instance.subspace
@@ -96,6 +95,10 @@ class ConvoViewSet(viewsets.ModelViewSet):
             )
             
         return Response(status=status.HTTP_200_OK)
+    
+    @action(methods=("GET",), detail=True, url_path="subspace-convos")
+    def get_subspace_convos(self, request, pk):
+        return Response(serializers.ConvoSerializer(models.Convo.objects.filter(subspace_id=int(pk)), many=True).data)
 
         
 
@@ -227,7 +230,7 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(
             user=request.user,
-            workspace=request.user.workspace_set.all()[0])
+        )
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -235,8 +238,9 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = serializers.CreateKnowledgeBaseSerializer(
-            instance,
-            data=request.data
+            instance=instance,
+            data=request.data,
+            partial=partial
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -249,6 +253,7 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
 
 
 class SubspaceViewSet(viewsets.ModelViewSet):
+    permission_classes= [permissions.IsAuthenticated]
     serializer_class = serializers.SubspaceSerializer
     
     def get_queryset(self):
@@ -267,10 +272,16 @@ class SubspaceViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = serializers.CreateKnowledgeBaseSerializer(
-            instance,
-            data=request.data
+        serializer = SubSpaceCreateSerializer(
+            instance=instance,
+            data=request.data,
+            partial=partial
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance= self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_200_OK)

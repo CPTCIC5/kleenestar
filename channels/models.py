@@ -138,7 +138,7 @@ class Note(models.Model):
 
 class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE, null=True, blank=True)
+    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
     title=  models.CharField(max_length=50)
     image= models.CharField(max_length=500,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
