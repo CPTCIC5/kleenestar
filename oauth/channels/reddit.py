@@ -381,7 +381,7 @@ def get_reddit_marketing_data(access_token):
 
 
         reddit_marketing_data = {
-            "channel_type": "Reddit Channel",
+            "channel": "Reddit",
             "business_details": business_details,
             "marketing_detials": marketing_data_list
         }

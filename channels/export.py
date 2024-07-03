@@ -39,6 +39,8 @@ def merge_json_files(request):
         merged_data.append(file_data)
 
     return Response(merged_data)
+
+
 """
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -48,13 +50,19 @@ from .models import Channel
 from oauth.channels import google, facebook, twitter, linkedin, tiktok, reddit, shopify, google_analytics, mailchimp
 from rest_framework.permissions import IsAuthenticated
 from oauth.helper import refresh_credentials
+from django.views.decorators.csrf import csrf_exempt
 logger = logging.getLogger(__name__)
 
 
-@permission_classes([IsAuthenticated])
-@api_view(("GET",))
-def merge_json_files(subspace_id):
 
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+#Bad Practice for Production (Add some level of authentication)
+def merge_json_files(request):
+
+    subspace_id = request.query_params.get("subspace_id")
+    print(subspace_id, "exports")
     if not subspace_id:
         return Response({"error": "No subspace found for the user"}, status=400)
 
@@ -74,7 +82,7 @@ def merge_json_files(subspace_id):
 
     try:
         channels = Channel.objects.filter(subspace_id=subspace_id)
-
+    
         for channel in channels:
             print(channel.channel_type)
 
@@ -104,10 +112,10 @@ def merge_json_files(subspace_id):
                 merged_data.append(data)
         
         logger.info(f"Merged data: {merged_data}")
-        
         return Response(
             merged_data, status=status.HTTP_200_OK
         )
     except Exception as e:
-        return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("Error in export.py",str(e))
+        return None
 """

@@ -298,7 +298,7 @@ def get_posts_for_organization(access_token, organization_urn_list):
 
 def get_linkedin_marketing_data(access_token):
     try:
-        marketing_data = [{"channel_type": "LinkedIn Channel"}]
+        marketing_data = {"channel": "LinkedIn", "channel_data": []}
         account_list = get_linkedin_ad_accounts(access_token)
         for account in account_list:
             # marketing data dictionary (structure)
@@ -308,9 +308,7 @@ def get_linkedin_marketing_data(access_token):
             'campaign_data': {
                 "details": [],
                 "ad_creatives": []
-            },
-            "post_data" : []
-
+            }
             }
 
             # add account related data
@@ -330,12 +328,12 @@ def get_linkedin_marketing_data(access_token):
                     ad_creative_dict['statistics'].append(get_linkedin_ad_analytics(access_token,  campaign.get('id') ))
                     ad_creative_list.append(ad_creative_dict)
                 account_data["campaign_data"]["ad_creatives"] = ad_creative_list
-            marketing_data.append(account_data)
+            marketing_data["channel_data"].append(account_data)
 
         organization_list = get_organization_urns(access_token)
         post_details = get_posts_for_organization(access_token, organization_list)
 
-        marketing_data.append({
+        marketing_data["channel_data"].append({
             "post_data": post_details
         })
 

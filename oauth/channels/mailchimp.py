@@ -306,7 +306,7 @@ def get_mailchimp_data(access_token,server_prefix):
         list_ids = [lst['id'] for lst in lists['lists']]
 
         marketing_data = {
-            "channel_type": "Mailchimp",
+            "channel": "Mailchimp",
             "automations": get_automations(client),
             "campaigns": get_campaigns(client),
             "conversations": get_conversations(client),

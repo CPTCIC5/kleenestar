@@ -22,6 +22,7 @@ scopes = 'read_products,read_orders,read_marketing_events,read_marketing_activit
 
 @api_view(("GET",))
 def shopify_oauth(request):
+
     shop = request.query_params.get("shop")
     subspace_id = request.query_params.get("subspace_id")
     state = urlencode({'subspace_id': subspace_id})
@@ -67,6 +68,7 @@ def shopify_oauth_callback(request):
         state = request.query_params.get('state')
 
         state_params = parse_qs(state)
+        print(state_params)
         subspace_id = state_params.get('subspace_id', [None])[0]
         
         access_token = exchange_code_for_token(shop, code)
@@ -247,7 +249,7 @@ def get_shopify_data(access_token, shop_name):
         
         
         shopify_data = {
-            "channel_type": "Shopify Channel",
+            "channel": "Shopify Channel",
             'product_data': product_data,
             'order_statistics': order_statistics,
             'marketing_events': marketing_events,

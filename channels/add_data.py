@@ -7,7 +7,10 @@ import json
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes,api_view
 from rest_framework.response import Response
-
+from channels.models import Channel
+from workspaces.models import WorkSpace
+import json
+from typing import Any, Dict
 from dotenv import load_dotenv
 import os
 
@@ -26,7 +29,7 @@ def get_workspace():
         print("Failed to fetch data:", response.status_code)
         return response.raise_for_status()
 
- 
+
     text_splitter= RecursiveJsonSplitter(max_chunk_size=128)
     documents = text_splitter.create_documents(texts=response_data)
 
@@ -61,6 +64,7 @@ def get_channels(request):
     namespace = request.user.workspace_set.first().pinecone_namespace
     print(namespace)
     documents= get_workspace()
+
     if namespace in stats()['namespaces']:
         print('block-1')
         delete_vectores(namespace=namespace)
@@ -73,3 +77,61 @@ def get_channels(request):
     index= pc.Index("kleenestar")
 
     return  Response({'detail':'xyz'})
+
+
+"""
+
+ChannelTask() - 
+
+1. Iterrates through all the subspaces of all workspaces
+2. Get the marketing data of each of them
+3. Convert them into documents and upsert the embeddings to the pinecone DB
+
+"""
+
+def ChannelTask():
+    for workspace in WorkSpace.objects.all():
+        for subspace in workspace.subspace_set.all():
+            add_to_pinecone(subspace)
+
+
+def add_to_pinecone(subspace):
+    print("in subspace_", subspace)
+    namespace = subspace.pinecone_namespace
+    print(namespace)
+
+    documents= get_subspace_channels_data(subspace)
+    print(documents, "documents")
+    if namespace in stats()['namespaces']:
+        print('block-1')
+        delete_vectores(namespace=namespace)
+        add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
+    else:
+        print('block-2')
+        add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)
+    
+    return  Response({'detail':'xyz'})
+
+
+def get_subspace_channels_data(subspace):
+    response = requests.get(API_URL + f"?subspace_id={subspace.id}")
+    
+    if response.status_code == 200:
+        response_data = response.json()
+
+    else:
+        print("Failed to fetch data:", response.status_code)
+        return response.raise_for_status()
+
+    text_splitter= RecursiveJsonSplitter(max_chunk_size=128)
+    documents = text_splitter.create_documents(texts=response_data)
+
+    for i, document in enumerate(documents):
+        
+        if 'channel' in document.page_content:
+            document.metadata['channel'] = json.loads(document.page_content)['channel']
+
+        else:
+            document.metadata['channel'] = documents[i-1].metadata['channel']
+
+    return documents

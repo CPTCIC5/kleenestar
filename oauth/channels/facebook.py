@@ -295,7 +295,7 @@ def get_facebook_marketing_data(access_token, ad_account_list):
         campaign_data = get_facebook_campaign_statistics(access_token, campaign_data)
         post_details_data = get_page_posts(access_token)
 
-        marketing_data = [{"channel_type": "Meta Channel"},campaign_data, post_details_data]
+        marketing_data = [{"channel": "Meta Channel"},campaign_data, post_details_data]
 
         return Response(
             marketing_data, status=status.HTTP_200_OK

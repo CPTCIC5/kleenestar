@@ -382,7 +382,10 @@ def get_twitter_marketing_data(access_token, access_token_secret):
         auth = OAuth1(os.getenv("TWITTER_CLIENT_ID"), os.getenv("TWITTER_CLIENT_SECRET"), access_token, access_token_secret)
 
         accounts = get_twitter_ad_accounts(auth)
-        marketing_data = []
+        marketing_data = {
+            "channel": "Twitter/X Channel",
+            "channel_data": []
+        }
         for account_id in accounts:
             campaigns_data = get_twitter_campaign_data(auth, account_id)
 
@@ -401,7 +404,6 @@ def get_twitter_marketing_data(access_token, access_token_secret):
             media_details = get_media_details(auth, account_id, account_media_ids)
             
             marketing_data_dict = {
-                "channel_type": "Twitter/X Channel",
                 "account_id": account_id,
                 "campaigns_data": campaigns_data,
                 "line_items_data": line_items_data,
@@ -410,7 +412,7 @@ def get_twitter_marketing_data(access_token, access_token_secret):
                 "media_data": media_details
             }
 
-            marketing_data.append(marketing_data_dict)
+            marketing_data["channel_data"].append(marketing_data_dict)
         
         return marketing_data
 

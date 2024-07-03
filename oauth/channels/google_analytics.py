@@ -413,7 +413,7 @@ def get_ga4_properties(credentials, accountList):
 
 def get_google_analytics_data(access_token):
 
-    google_analytics_data = [{"channel_type": "Google Analytics"}]
+    google_analytics_data = {"channel": "Google Analytics", "channel_data": []}
     try:
         # Build the Admin API client to get the GA4 property ID
         credentials = Credentials(token=access_token)
@@ -459,6 +459,7 @@ def get_google_analytics_data(access_token):
 
             # Return all metrics
             analytics_data = {
+                "property_id": property['id'],
                 "property_details": property,
                 "user_metrics": user_metrics,
                 "session_metrics": session_metrics,
@@ -474,7 +475,7 @@ def get_google_analytics_data(access_token):
                 "realtime_metrics": realtime_metrics,
                 "pivot_metrics": pivot_metrics,
             }
-            google_analytics_data.append(analytics_data)
+            google_analytics_data["channel_data"].append(analytics_data)
         
         return google_analytics_data
     

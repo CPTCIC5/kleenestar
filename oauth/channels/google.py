@@ -203,30 +203,37 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
     credentials["login_customer_id"] = manager_id
 
     google_client = GoogleAdsClient.load_from_dict(credentials , version='v16')
-    marketing_data = []
 
-    for id in eval(client_id_list):
+    marketing_data = {
+        "channel": "Google Ads",
+        "channel_data": []
+    }
+    
+    try:
+        for id in eval(client_id_list):
 
-        # end_date = datetime.now().date()
-        # start_date = end_date - timedelta(days=30)
-        ga_service = google_client.get_service("GoogleAdsService")
-        results = {
-            "channel": "Goolge Ads",
-            "campaigns": [],
-            "ad_groups": [],
-            "ad_group_ads": []
-        }
-        campaign_query = """
-        SELECT campaign.id, campaign.name, campaign.status, campaign.serving_status, campaign.advertising_channel_type, campaign.start_date, campaign.end_date, campaign.campaign_budget, campaign.target_cpa.cpc_bid_ceiling_micros, campaign.target_cpa.cpc_bid_floor_micros, campaign.target_cpa.target_cpa_micros, campaign_budget.id, campaign_budget.name, campaign_budget.period, campaign_budget.amount_micros, campaign_budget.status, campaign_budget.recommended_budget_estimated_change_weekly_views, campaign_budget.recommended_budget_estimated_change_weekly_interactions, campaign_budget.recommended_budget_estimated_change_weekly_cost_micros, campaign_budget.recommended_budget_estimated_change_weekly_clicks, campaign_budget.recommended_budget_amount_micros, campaign_budget.type, campaign_budget.total_amount_micros, campaign_group.id, campaign_group.name, campaign_group.resource_name, campaign_group.status, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM campaign"""  # + f"""WHERE segments.date BETWEEN {start_date} AND {end_date} """
+            # end_date = datetime.now().date()
+            # start_date = end_date - timedelta(days=30)
+            ga_service = google_client.get_service("GoogleAdsService")
+
+            results = {
+                "client_account_id": id,
+                "campaigns": [],
+                "ad_groups": [],
+                "ad_group_ads": []
+            }
+
+            campaign_query = """
+            SELECT campaign.id, campaign.name, campaign.status, campaign.serving_status, campaign.advertising_channel_type, campaign.start_date, campaign.end_date, campaign.campaign_budget, campaign.target_cpa.cpc_bid_ceiling_micros, campaign.target_cpa.cpc_bid_floor_micros, campaign.target_cpa.target_cpa_micros, campaign_budget.id, campaign_budget.name, campaign_budget.period, campaign_budget.amount_micros, campaign_budget.status, campaign_budget.recommended_budget_estimated_change_weekly_views, campaign_budget.recommended_budget_estimated_change_weekly_interactions, campaign_budget.recommended_budget_estimated_change_weekly_cost_micros, campaign_budget.recommended_budget_estimated_change_weekly_clicks, campaign_budget.recommended_budget_amount_micros, campaign_budget.type, campaign_budget.total_amount_micros, campaign_group.id, campaign_group.name, campaign_group.resource_name, campaign_group.status, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM campaign"""  # + f"""WHERE segments.date BETWEEN {start_date} AND {end_date} """
+            
+            ad_group_query = """
+            SELECT campaign.name, ad_group.id, ad_group.name, ad_group.status, ad_group.campaign, ad_group.effective_target_cpa_micros, ad_group.effective_target_cpa_source, ad_group.type, ad_group.target_cpm_micros, ad_group.target_cpa_micros, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group """ # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
+
+            ad_group_ad_query = """ 
+            SELECT campaign.name, ad_group.name, ad_group_ad.ad.id, ad_group_ad.ad.name, ad_group_ad.status, ad_group_ad.ad.final_urls, ad_group_ad.ad.text_ad.description1, ad_group_ad.ad.text_ad.description2, ad_group_ad.ad.type, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group_ad """  # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
+            keyword_view_query = """
+            SELECT campaign.name, ad_group.name,keyword_view.resource_name, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM keyword_view """
         
-        ad_group_query = """
-        SELECT campaign.name, ad_group.id, ad_group.name, ad_group.status, ad_group.campaign, ad_group.effective_target_cpa_micros, ad_group.effective_target_cpa_source, ad_group.type, ad_group.target_cpm_micros, ad_group.target_cpa_micros, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group """ # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
-
-        ad_group_ad_query = """ 
-        SELECT campaign.name, ad_group.name, ad_group_ad.ad.id, ad_group_ad.ad.name, ad_group_ad.status, ad_group_ad.ad.final_urls, ad_group_ad.ad.text_ad.description1, ad_group_ad.ad.text_ad.description2, ad_group_ad.ad.type, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM ad_group_ad """  # + f"""WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'""" 
-        keyword_view_query = """
-        SELECT campaign.name, ad_group.name,keyword_view.resource_name, metrics.cost_micros, metrics.conversions_value, metrics.clicks, metrics.interaction_rate, metrics.view_through_conversions, metrics.average_cpc, metrics.conversions, metrics.ctr, metrics.all_conversions, metrics.cost_per_conversion, metrics.value_per_conversion, metrics.all_conversions_value, metrics.conversions_from_interactions_rate FROM keyword_view """
-        try:
             campaign_response = ga_service.search(customer_id=id, query=campaign_query)
             campaign_data = []
             ad_group_response = ga_service.search(customer_id=id, query=ad_group_query)
@@ -386,21 +393,22 @@ def get_google_marketing_data(refresh_token,manager_id, client_id_list):
                         "conversions_from_interactions_rate": keyword_view_row.metrics.conversions_from_interactions_rate
                     }
                 })
-            results["channel_type"] = "Google Channel"
             results["keyword_views"] = keyword_view_data
             results["ad_group_ads"] = ad_group_ad_data
             results["ad_groups"] = ad_group_data
             results["campaigns"] = campaign_data
-            marketing_data.append(results)
 
-            return marketing_data
         
-        except GoogleAdsException as ex:
-            print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
-            for error in ex.failure.errors:
-                print(f"\tError with message {error.message}.")
-                if error.location:
-                    for field_path_element in error.location.field_path_elements:
-                        print(f"\t\tOn field: {field_path_element.field_name}")
-            return None
+            marketing_data["channel_data"].append(results)
+            
+        return marketing_data
+            
+    except GoogleAdsException as ex:
+        print(f"Request failed with status {ex.error.code().name} and includes the following errors:")
+        for error in ex.failure.errors:
+            print(f"\tError with message {error.message}.")
+            if error.location:
+                for field_path_element in error.location.field_path_elements:
+                    print(f"\t\tOn field: {field_path_element.field_name}")
+        return None
             
