@@ -108,19 +108,24 @@ class PromptFeedbackCreateSerializer(serializers.ModelSerializer):
 
 
 
+class KnowledgeSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.KnowledgeSource
+        fields = ['id', 'text_data', 'created_at']
+
+class KnowledgeBaseSerializer(serializers.ModelSerializer):
+    knowledge_source = KnowledgeSourceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.KnowledgeBase
+        fields = ['id', 'subspace', 'knowledge_source', 'created_at']
+        read_only_fields = ['created_at']
 
 class CreateKnowledgeBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.KnowledgeBase
-        fields = ("file", "title", "subspace")
+        fields = ['id', 'subspace', 'knowledge_source']
 
-class KnowlodgeBaseSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    subspace = SubspaceSerializer()
-
-    class Meta:
-        model = models.KnowledgeBase
-        fields = ("user", "subspace", "file", "title", "id", "created_at")
 
 
         

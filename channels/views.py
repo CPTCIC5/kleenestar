@@ -220,40 +220,61 @@ class BlockNoteViewSet(viewsets.ModelViewSet):
 class KnowledgeBaseView(viewsets.ModelViewSet):
     queryset = models.KnowledgeBase.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = serializers.KnowlodgeBaseSerializer
+    serializer_class = serializers.KnowledgeBaseSerializer
     filterset_fields = ('subspace',)
 
     def get_queryset(self):
         user = self.request.user
         return models.KnowledgeBase.objects.filter(subspace__workspace=user.workspace_set.all()[0])
-    
+
     def create(self, request, *args, **kwargs):
-        serializer = serializers.CreateKnowledgeBaseSerializer(
-            data=request.data
-        )
+        serializer = serializers.CreateKnowledgeBaseSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(
-            user=request.user,
-        )
+        workspace = request.user.workspace_set.first()
+        knowledge_base = serializer.save(subspace__workspace=workspace)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = serializers.CreateKnowledgeBaseSerializer(
-            instance=instance,
-            data=request.data,
-            partial=partial
-        )
+        serializer = serializers.CreateKnowledgeBaseSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'])
+    def create_knowledge_source(self, request):
+        serializer = serializers.KnowledgeSourceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        knowledge_source = serializer.save(user=request.user)
+        return Response(serializers.KnowledgeSourceSerializer(knowledge_source).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get'])
+    def list_knowledge_sources(self, request):
+        user = request.user
+        knowledge_sources = models.KnowledgeSource.objects.filter(user=user)
+        serializer = serializers.KnowledgeSourceSerializer(knowledge_sources, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['put', 'patch'])
+    def update_knowledge_source(self, request, pk=None):
+        instance = models.KnowledgeSource.objects.get(pk=pk)
+        serializer = serializers.KnowledgeSourceSerializer(instance, data=request.data, partial=request.method == 'PATCH')
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'])
+    def delete_knowledge_source(self, request, pk=None):
+        instance = models.KnowledgeSource.objects.get(pk=pk)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SubspaceViewSet(viewsets.ModelViewSet):
