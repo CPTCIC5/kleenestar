@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from openai import OpenAI
-from channels.models import Convo
+from .models import Convo
 from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 import uuid
@@ -127,14 +127,17 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
 
     with client.beta.threads.runs.stream(
     thread_id=thread.id,
-    assistant_id=get_convo.workspace.assistant_id,
+    assistant_id=get_convo.subspace.workspace.assistant_id,
     event_handler=EventHandler(),
     ) as stream:
         stream.until_done()
 
+    all_messages = client.beta.threads.messages.list(
+        thread_id=thread.id
+        )
+    assistant_response= all_messages.data[0].content[0]
     # Return the content of the first message added by the Assistant
-        assistant_response= stream
-    print(assistant_response)
+    return {'text': assistant_response.text.value}
 
 
     '''if type(assistant_response) == TextContentBlock:
@@ -154,3 +157,29 @@ def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
         # print('block-3')
         # print(assistant_response.image_url_content_block)
         # return {'image': assistant_response.image_file.image_url_content_block}'''
+
+
+def followup_questions(query, output):
+
+    thread = client.beta.threads.create()
+
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=f"this is the query: {query} this is the output: {output} plesase create 3 follow up questions and say 'this is the follow up questions'")
+
+    with client.beta.threads.runs.stream(
+    thread_id=thread.id,
+    assistant_id="asst_Tr8r4a1O8QnZFNZshEIpqZGf",
+    event_handler=EventHandler(),
+    ) as stream:
+        stream.until_done()
+    all_messages = client.beta.threads.messages.list(
+        thread_id=thread.id
+        )
+    assistant_response= all_messages.data[0].content[0]
+    
+    return {'questions': assistant_response.text.value}
+if __name__ == '__main__':
+    output= generate_insights_with_gpt4('how does my marketing data look like accross all channels', convo=1)['text']
+    followup_questions(query='how does my marketing data look like accross all channels', output=output)
