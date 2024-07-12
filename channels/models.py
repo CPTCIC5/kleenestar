@@ -307,7 +307,28 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
         # print(assistant_response.image_url_content_block)
         # return {'image': assistant_response.image_file.image_url_content_block}
     
+def followup_questions(query, output):
 
+    thread = client.beta.threads.create()
+
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=f"this is the query: {query} this is the output: {output} plesase create 3 follow up questions and say 'those are the follow up questions'")
+
+    with client.beta.threads.runs.stream(
+    thread_id=thread.id,
+    assistant_id="asst_Tr8r4a1O8QnZFNZshEIpqZGf",
+    event_handler=EventHandler(),
+    ) as stream:
+        stream.until_done()
+
+    all_messages = client.beta.threads.messages.list(
+        thread_id=thread.id
+        )
+    assistant_response= all_messages.data[0].content[0]
+    
+    return {'questions': assistant_response.text.value}
 
 class Prompt(models.Model):
     convo= models.ForeignKey(Convo,on_delete=models.CASCADE)
@@ -320,7 +341,7 @@ class Prompt(models.Model):
     response_file = models.FileField(upload_to='Response-File/',blank= True, null= True) # gpt generated file
     #blocknote = models.ForeignKey(BlockNote,on_delete=models.CASCADE,blank=True,null=True)
     #blocknote = models.ManyToManyField(BlockNote,null=True, blank=True)
-
+    similar_questions= models.TextField(max_length=10_000,blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -349,6 +370,9 @@ class Prompt(models.Model):
                                                     )
         self.response_text = response_data.get('text', None)
         self.response_file = response_data.get('image', None)
+        x1=followup_questions(self.text_query,self.response_text)
+        print(x1,'x1')
+        self.similar_questions= x1['questions']
 
         super().save()
     
