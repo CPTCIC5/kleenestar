@@ -81,7 +81,7 @@ def get_channels(request):
 
 """
 
-ChannelTask() - 
+channel_task() - 
 
 1. Iterrates through all the subspaces of all workspaces
 2. Get the marketing data of each of them
@@ -89,19 +89,16 @@ ChannelTask() -
 
 """
 
-def ChannelTask():
+def channel_task():
     for workspace in WorkSpace.objects.all():
         for subspace in workspace.subspace_set.all():
             add_to_pinecone(subspace)
 
 
 def add_to_pinecone(subspace):
-    print("in subspace_", subspace)
     namespace = subspace.pinecone_namespace
-    print(namespace)
-
     documents= get_subspace_channels_data(subspace)
-    print(documents, "documents")
+
     if namespace in stats()['namespaces']:
         print('block-1')
         delete_vectores(namespace=namespace)
