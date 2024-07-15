@@ -12,7 +12,6 @@ from oauth.channels import google,facebook,twitter,linkedin,reddit,tiktok,shopif
 from channels.models import Channel
 from django.shortcuts import get_object_or_404
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])  # Allow access to anyone
 def merge_json_files(request):
