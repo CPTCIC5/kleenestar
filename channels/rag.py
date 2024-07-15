@@ -88,7 +88,7 @@ def add_documents_es(chunks):
 
 
 
-def RagData(question, namespace): #only for retrieving 
+def RagData(query, namespace): #only for retrieving 
     print(namespace)
     pinecone_vs= get_pinecone_vectorestore_openai(namespace)
     self_querying= self_querying_retriever(pinecone_vs)
@@ -98,6 +98,5 @@ def RagData(question, namespace): #only for retrieving
     ensemble_retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying, ])
 
     retriever= multi_query_retriever(ensemble_retriever)
-    
-    documents = retriever.invoke(input=question)
+    documents= retriever.invoke(input= query)
     return documents

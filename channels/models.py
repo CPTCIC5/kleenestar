@@ -10,6 +10,8 @@ import re
 from django.core.files.base import ContentFile
 import uuid
 
+#from langsmith import traceable
+from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 from openai.types.beta.threads.text_content_block import TextContentBlock
 from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
 from openai.types.beta.threads.image_file_content_block import ImageFileContentBlock
@@ -179,7 +181,7 @@ class Convo(models.Model):
         notes = Note.objects.filter(prompt__in=prompts)
         return notes
     
-
+#@traceable(name="insights")
 def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=None):
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()

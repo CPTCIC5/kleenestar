@@ -1,185 +1,121 @@
+from langchain.agents.openai_assistant import OpenAIAssistantRunnable
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain import hub
+from langchain.retrievers import EnsembleRetriever
+from langchain_openai import OpenAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
+from langchain_openai import ChatOpenAI
+from langchain.retrievers.self_query.base import SelfQueryRetriever
 from dotenv import load_dotenv
-from openai import OpenAI
-from .models import Convo
-from django.shortcuts import get_object_or_404
-from django.core.files.base import ContentFile
-import uuid
-from .rag import RagData
-from typing_extensions import override
-from openai import AssistantEventHandler
-from openai.types.beta.threads.text_content_block import TextContentBlock
-from openai.types.beta.threads.image_url_content_block import ImageURLContentBlock
-from openai.types.beta.threads.image_file_content_block import ImageFileContentBlock
+from langchain_text_splitters import RecursiveJsonSplitter
+#from langchain_elasticsearch import ElasticsearchStore
+from langchain.retrievers.multi_query import MultiQueryRetriever
+import os
+import requests
+import json
 
 load_dotenv()
 
-client = OpenAI()
+"""
+#Later on someday
+def get_pinecone_vectorstore():
+    embeddings = OpenAIEmbeddings(model='text-embedding-3-large')# aryan recommened
+    vectorstore = PineconeVectorStore(  embedding=embeddings,
+                                        index_name="kleenestar",
+                                        )
+
+    return vectorstore
+"""
+
+def get_pinecone_vectorestore_openai(namespace): 
+    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
+    pinecone_vs = PineconeVectorStore(embedding=embeddings, index_name='kleenestar',namespace=namespace)
+
+    return pinecone_vs 
 
  
-# First, we create a EventHandler class to define
-# how we want to handle the events in the response stream.
- 
-class EventHandler(AssistantEventHandler):    
-  @override
-  def on_text_created(self, text) -> None:
-    print(f"\nassistant > ", end="", flush=True)
-      
-  @override
-  def on_text_delta(self, delta, snapshot):
-    print(delta.value, end="", flush=True)
-      
-  def on_tool_call_created(self, tool_call):
-    print(f"\nassistant > {tool_call.type}\n", flush=True)
-  
-  def on_tool_call_delta(self, delta, snapshot):
-    if delta.type == 'code_interpreter':
-      if delta.code_interpreter.input:
-        print(delta.code_interpreter.input, end="", flush=True)
-      if delta.code_interpreter.outputs:
-        print(f"\n\noutput >", flush=True)
-        for output in delta.code_interpreter.outputs:
-          if output.type == "logs":
-            print(f"\n{output.logs}", flush=True)
+def self_querying_retriever(vectorstore):
+    llm = ChatOpenAI(temperature=0.1)
+    metadata_field_info = []
+    document_content_description = "marketing channel data in real-time"
+    retriever = SelfQueryRetriever.from_llm(
+    llm= llm,
+    vectorstore= vectorstore,
+    metadata_field_info=metadata_field_info,
+    document_contents= document_content_description
+        )
+    return retriever
 
-"""
-def get_convo_prompts(convo:int):
-    get_convo= get_object_or_404(Convo,id=convo)
-    history = get_convo.prompt_set.all()
-    return history
-"""
+def multi_query_retriever(retriever):
+    llm = ChatOpenAI(
+    temperature=0,
+    max_tokens=800,
+    model_kwargs={"top_p": 0, "frequency_penalty": 0, "presence_penalty": 0},
+    )
 
 
-"""
-def get_history(convo_id:int):
-    history = get_convo_prompts(convo_id)
-    if history.count() >= 1:
-        history_list = []
-        for i in history:
-            history_list.append(i.text_query)
-        return str(history_list)
-    else:
-        return False
-"""
-def generate_insights_with_gpt4(user_query: str, convo: int, file=None):
-    get_convo = get_object_or_404(Convo, id=convo)
-    history = get_convo.prompt_set.all()
-    all_prompts = history.count()
-
+    retriever = MultiQueryRetriever.from_llm(
+        retriever=retriever, llm=llm
+        )
     
-
-    # Call RagData function with the user query to get RAG context
-    rag_context = RagData(user_query, 'KRmPlTxd9W')
-    print('this-is-rag-contextttt',rag_context)
+    return retriever
 
 
-
-    # Creating a new conversation thread
-    if all_prompts >= 1:
-        thread = client.beta.threads.retrieve(
-            thread_id=get_convo.thread_id
-        )
-
-    else:
-        thread = client.beta.threads.create()
-        get_convo.thread_id = thread.id
-        get_convo.save()
-        #convo.assistant_id = thread
+def get_retriver(retrivers):
+    ensemble_retriever = EnsembleRetriever(retrievers=retrivers)
+    return ensemble_retriever
 
 
-        
+"""
 
-    if file is not None:
-        file.open()
+def get_es_vectorstore():
+    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
+    db = ElasticsearchStore(es_cloud_id=os.getenv('ELASTICSEARCH_CLOUD_ID'),
+    index_name="kleenestar",
+    es_api_key= os.getenv('ELASTICSEARCH_API_KEY'),
+    embedding=embeddings)
+    return db
+"""
 
-        message_file = client.files.create(
-          file=file.file.file, purpose="assistants"
-        )
-        file.close()
+"""
+def add_documents_es(chunks):
+    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
 
-        message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=user_query,
-                attachments=[
-            {
-                "file_id": message_file.id,
-                "tools": [{"type": "file_search"}, {"type":"code_interpreter"} ]
-            }
-        ]
-        )
-        
-    else:
-        message = client.beta.threads.messages.create(
-            thread_id=thread.id,
-            role="user",
-            content=user_query
-        )
-
-    # Posting RAG context as a message in the thread for the Assistant
-    for context in rag_context:
-        rag_message = client.beta.threads.messages.create(
-            thread_id=thread.id,
-            role="assistant",
-            content=context.page_content
-        )
-
-    # Initiating a run
-
-    with client.beta.threads.runs.stream(
-    thread_id=thread.id,
-    assistant_id=get_convo.subspace.workspace.assistant_id,
-    event_handler=EventHandler(),
-    ) as stream:
-        stream.until_done()
-
-    all_messages = client.beta.threads.messages.list(
-        thread_id=thread.id
-        )
-    assistant_response= all_messages.data[0].content[0]
-    # Return the content of the first message added by the Assistant
-    return {'text': assistant_response.text.value}
+    elastic_vector_search = ElasticsearchStore.from_documents(documents=chunks,
+    es_cloud_id=os.getenv('ELASTICSEARCH_CLOUD_ID'),
+    index_name="kleenestar",
+    embedding=embeddings,
+    es_api_key= os.getenv('ELASTICSEARCH_API_KEY')
+    )
+"""
 
 
-    '''if type(assistant_response) == TextContentBlock:
-        print('block-1')
-        return {'text': assistant_response.text.value}
-    elif  type(assistant_response) == ImageFileContentBlock:
-        print('block-2')
-        file_content = client.files.content(assistant_response.image_file.file_id).content
-        image_file = ContentFile(file_content, name=f"{uuid.uuid4()}.png")
-        if 'text' in assistant_response.type:
-            return {'text': assistant_response.text.value, 'image': image_file}
-        else:
-            return {'image': image_file}
+
+def RagData(namespace): #only for retrieving 
+    print(namespace)
+    pinecone_vs= get_pinecone_vectorestore_openai(namespace)
+    self_querying= self_querying_retriever(pinecone_vs)
+    #add_documents_es(chunks=documents)
+    #elastic_vs= get_es_vectorstore()
+    #elastic_vs.as_retriever()
+    ensemble_retriever =get_retriver(retrivers=[pinecone_vs.as_retriever(), self_querying])
+
+    retriever= multi_query_retriever(ensemble_retriever)
     
-    elif  type(assistant_response) == ImageURLContentBlock:
-        raise Exception("received ImageURLContentBlock, unable to process this...")
-        # print('block-3')
-        # print(assistant_response.image_url_content_block)
-        # return {'image': assistant_response.image_file.image_url_content_block}'''
+    return retriever
+
+namespace = '6HkfOT3AXn'
+assistantid= 'asst_Tr8r4a1O8QnZFNZshEIpqZGf'
+retriever= RagData(namespace=namespace)
+
+assistant= OpenAIAssistantRunnable(assistant_id=assistantid)
 
 
-def followup_questions(query, output):
+rag_chain = (
+    {"context": retriever, "question": RunnablePassthrough()}
+    | assistant
+    | StrOutputParser()
+)
 
-    thread = client.beta.threads.create()
-
-    message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=f"this is the query: {query} this is the output: {output} plesase create 3 follow up questions and say 'this is the follow up questions'")
-
-    with client.beta.threads.runs.stream(
-    thread_id=thread.id,
-    assistant_id="asst_Tr8r4a1O8QnZFNZshEIpqZGf",
-    event_handler=EventHandler(),
-    ) as stream:
-        stream.until_done()
-    all_messages = client.beta.threads.messages.list(
-        thread_id=thread.id
-        )
-    assistant_response= all_messages.data[0].content[0]
-    
-    return {'questions': assistant_response.text.value}
-if __name__ == '__main__':
-    output= generate_insights_with_gpt4('how does my marketing data look like accross all channels', convo=1)['text']
-    followup_questions(query='how does my marketing data look like accross all channels', output=output)
+print(rag_chain.invoke("how does my marketing data look like"))
