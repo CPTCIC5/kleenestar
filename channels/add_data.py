@@ -97,6 +97,7 @@ def channel_task():
 
 def add_to_pinecone(subspace):
     namespace = subspace.pinecone_namespace
+    namespace = 'EJuEAsQA2M'
     documents= get_subspace_channels_data(subspace)
 
     if namespace in stats()['namespaces']:
@@ -132,3 +133,7 @@ def get_subspace_channels_data(subspace):
             document.metadata['channel'] = documents[i-1].metadata['channel']
 
     return documents
+
+def dummy(namespace):
+    documents = get_workspace()
+    add_to_pinecone_vectorestore_openai(documents=documents, namespace=namespace)

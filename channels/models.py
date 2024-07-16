@@ -309,7 +309,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
         # print(assistant_response.image_url_content_block)
         # return {'image': assistant_response.image_file.image_url_content_block}
     
-def followup_questions(query, output):
+def followup_questions(query, output, assist_id):
 
     thread = client.beta.threads.create()
 
@@ -320,7 +320,7 @@ def followup_questions(query, output):
 
     with client.beta.threads.runs.stream(
     thread_id=thread.id,
-    assistant_id="asst_Tr8r4a1O8QnZFNZshEIpqZGf",
+    assistant_id=assist_id,
     event_handler=EventHandler(),
     ) as stream:
         stream.until_done()
@@ -372,8 +372,7 @@ class Prompt(models.Model):
                                                     )
         self.response_text = response_data.get('text', None)
         self.response_file = response_data.get('image', None)
-        x1=followup_questions(self.text_query,self.response_text)
-        print(x1,'x1')
+        x1=followup_questions(self.text_query,self.response_text, assist_id=self.convo.subspace.workspace.assistant_id)
         self.similar_questions= x1['questions']
 
         super().save()
