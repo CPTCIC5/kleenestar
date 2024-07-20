@@ -75,7 +75,8 @@ class Channel(models.Model):
         (7, 'Shopify'),
         (8, 'Google-Analytics'),
         (9, 'MailChimp'),
-        (10, 'Instagram')
+        (10, 'Instagram'),
+        (11, 'Bing')
     )
     channel_type = models.IntegerField(choices=CHANNEL_TYPES)
     subspace = models.ForeignKey(SubSpace, on_delete=models.CASCADE)
