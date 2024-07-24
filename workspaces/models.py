@@ -26,14 +26,14 @@ By following these guidelines, provide precise, insightful, and actionable marke
 
 
 INDUSTRIES = (
-    ("⁠Retail", "⁠Retail"),
-    ("⁠Hospitality", "⁠Hospitality"),
-    ("⁠Media", "⁠Media"),
-    ("⁠Technology", "⁠Technology"),
-    ("⁠Finance", "⁠Finance"),
-    ("⁠Sport", "⁠Sport"),
-    ("⁠Beauty", "⁠Beauty"),
-    ("⁠Automotive", "⁠Automotive")
+    (1, "Retail"),
+    (2, "Hospitality"),
+    (3, "Media"),
+    (4, "Technology"),
+    (5, "Finance"),
+    (6, "Sport"),
+    (7, "Beauty"),
+    (8, "Automotive")
 )
 
 def create_namespace_id():
