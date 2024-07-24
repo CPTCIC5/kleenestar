@@ -42,10 +42,10 @@ class WorkSpaceInviteSerializer(serializers.ModelSerializer):
 class SubSpaceCreateSerializer(serializers.ModelSerializer):    
     class Meta:
         model= SubSpace
-        fields= ['workspace', 'name', 'country', 'industry']
+        fields= ['workspace', 'name', 'industry']
 
 class SubspaceSerializer(serializers.ModelSerializer):
     workspace= WorkSpaceSerializer()
     class Meta:
         model= SubSpace
-        fields= ['id', 'workspace', 'name', 'country', 'industry', 'created_at']
+        fields= ['id', 'workspace', 'name', 'industry', 'created_at']

@@ -26,14 +26,14 @@ By following these guidelines, provide precise, insightful, and actionable marke
 
 
 INDUSTRIES = (
-    (1, "Retail"),
-    (2, "Hospitality"),
-    (3, "Media"),
-    (4, "Technology"),
-    (5, "Finance"),
-    (6, "Sport"),
-    (7, "Beauty"),
-    (8, "Automotive")
+    ("Retail", "Retail"),
+    ("Hospitality", "Hospitality"),
+    ("Media", "Media"),
+    ("Technology", "Technology"),
+    ("Finance", "Finance"),
+    ("Sport", "Sport"),
+    ("Beauty", "Beauty"),
+    ("Automotive", "Automotive")
 )
 
 def create_namespace_id():
@@ -164,7 +164,7 @@ class WorkSpaceInvite(models.Model):
 class SubSpace(models.Model):
     workspace= models.ForeignKey(WorkSpace,on_delete=models.CASCADE)
     name= models.CharField(max_length=100)
-    country= models.CharField(choices=CountryField().choices, max_length=50)
+    #country= models.CharField(choices=CountryField().choices, max_length=50)
     industry= models.CharField(max_length=80, choices=INDUSTRIES)
     pinecone_namespace= models.CharField(max_length=11,default=create_namespace_id)
     created_at= models.DateTimeField(auto_now_add=True)
