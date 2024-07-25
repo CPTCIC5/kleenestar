@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 import json
 import base64
 import hashlib
-from channels.models import APICredentials
+from app_channels.models import APICredentials
 import mailchimp_marketing as MailchimpMarketing
 from mailchimp_marketing.api_client import ApiClientError
 

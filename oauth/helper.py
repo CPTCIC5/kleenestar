@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from channels.models import Channel
+from app_channels.models import Channel
 from users.models import User
 from oauth import check_refresh
 from oauth.exceptions import RefreshException

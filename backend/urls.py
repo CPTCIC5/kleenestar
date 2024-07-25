@@ -27,9 +27,10 @@ urlpatterns = [
     path('api/auth/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path("", include("allauth.urls")),
     path("api/workspaces/", include("workspaces.urls")),
-    path("api/channels/", include('channels.urls')),
+    path("api/channels/", include('app_channels.urls')),  # Update to new app name
     path("api/oauth/", include('oauth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ \
-               static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

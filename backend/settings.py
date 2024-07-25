@@ -20,7 +20,6 @@ ALLOWED_HOSTS = ['https://polite-awake-bobcat.ngrok-free.app','*']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'admin_tools_stats',  # this must be BEFORE 'admin_tools' and 'django.contrib.admin'
     'django_nvd3',
@@ -29,26 +28,30 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sites",
     "django.contrib.messages",
-    #"daphne",
+    "daphne",
+    "channels",  # This refers to the Django Channels package
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
-    "channels.apps.ChannelsConfig",
+    "app_channels.apps.AppChannelsConfig",  # Update this to the new app config
     "workspaces.apps.WorkspacesConfig",
     "dummy.apps.DummyConfig",
     "oauth.apps.OauthConfig",
     "rest_framework",
     "django_rest_passwordreset",
     "corsheaders",
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'django_admin_logs',
     "debug_toolbar",
-    #"django_eventstream",
+    # "django_eventstream",
 ]
+
+ASGI_APPLICATION=  "backend.asgi.application"
+
 
 DJANGO_ADMIN_LOGS_DELETABLE = False
 DJANGO_ADMIN_LOGS_ENABLED = True
@@ -111,6 +114,15 @@ TEMPLATES = [
     },
 ]
 
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 WSGI_APPLICATION = "backend.wsgi.application"
 
 INTERNAL_IPS = [

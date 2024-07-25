@@ -1,5 +1,5 @@
 from django.db import models
-from channels.models import Channel
+from app_channels.models import Channel
 
 
 # Create your models here.

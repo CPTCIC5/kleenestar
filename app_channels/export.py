@@ -9,7 +9,7 @@ from rest_framework.decorators import permission_classes,api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from oauth.channels import google,facebook,twitter,linkedin,reddit,tiktok,shopify
-from channels.models import Channel
+from app_channels.models import Channel
 from django.shortcuts import get_object_or_404
 
 @api_view(['GET'])
@@ -21,11 +21,11 @@ def merge_json_files(request):
     merged_data = []
     
     # List all JSON files in the specified folder
-    json_files = [f for f in os.listdir("channels/") if f.endswith(".json")]
+    json_files = [f for f in os.listdir("app_channels/") if f.endswith(".json")]
 
     # Iterate over each JSON file
     for filename in json_files:
-        file_path = os.path.join("channels/", filename)
+        file_path = os.path.join("app_channels/", filename)
 
         # Load JSON data from the file
         with open(file_path, "r") as file:

@@ -7,7 +7,7 @@ import json
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes,api_view
 from rest_framework.response import Response
-from channels.models import Channel
+from app_channels.models import Channel
 from workspaces.models import WorkSpace
 import json
 from typing import Any, Dict

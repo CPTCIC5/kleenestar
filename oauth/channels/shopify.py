@@ -11,7 +11,7 @@ from rest_framework.decorators import permission_classes
 from oauth.external_urls import frontend_channel_url,shopify_redirect_uri
 from oauth.helper import get_channel,create_channel
 from dotenv import load_dotenv
-from channels.models import APICredentials
+from app_channels.models import APICredentials
 
 load_dotenv(override=True)
 
