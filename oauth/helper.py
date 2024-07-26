@@ -11,9 +11,9 @@ def get_channel(channel_type_num, subspace_id):
 def create_channel(channel_type_num, subspace_id):
     try:
         new_channel = Channel.objects.create(
-            channel_type=channel_type_num, 
-            subspace_id=subspace_id
+           channel_type_num=channel_type_num, subspace_id=subspace_id
         )
+        print(new_channel, "created")
         return new_channel
     except Exception:
         return Channel.objects.get(channel_type=channel_type_num, subspace=subspace_id)

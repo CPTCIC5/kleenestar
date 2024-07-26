@@ -115,7 +115,7 @@ def mailchimp_oauth_callback(request):
                 mailchimp_channel.credentials.save()
 
             mailchimp_channel.save()
-            return redirect(frontend_channel_url)
+            return redirect(f"{frontend_channel_url}/{subspace_id}/")
         
         else:
             return Response(

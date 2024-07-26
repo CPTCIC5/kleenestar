@@ -131,7 +131,7 @@ def reddit_oauth_callback(request):
                 reddit_channel.credentials.save()
 
             reddit_channel.save()
-            return redirect(frontend_channel_url)
+            return redirect(f"{frontend_channel_url}/{subspace_id}/")
         
         else:
             return Response(

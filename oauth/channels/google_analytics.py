@@ -135,7 +135,7 @@ def google_analytics_oauth_callback(request):
 
         google_analytics_channel.save()
 
-        return redirect(frontend_channel_url)
+        return redirect(f"{frontend_channel_url}/{subspace_id}/")
 
     
     except Exception as e:

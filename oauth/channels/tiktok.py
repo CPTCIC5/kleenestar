@@ -115,7 +115,7 @@ def tiktok_oauth_callback(request):
             tiktok_channel.credentials.save()
 
         tiktok_channel.save()
-        return redirect(frontend_channel_url)
+        return redirect(f"{frontend_channel_url}/{subspace_id}/")
 
     except Exception as e:
         print(f"Exception occurred: {e}")

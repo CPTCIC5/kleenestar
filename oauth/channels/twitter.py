@@ -147,7 +147,7 @@ def twitter_oauth_callback(request):
             twitter_channel.credentials.save()
 
         twitter_channel.save()
-        return redirect(frontend_channel_url)
+        return redirect(f"{frontend_channel_url}/{subspace_id}/")
 
     except Exception as e:
         print(f"Exception occurred: {e}")

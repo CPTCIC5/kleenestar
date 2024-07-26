@@ -42,3 +42,10 @@ google_analytics_redirect_uri = f'{backend_url}api/oauth/google-analytics-callba
 mailchimp_redirect_uri = f"{backend_url}api/oauth/mailchimp-callback/"
 mailchimp_token_uri = "https://login.mailchimp.com/oauth2/token"
 mailchimp_metadata_uri = "https://login.mailchimp.com/oauth2/metadata"
+
+bing_redirect_uri = "http://localhost:8000/api/oauth/bing-callback/"
+bing_token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+bing_scopes = [
+    "https://ads.microsoft.com/msads.manage",
+    "offline_access"
+]

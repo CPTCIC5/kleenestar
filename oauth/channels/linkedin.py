@@ -115,7 +115,7 @@ def linkedin_oauth_callback(request):
 
         linkedin_channel.save()
 
-        return redirect(frontend_channel_url)
+        return redirect(f"{frontend_channel_url}/{subspace_id}/")
 
 
     except Exception as e:

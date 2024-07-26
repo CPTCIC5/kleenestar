@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .channels import google, facebook, twitter, linkedin, reddit,tiktok, shopify, mailchimp, google_analytics
+from .channels import google, facebook, twitter, linkedin, reddit,tiktok, shopify, mailchimp, google_analytics, bing
 
 urlpatterns = [
     path("google-callback/", google.google_oauth_callback),
@@ -38,6 +38,9 @@ urlpatterns = [
 
     path("mailchimp/", mailchimp.mailchimp_oauth),
     path("mailchimp-callback/", mailchimp.mailchimp_oauth_callback),
-    path("mailchimp_data/",mailchimp.get_mailchimp_data)
+    path("mailchimp_data/",mailchimp.get_mailchimp_data),
+
+    path("bing/", bing.bing_oauth),
+    path("bing-callback/", bing.bing_oauth_callback),
     
 ]

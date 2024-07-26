@@ -98,7 +98,7 @@ def shopify_oauth_callback(request):
             shopify_channel.credentials.save()
 
         shopify_channel.save()
-        return redirect(frontend_channel_url)
+        return redirect(f"{frontend_channel_url}/{subspace_id}/")
 
     
     except Exception as e:
