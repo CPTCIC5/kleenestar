@@ -19,6 +19,7 @@ from typing_extensions import override
 from openai import AssistantEventHandler
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.http.response import StreamingHttpResponse
 #from .old_rag import RagData as RagData_2
 
 load_dotenv()
