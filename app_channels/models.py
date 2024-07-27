@@ -379,38 +379,6 @@ class Prompt(models.Model):
 
         super().save()
     
-    """
-    def save(self, *args, **kwargs):
-        response_data = generate_insights_with_gpt4(self.text_query, self.convo.id, self.file_query)
-        raw_response_text = response_data.get('text')
-
-        # Extract table data from response text
-        table_pattern = re.compile(r'(\|.*?\|(?:\n\|.*?\|)+)')  # Adjust the regex as per your table format
-        
-        tables = table_pattern.findall(raw_response_text)
-        print(tables)
-
-        # Convert tables to JSON-compatible format
-        json_tables = []
-        for table in tables:
-            rows = table.strip().split('\n')
-            headers = [header.strip() for header in rows[0].strip('|').split('|')]
-            json_table = []
-            for row in rows[1:]:
-                values = [value.strip() for value in row.strip('|').split('|')]
-                json_table.append(dict(zip(headers, values)))
-            json_tables.append(json_table)
-        
-        # Remove table data from response text
-        text_without_tables = table_pattern.sub('', raw_response_text).strip()
-        
-        self.response_text = text_without_tables
-        self.table_data = json_tables
-        self.response_image = response_data.get('image', None)
-        
-        super().save(*args, **kwargs)
-    """
-    
     
     class Meta:
         ordering  = ['author','id']
