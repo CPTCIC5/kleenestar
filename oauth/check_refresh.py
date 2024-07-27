@@ -25,6 +25,10 @@ shopify - access token has no expiry, it is expired after the user uninstalls th
 
 *tiktok - expires in few hours (yet to figure out refresh token)
 
+instagram - yet to be completed
+
+bing - access token - 60 days, and refresh token - 365 days
+
 """
 #done
 def check_update_google_credentials(refresh_token,access_token):
@@ -234,7 +238,7 @@ def check_update_shopify_credentials(access_token, shop_name):
     except RequestException as e:
         raise RefreshException("Invalid Credentials")
     
-
+#done
 def check_update_mailchimp_credentials(api_key, server_prefix):
     verify_credentials_url = f"https://{server_prefix}.api.mailchimp.com/3.0/"
 
@@ -251,3 +255,54 @@ def check_update_mailchimp_credentials(api_key, server_prefix):
     
     except RequestException as e:
         raise RefreshException("Invalid Credentials")
+
+
+# not done
+# def check_update_instagram_credentials():
+
+
+# done
+def check_update_bing_credentials(access_token, refresh_token):
+    verify_credentials_url = "https://graph.microsoft.com/v1.0/me" 
+    refresh_token_url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+    client_id = os.getenv("BING_CLIENT_ID")
+    client_secret = os.getenv("BING_CLIENT_SECRET")
+    
+    try:
+        # Verify the current access token
+        response = requests.get(
+            verify_credentials_url,
+            headers={
+                'Authorization': f'Bearer {access_token}'
+            }
+        )
+
+        if response.status_code == 200:
+            return False, access_token
+        else:
+            print("Access token invalid, refreshing...")
+            refresh_response = requests.post(
+                refresh_token_url,
+                data={
+                    'grant_type': 'refresh_token',
+                    'refresh_token': refresh_token,
+                    'client_id': client_id,
+                    'client_secret': client_secret,
+                    'scope': 'https://ads.microsoft.com/msads.manage offline_access'
+                }
+            )
+
+            if refresh_response.status_code == 200:
+                new_token_data = refresh_response.json()
+                new_access_token = new_token_data.get('access_token')
+                if new_access_token:
+                    print("Updated access token - Bing Ads")
+                    return True, new_access_token
+                else:
+                    raise RefreshException("Failed to obtain new access token")
+            else:
+                raise RefreshException("Failed to refresh access token")
+    
+    except RequestException as e:
+        print(f"Request exception: {e}")
+        raise RefreshException("Failed to verify or refresh access token")

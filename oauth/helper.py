@@ -4,18 +4,18 @@ from users.models import User
 from oauth import check_refresh
 from oauth.exceptions import RefreshException
 
-
 def get_channel(channel_type_num, subspace_id):
     return get_object_or_404(Channel, channel_type=channel_type_num, subspace=subspace_id)
 
 def create_channel(channel_type_num, subspace_id):
     try:
+        
         new_channel = Channel.objects.create(
-           channel_type_num=channel_type_num, subspace_id=subspace_id
+           channel_type=channel_type_num, subspace_id=subspace_id
         )
-        print(new_channel, "created")
         return new_channel
-    except Exception:
+    except Exception as e:
+        print(str(e), "Error in creating channel object")
         return Channel.objects.get(channel_type=channel_type_num, subspace=subspace_id)
     
 
@@ -31,7 +31,9 @@ def refresh_credentials(channel):
         6: check_refresh.check_update_reddit_credentials,
         7: check_refresh.check_update_shopify_credentials,
         8: check_refresh.check_update_google_credentials,
-        9: check_refresh.check_update_mailchimp_credentials
+        9: check_refresh.check_update_mailchimp_credentials,
+        # 10: check_refresh.check_update_instagram_credentials,
+        11: check_refresh.check_update_bing_credentials
     }
 
     try:
@@ -75,7 +77,15 @@ def refresh_credentials(channel):
                         
                 elif channel.channel_type == 9: # No Refresh token passed
                     get_refresh_function(credentials.key_1,credentials.key_2)
-                    
+                
+                # elif channel.channel_type == 10: # No Refresh token passed
+                #     get_refresh_function(credentials.key_1,credentials.key_2)
+
+                elif channel.channel_type == 11: # Update Access token If the new access token is generated
+                    data = get_refresh_function(credentials.key_1, credentials.key_2)
+                    if(data[0]):
+                        channel.credentials.key_1 = data[1]
+                     
                 channel.credentials.save()
             
             channel.save()
