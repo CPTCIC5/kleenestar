@@ -20,7 +20,7 @@ class ChannelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Customize queryset based on the request or user
         user = self.request.user
-        return models.Channel.objects.filter(subspace__workspace=user.workspace_set.all()[0])
+        return models.Channel.objects.filter(subspace__workspace=user.workspace_set.first())
     
 
     def create(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
     filterset_fields = ('subspace',)
 
     def get_queryset(self):
-        workspace = self.request.user.workspace_set.all()[0]
+        workspace = self.request.user.workspace_set.first()
         return models.Convo.objects.filter(subspace__workspace=workspace)
     
 
@@ -88,7 +88,7 @@ class ConvoViewSet(viewsets.ModelViewSet):
         # should work ig idk test and see
 
         self.perform_destroy(instance)
-        workspace = self.request.user.workspace_set.all()[0]
+        workspace = self.request.user.workspace_set.first()
 
         if models.Convo.objects.filter(subspace=subspace).count() < 1:
             models.Convo.objects.create(
@@ -225,7 +225,7 @@ class KnowledgeBaseView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return models.KnowledgeBase.objects.filter(subspace__workspace=user.workspace_set.all()[0])
+        return models.KnowledgeBase.objects.filter(subspace__workspace=user.workspace_set.first())
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.CreateKnowledgeBaseSerializer(data=request.data)
@@ -282,7 +282,7 @@ class SubspaceViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SubspaceSerializer
     
     def get_queryset(self):
-        return models.SubSpace.objects.filter(workspace=self.request.user.workspace_set.all()[0])
+        return models.SubSpace.objects.filter(workspace=self.request.user.workspace_set.first())
 
     
     def create(self, request, *args, **kwargs):
