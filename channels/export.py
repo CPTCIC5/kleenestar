@@ -41,26 +41,31 @@ def merge_json_files(request):
 
     return Response(merged_data)
 
+
 """
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 import logging
+from rest_framework.permissions import AllowAny
 from .models import Channel
 from oauth.channels import google, facebook, twitter, linkedin, tiktok, reddit, shopify, google_analytics, mailchimp
 from rest_framework.permissions import IsAuthenticated
 from oauth.helper import refresh_credentials
+from django.views.decorators.csrf import csrf_exempt
 logger = logging.getLogger(__name__)
 
 
-@permission_classes([IsAuthenticated])
-@api_view(("GET",))
-def merge_json_files(request):
-    print(request.user.email)
-    user = request.user
-    workspace = user.workspace_set.first() # Use first() instead of all()[0] for better practice
 
-    if not workspace:
+@csrf_exempt
+@api_view(("GET",))
+@permission_classes([AllowAny]) 
+#Bad Practice for Production (Add some level of authentication)
+def merge_json_files(request):
+
+    workspace_id = request.query_params.get("workspace_id")
+    print(workspace_id, "exports")
+    if not workspace_id:
         return Response({"error": "No workspace found for the user"}, status=400)
 
     merged_data = []
@@ -78,8 +83,8 @@ def merge_json_files(request):
     }
 
     try:
-        channels = Channel.objects.filter(workspace=workspace)
-
+        channels = Channel.objects.filter(workspace_id=workspace_id)
+    
         for channel in channels:
             print(channel.channel_type)
 
@@ -109,10 +114,10 @@ def merge_json_files(request):
                 merged_data.append(data)
         
         logger.info(f"Merged data: {merged_data}")
-        
         return Response(
             merged_data, status=status.HTTP_200_OK
         )
     except Exception as e:
-        return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print("Error in export.py",str(e))
+        return None
 """
