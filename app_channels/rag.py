@@ -4,12 +4,10 @@ from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from dotenv import load_dotenv
-from langchain_text_splitters import RecursiveJsonSplitter
 #from langchain_elasticsearch import ElasticsearchStore
 from langchain.retrievers.multi_query import MultiQueryRetriever
+from pinecone import Pinecone
 import os
-import requests
-import json
 
 load_dotenv()
 
@@ -87,6 +85,10 @@ def add_documents_es(chunks):
 """
 
 
+"""
+RagData function fetches the latest embeddings from the pinecone vector store,
+to give rag context to the prompt
+"""
 
 def RagData(query, namespace): #only for retrieving 
     print(namespace)
@@ -100,3 +102,22 @@ def RagData(query, namespace): #only for retrieving
     retriever= multi_query_retriever(ensemble_retriever)
     documents= retriever.invoke(input= query)
     return documents
+
+
+
+
+def stats():
+    pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index= pc.Index("kleenestar")
+    return index.describe_index_stats()
+
+def delete_vectores(namespace):
+    pc= Pinecone(api_key=os.environ['PINECONE_API_KEY'])
+    index= pc.Index("kleenestar")
+    index.delete(delete_all=True, namespace=namespace)
+
+def add_to_pinecone_vectorestore_openai(documents, namespace):
+    embeddings= OpenAIEmbeddings(model='text-embedding-3-large')
+    pinecone_vs = PineconeVectorStore.from_documents(embedding=embeddings, index_name='kleenestar', namespace=namespace, documents=documents)
+
+
