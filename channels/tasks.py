@@ -1,5 +1,5 @@
 from celery import shared_task
-from channels.rag import stats, delete_vectores, add_to_pinecone_vectorestore_openai
+from app_channels.rag import stats, delete_vectores, add_to_pinecone_vectorestore_openai
 from workspaces.models import WorkSpace
 from rest_framework.response import Response
 from langchain_text_splitters import RecursiveJsonSplitter
