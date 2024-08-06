@@ -52,6 +52,21 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION=  "backend.asgi.application"
 
+if os.getenv("REDIS_HOST"):
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(os.getenv("REDIS_HOST"), int(os.getenv("REDIS_PORT")))],
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 DJANGO_ADMIN_LOGS_DELETABLE = False
 DJANGO_ADMIN_LOGS_ENABLED = True
@@ -114,15 +129,6 @@ TEMPLATES = [
     },
 ]
 
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
-    },
-}
 WSGI_APPLICATION = "backend.wsgi.application"
 
 INTERNAL_IPS = [

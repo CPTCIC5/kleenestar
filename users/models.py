@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django_countries.fields import CountryField
 from django.core.validators import validate_image_file_extension
+from django.utils import timezone
 
 from .managers import CustomUserManager
 
@@ -12,6 +13,8 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(("email address"), unique=True)
     newsletter = models.BooleanField(default=True, help_text="Do you want to receive the newsletter?")
+    ws_channel_name = models.CharField(max_length=300, blank=True, null=True)
+    last_online = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

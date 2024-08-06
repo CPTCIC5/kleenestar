@@ -22,6 +22,7 @@ from django.urls import path, include
 from .views import ConvoViewSet, PromptViewSet, ChannelViewSet, BlockNoteViewSet, KnowledgeBaseView, SubspaceViewSet
 from app_channels.export import merge_json_files
 from app_channels.add_data import get_channels
+from .consumer import ChatConsumer
 
 router = DefaultRouter()
 # Register viewsets with the router
@@ -49,3 +50,4 @@ urlpatterns = [
     path('prompts/<int:pk>/delete/', PromptViewSet.as_view({'delete': 'destroy'}), name='delete-prompt'),
 ]
 urlpatterns += router.urls
+websocket_urlpatterns = [path("api/ws/", ChatConsumer.as_asgi())]

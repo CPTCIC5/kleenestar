@@ -32,13 +32,6 @@ class ConvoCreateSerializer(serializers.ModelSerializer):
         model = models.Convo
         fields = ['title', 'archived', 'subspace']
 
-class ConvoSerializer(serializers.ModelSerializer):
-    subspace = SubspaceSerializer()
-
-    class Meta:
-        model = models.Convo
-        fields = ('id', 'thread_id', 'subspace', 'title', 'archived', 'created_at')
-
 
 
 
@@ -90,6 +83,15 @@ class PromptCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Prompt
         fields = ("text_query", "file_query")
+
+class ConvoSerializer(serializers.ModelSerializer):
+    subspace = SubspaceSerializer()
+    all_notes = NoteSerializer(many=True)
+
+    class Meta:
+        model = models.Convo
+        fields = ('id', 'thread_id', 'subspace', 'title', 'archived', 'created_at', 'all_notes')
+
 
 class PromptSerializer(serializers.ModelSerializer):
     convo= ConvoSerializer()

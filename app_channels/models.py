@@ -9,6 +9,8 @@ from .rag import RagData
 import re
 from django.core.files.base import ContentFile
 import uuid
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 #from langsmith import traceable
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
@@ -25,15 +27,28 @@ from django.http.response import StreamingHttpResponse
 load_dotenv()
 
 client = OpenAI()
+channel_layer = get_channel_layer()
 
-class EventHandler(AssistantEventHandler):    
+class EventHandler(AssistantEventHandler):
+
+  def __init__(self, *, user, thread):
+    self.user = user
+    self.thread = thread
+    super().__init__()
+
   @override
   def on_text_created(self, text) -> None:
+    print("STARTED.....")
     print(f"\nassistant > ", end="", flush=True)
       
   @override
   def on_text_delta(self, delta, snapshot):
+    print("received.....")
+    print("CHANNEL NAME", self.user.ws_channel_name)
     print(delta.value, end="", flush=True)
+    self.user.refresh_from_db()
+    if self.user.ws_channel_name:
+      async_to_sync(channel_layer.send)(self.user.ws_channel_name, {"type": "prompt_text_receive", "data": {"text": delta.value}})
       
   def on_tool_call_created(self, tool_call):
     print(f"\nassistant > {tool_call.type}\n", flush=True)
@@ -48,6 +63,33 @@ class EventHandler(AssistantEventHandler):
           if output.type == "logs":
             print(f"\n{output.logs}", flush=True)
 
+    def on_end(self):
+      # Retrieve messages added by the Assistant to the thread
+      all_messages = client.beta.threads.messages.list(
+        thread_id=self.thread.id
+      )
+
+      # Return the content of the first message added by the Assistant
+      assistant_response= all_messages.data[0].content[0]
+    
+      if type(assistant_response) == TextContentBlock:
+          print('block-1')
+          return {'text': assistant_response.text.value}
+      elif  type(assistant_response) == ImageFileContentBlock:
+        print('block-2')
+        file_content = client.files.content(assistant_response.image_file.file_id).content
+        image_file = ContentFile(file_content, name=f"{uuid.uuid4()}.png")
+        if 'text' in assistant_response.type:
+            return {'text': assistant_response.text.value, 'image': image_file}
+        else:
+            return {'image': image_file}
+    
+      elif  type(assistant_response) == ImageURLContentBlock:
+        raise Exception("received ImageURLContentBlock, unable to process this...")
+        # print('block-3')
+        # print(assistant_response.image_url_content_block)
+        # return {'image': assistant_response.image_file.image_url_content_block}
+      
 
 #from channels.ai import generate_insights_with_gpt4
 
@@ -184,7 +226,7 @@ class Convo(models.Model):
         return notes
     
 #@traceable(name="insights")
-def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=None):
+def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=None, *, user):
     get_convo = get_object_or_404(Convo, id=convo)
     history = get_convo.prompt_set.all()
     all_prompts = history.count()
@@ -278,40 +320,18 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
         if event.event == "thread.message.completed":
             break'''
 
+    event_handler = EventHandler(user = user, thread=thread)
+
+    print("FINALLY")
     with client.beta.threads.runs.stream(
     thread_id=thread.id,
     assistant_id=get_convo.subspace.workspace.assistant_id,
-    event_handler=EventHandler(),
+    event_handler=event_handler,
     ) as stream:
         stream.until_done()
 
-    # Retrieve messages added by the Assistant to the thread
-    all_messages = client.beta.threads.messages.list(
-        thread_id=thread.id
-    )
 
-    # Return the content of the first message added by the Assistant
-    assistant_response= all_messages.data[0].content[0]
-    
-    if type(assistant_response) == TextContentBlock:
-        print('block-1')
-        return {'text': assistant_response.text.value}
-    elif  type(assistant_response) == ImageFileContentBlock:
-        print('block-2')
-        file_content = client.files.content(assistant_response.image_file.file_id).content
-        image_file = ContentFile(file_content, name=f"{uuid.uuid4()}.png")
-        if 'text' in assistant_response.type:
-            return {'text': assistant_response.text.value, 'image': image_file}
-        else:
-            return {'image': image_file}
-    
-    elif  type(assistant_response) == ImageURLContentBlock:
-        raise Exception("received ImageURLContentBlock, unable to process this...")
-        # print('block-3')
-        # print(assistant_response.image_url_content_block)
-        # return {'image': assistant_response.image_file.image_url_content_block}
-    
-def followup_questions(query, output, assist_id):
+def followup_questions(query, output, assist_id, *, user):
 
     thread = client.beta.threads.create()
 
@@ -320,10 +340,11 @@ def followup_questions(query, output, assist_id):
         role="user",
         content=f"this is the query: {query} this is the output: {output} plesase create 3 follow up questions and say 'those are the follow up questions'")
 
+    event_handler = EventHandler(user = user, thread=thread)
     with client.beta.threads.runs.stream(
     thread_id=thread.id,
     assistant_id=assist_id,
-    event_handler=EventHandler(),
+    event_handler=event_handler,
     ) as stream:
         stream.until_done()
 
@@ -348,7 +369,7 @@ class Prompt(models.Model):
     similar_questions= models.TextField(max_length=10_000,blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
+    """
     def save(self,*args,**kwargs):
 
         history_counts= self.convo.prompt_set.all().count()
@@ -378,6 +399,7 @@ class Prompt(models.Model):
         self.similar_questions= x1['questions']
 
         super().save()
+        """
     
     
     class Meta:

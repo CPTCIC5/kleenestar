@@ -3,9 +3,18 @@ from rest_framework import viewsets, permissions, status,pagination
 from rest_framework.response import Response
 from . import models, serializers
 from rest_framework.decorators import action
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
+from openai import OpenAI
+from dotenv import load_dotenv
+from django.http import StreamingHttpResponse
+import uuid
+from .models import generate_insights_with_gpt4,followup_questions
 from workspaces.serializers import SubSpaceCreateSerializer
 
+load_dotenv()
+client= OpenAI()
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 10
 
@@ -119,13 +128,49 @@ class PromptViewSet(viewsets.ModelViewSet):
         return convo.prompt_set.all()  # Return prompts associated with the 
     
     def create(self, request, *args, **kwargs):
+        channel_layer = get_channel_layer()
+
+        if request.user.ws_channel_name:
+            async_to_sync(channel_layer.send)(request.user.ws_channel_name, {"type": "test"})
+
+
         serializer = serializers.PromptCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         convo = get_object_or_404(models.Convo, pk=self.kwargs['pk'])
-        serializer.save(convo=convo, author=request.user)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    
+
+        # Create Prompt instance but do not save it yet
+        prompt_instance = serializer.save(convo=convo, author=request.user)
+
+        history_counts = convo.prompt_set.all().count()
+        if history_counts >= 1:
+            thread = client.beta.threads.retrieve(thread_id=convo.thread_id)
+        else:
+            thread = client.beta.threads.create()
+            convo.thread_id = thread.id
+            convo.save()
+
+        generate_insights_with_gpt4(
+            user_query=prompt_instance.text_query, 
+            convo=convo.id, 
+            file=prompt_instance.file_query or None, 
+            namespace=convo.subspace.pinecone_namespace,
+            user=request.user,
+        )
+
+            # prompt_instance.response_text = response_data.get('text', None)
+            # if response_data.get('image', None):
+            #     prompt_instance.response_file.save(f"{uuid.uuid4()}.png", response_data['image'], save=False)
+
+            # x1 = followup_questions(prompt_instance.text_query, prompt_instance.response_text, assist_id=convo.subspace.workspace.assistant_id)
+            # prompt_instance.similar_questions = x1['questions']
+
+            # # Now save the instance with the updated fields
+            # prompt_instance.save()
+
+            # yield f"data: {serializer.data}\n\n"
+
+        return Response("done")
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial',False)
         instance = self.get_object()
