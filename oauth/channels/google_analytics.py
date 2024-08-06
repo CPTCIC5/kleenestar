@@ -157,7 +157,7 @@ def filter_and_add_metrics(client, property_id, metrics):
     filtered_metrics = [metric for metric in metrics if metric.name in valid_metrics]
     return filtered_metrics
 
-def run_pivot_report(client, property_id, metrics, dimensions, pivots, start_date="2023-01-01", end_date="today"):
+def run_pivot_report(client, property_id, metrics, dimensions, pivots, start_date="30daysAgo", end_date="today"):
     request = RunPivotReportRequest(
         property=f"properties/{property_id}",
         metrics=metrics,
@@ -212,7 +212,7 @@ def run_report(client, property_id, metrics, dimensions=[Dimension(name="date")]
         property=f"properties/{property_id}",
         metrics=filter_and_add_metrics(client, property_id, metrics),
         dimensions=dimensions,
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+        date_ranges=[DateRange(start_date="30daysAgo", end_date="today")], # fetch data since 30 days ago
     )
     
     response = client.run_report(request)
@@ -360,6 +360,23 @@ def get_content_metrics(client, property_id):
     ]
     return run_report(client, property_id, metrics)
 
+def get_utm_params_metrics(client, property_id):
+    dimensions=[
+        Dimension(name="date"),
+        Dimension(name="source"),
+        Dimension(name="medium"),
+        Dimension(name="campaign"),
+        Dimension(name="term"),
+        Dimension(name="content")
+    ],
+    metrics=[
+        Metric(name="sessions"),
+        Metric(name="users"),
+        Metric(name="pageviews")
+    ],
+    return run_report(client, property_id, metrics, dimensions)
+
+
 def get_ga4_accounts(credentials):
     client = AnalyticsAdminServiceClient(credentials=credentials)
     try:
@@ -436,6 +453,7 @@ def get_google_analytics_data(access_token):
             technology_metrics = get_technology_metrics(data_api_client, property['id'])
             goal_metrics = get_goal_metrics(data_api_client, property['id'])
             content_metrics = get_content_metrics(data_api_client, property['id'])
+            utm_metrics = get_utm_params_metrics(data_api_client, property['id'])
 
             # Real-time Metrics
             realtime_metrics = run_realtime_report(data_api_client, property['id'], [
@@ -464,6 +482,7 @@ def get_google_analytics_data(access_token):
                 "user_metrics": user_metrics,
                 "session_metrics": session_metrics,
                 "event_metrics": event_metrics,
+                "utm_params_metrics": utm_metrics,
                 "ecommerce_metrics": ecommerce_metrics,
                 "engagement_metrics": engagement_metrics,
                 "ad_metrics": ad_metrics,
