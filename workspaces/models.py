@@ -64,7 +64,7 @@ class WorkSpace(models.Model):
     )
     # audience_type = models.CharField(max_length=80,choices =AUDIENCE)
     assistant_id = models.CharField(max_length=40,blank=True)
-    pinecone_namespace= models.CharField(max_length=50, default=create_namespace_id)
+    #pinecone_namespace= models.CharField(max_length=50, default=create_namespace_id)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):

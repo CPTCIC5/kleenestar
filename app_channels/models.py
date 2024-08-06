@@ -135,8 +135,8 @@ class Note(models.Model):
     prompt = models.ForeignKey("Prompt",on_delete= models.CASCADE)
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
     note_text= models.CharField(max_length=500)
-    created_at= models.DateTimeField(auto_now_add=True)
     color = models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
+    created_at= models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.blocknote)
@@ -163,11 +163,11 @@ class Folder(models.Model):
 
 class Convo(models.Model):
     #folder= models.ForeignKey(Folder, on_delete=models.PROTECT, blank=True, null=True)
-    thread_id = models.CharField(max_length=100,blank=True,null=True)
-    subspace = models.ForeignKey(SubSpace, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100,default= 'New Chat')
-    archived =  models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    thread_id= models.CharField(max_length=100,blank=True,null=True)
+    subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
+    title= models.CharField(max_length=100,default= 'New Chat')
+    archived=  models.BooleanField(default=False)
+    created_at= models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
