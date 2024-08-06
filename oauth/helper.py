@@ -9,7 +9,6 @@ def get_channel(channel_type_num, subspace_id):
 
 def create_channel(channel_type_num, subspace_id):
     try:
-        
         new_channel = Channel.objects.create(
            channel_type=channel_type_num, subspace_id=subspace_id
         )
