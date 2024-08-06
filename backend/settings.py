@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_rest_passwordreset",
     "corsheaders",
+    'django_celery_beat',
+    'django_celery_results',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -262,3 +264,22 @@ CORS_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS
 CSRF_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+
+# CELERY CONFIGURATION
+# this allows you to schedule items in the Django admin.
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+
+# REDIS CONFIGURATION
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+DJANGO_REDIS_IGNORE_EXCEPTIONS = True
