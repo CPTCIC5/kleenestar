@@ -12,6 +12,11 @@ from datetime import datetime, timedelta
 """
 channel_task function will be tasked to celery to make sure that the pinecone
 vector store has the latest embeddings stored in the appropriate namespaces.
+
+1. Iterrates through all the subspaces of all workspaces
+2. Get the marketing data of each of them
+3. Convert them into documents and upsert the embeddings to the pinecone DB
+
 """
 
 API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
@@ -20,17 +25,18 @@ API_URL = "http://127.0.0.1:8000/api/channels/xyz/"
 def channel_task():
     
     print(f"Task Running...")
-    
     for workspace in WorkSpace.objects.all():
-            namespace = workspace.pinecone_namespace
-            documents , response_data = retrive_workspace_channel_data(workspace)
+        for subspace in workspace.subspace_set.all():
+
+            namespace = subspace.pinecone_namespace
+            documents , response_data = retrive_subspace_channel_data(subspace)
             
             add_to_pinecone(documents, namespace)
             
-            cache.set(workspace.id , response_data) # store the result in redis store
-            cache.expire_at(workspace.id , datetime.now() + timedelta(hours=12)) # presists for 12 hours until next task finishes
+            cache.set(subspace.id , response_data) # store the result in redis store
+            cache.expire_at(subspace.id , datetime.now() + timedelta(hours=12)) # presists for 12 hours until next task finishes
             
-            print(f"Workspace - {workspace.id} - {workspace} added")
+            print(f"Subspace Data - {subspace.id} - {subspace} Fetched")
     
     print("Task Completed")
 
@@ -53,8 +59,8 @@ def add_to_pinecone(documents, namespace):
     
 
 # this function collects all the marketing data and convert them as documents
-def retrive_workspace_channel_data(workspace):
-    response = requests.get(API_URL +  f"?workspace_id={workspace.id}")
+def retrive_subspace_channel_data(subspace):
+    response = requests.get(API_URL +  f"?subspace_id={subspace.id}")
     if response.status_code == 200:
         response_data = response.json()
 

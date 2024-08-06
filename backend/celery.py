@@ -21,7 +21,6 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'channel_task_runner_crontab': {
         'task': 'channel_task_runner',
-        'schedule': 5,
-        # schedules.crontab(minute=0, hour='*/12') # every 12 hours
+        'schedule': schedules.crontab(minute=0, hour='*/12') # every 12 hours
     }
 }

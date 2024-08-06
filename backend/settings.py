@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "corsheaders",
     'django_celery_beat',
     'django_celery_results',
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
