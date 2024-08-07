@@ -66,7 +66,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class CreateBlockNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BlockNote
-        fields = ("title", "image", "subspace")
+        fields = ("title", "description", "image", "subspace")
 
 class BlockNoteSerializer(serializers.ModelSerializer):
     #user = UserSerializer()
@@ -75,7 +75,7 @@ class BlockNoteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.BlockNote
-        fields = ("user", "subspace", "title", "image", "id", "created_at","notes")
+        fields = ("user", "description", "subspace", "title", "image", "id", "created_at","notes")
 
     
 

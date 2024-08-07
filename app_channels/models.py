@@ -200,6 +200,7 @@ class BlockNote(models.Model):
     user= models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     subspace= models.ForeignKey(SubSpace, on_delete=models.CASCADE)
     title=  models.CharField(max_length=50)
+    description= models.TextField(default='dwguw')
     image= models.CharField(max_length=500,blank=True)
     created_at =  models.DateTimeField(auto_now_add=True)
 
