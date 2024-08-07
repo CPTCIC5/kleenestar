@@ -142,9 +142,12 @@ class PromptViewSet(viewsets.ModelViewSet):
         prompt_instance = serializer.save(convo=convo, author=request.user)
 
         history_counts = convo.prompt_set.all().count()
-        if history_counts >= 1:
+        print(history_counts,'tryy')
+        if history_counts >= 2:
+            print('2-1')
             thread = client.beta.threads.retrieve(thread_id=convo.thread_id)
         else:
+            print('2-2')
             thread = client.beta.threads.create()
             convo.thread_id = thread.id
             convo.save()
@@ -200,6 +203,13 @@ class PromptViewSet(viewsets.ModelViewSet):
         serializer = serializers.CreateNoteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(prompt=prompt)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(methods=("POST"), detail=True, url_path="create-tag")
+    def create_tag(self,request):
+        serializer= serializers.TagSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

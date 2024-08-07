@@ -173,9 +173,21 @@ COLOR_CHOICES = (
 )
 
 
+class Tags(models.Model):
+   name= models.CharField(max_length=100)
+   color= models.CharField(max_length=30, choices=COLOR_CHOICES)
+
+   def __str__(self):
+      return self.name
+   
+   class Meta:
+      verbose_name_plural='Tags'
+
+
 class Note(models.Model):
     prompt = models.ForeignKey("Prompt",on_delete= models.CASCADE)
     blocknote = models.ForeignKey("BlockNote", on_delete=models.CASCADE)
+    note_tag= models.ForeignKey(Tags, on_delete=models.CASCADE)
     note_text= models.CharField(max_length=500)
     color = models.CharField(max_length=30, choices=COLOR_CHOICES, default="#ADD8E6")
     created_at= models.DateTimeField(auto_now_add=True)
@@ -242,6 +254,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
 
     # Creating a new conversation thread
     if all_prompts >= 2: #system prompt counts as a prompt 
+        print('1-1')
         thread = client.beta.threads.retrieve(
             thread_id=get_convo.thread_id
         )
@@ -258,6 +271,7 @@ def generate_insights_with_gpt4(user_query: str, convo: int, namespace, file=Non
             else:
                 continue
     else:
+        print('1-2')
         thread = client.beta.threads.create()
         get_convo.thread_id = thread.id
         get_convo.save()
